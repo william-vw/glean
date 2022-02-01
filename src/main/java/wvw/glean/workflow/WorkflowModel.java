@@ -24,10 +24,10 @@ import org.apache.jen3.vocabulary.RDFS;
 import org.apache.log4j.Logger;
 
 import wvw.semweb.kb.jena.JenaKb;
+import wvw.semweb.kb.jena.NS;
 import wvw.utils.log.Log;
 import wvw.utils.map.HashMultiMap;
 import wvw.utils.map.MultiMap;
-import wvw.utils.rdf.NS;
 
 public abstract class WorkflowModel {
 
