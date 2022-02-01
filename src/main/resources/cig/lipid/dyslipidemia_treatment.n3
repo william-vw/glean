@@ -32,8 +32,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	
 :Pharmacological_Cholesterol_Lowering_Treatment a cig:MedicalWorkflow ; # gl:CompositeTask ;
-	#state:in gl:Inactive ;
-	state:in gl:Completed ;
+	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	gl:next :statin_prescribed ;
@@ -43,8 +42,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	
 :statin_prescribed a gl:DecisionTask ;
-	#state:in gl:Inactive ;
-	state:in gl:Active ;
+	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "Statins prescribed?" ;

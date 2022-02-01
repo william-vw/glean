@@ -37,7 +37,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		
-		
 		gl:precondition [ 
 			rdfs:label "no profile" ;
 			rdfs:comment """Newly identified CKD or established CKD with no prior measurement of lipid profile.""" ;
@@ -52,7 +51,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [
 		state:in gl:Inactive ;
-		
 		
 		gl:precondition [
 			rdfs:label "prior lipid profile" ;

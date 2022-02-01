@@ -37,7 +37,7 @@ public class WorkflowTest {
 //		testRederive();
 
 		// test TNM constructs
-//		test_next(spec);
+		test_next(spec);
 //		test_composite(spec);
 //		test_decision(spec);
 //		test_split(spec);
@@ -84,14 +84,14 @@ public class WorkflowTest {
 
 		JenaKb kb = m.getKb();
 
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		Log.i("\n>> adding profile that meets condition");
 		kb.add(kb.resource(base + "will"), kb.resource(base + "hasHR"), 151);
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 //		kb.printAll();
-		kb.printDerivations();
+//		kb.printDerivations();
 	}
 
 	public static void test_composite(N3ModelSpec spec) throws Exception {
@@ -99,22 +99,22 @@ public class WorkflowTest {
 				.load(wfTestFolder + "test_composite.n3");
 		JenaKb kb = m.getKb();
 
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		Log.i("\n>> moving tC subtasks to completed");
 		m.transitTo(kb.resource(base + "tC1"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tC2"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tC3"), kb.resource("gl:Completed"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		Log.i("\n>> moving tD to discarded");
 		m.transitTo(kb.resource(base + "tD"), kb.resource("gl:Discarded"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		Log.i("\n>> moving tE subtasks to discarded");
 		m.transitTo(kb.resource(base + "tE1"), kb.resource("gl:Discarded"));
 		m.transitTo(kb.resource(base + "tE2"), kb.resource("gl:Discarded"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 //		kb.printAll();
 //		kb.printDerivations();
@@ -125,7 +125,7 @@ public class WorkflowTest {
 				.load(base, wfTestFolder + "test_decision.n3");
 //		JenaKb kb = m.getKb();
 
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 //		kb.printAll();
 //		kb.printDerivations();
@@ -138,32 +138,32 @@ public class WorkflowTest {
 
 //		Log.i("\n>> moving tA to active");
 		m.transitTo(kb.resource(base + "tA"), kb.resource("gl:Active"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		Log.i("\n>> moving tA1x branches to completed");
 		m.transitTo(kb.resource(base + "tA11"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tA12"), kb.resource("gl:Completed"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		Log.i("\n>> moving tB1, tB2 branches to done");
 		m.transitTo(kb.resource(base + "tB1"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tB2"), kb.resource("gl:Discarded"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 //
 		Log.i("\n>> moving tC1, tC2 branches to completed");
 		m.transitTo(kb.resource(base + "tC1"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tC2"), kb.resource("gl:Completed"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 //
 		Log.i("\n>> moving tD1, tD2 branches to discarded");
 		m.transitTo(kb.resource(base + "tD1"), kb.resource("gl:Discarded"));
 		m.transitTo(kb.resource(base + "tD2"), kb.resource("gl:Discarded"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 //
 		Log.i("\n>> moving tE1, tE2 branches to discarded");
 		m.transitTo(kb.resource(base + "tE1"), kb.resource("gl:Discarded"));
 		m.transitTo(kb.resource(base + "tE2"), kb.resource("gl:Discarded"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 //		kb.printAll();
 //		kb.printDerivations();
@@ -176,34 +176,34 @@ public class WorkflowTest {
 				.load(base, wfTestFolder + "test_cycle.n3");
 		JenaKb kb = m.getKb();
 
-		m.printAllTransits();
+		m.printAllTransits(true);
 
-//		Log.i("\n>> moving tAx tasks to completed (iteration 1)");
-//		m.transitTo(kb.resource(base + "tA1"), kb.resource("gl:Completed"));
-//		m.transitTo(kb.resource(base + "tA2"), kb.resource("gl:Completed"));
-//		m.printAllTransits();
-//
-//		Log.i("\n>> moving tAx tasks to completed (iteration 2)");
-//
-//		m.removeConditionPremise(kb.resource(base + "will"), kb.resource(base + "hasHR"), null);
-//		m.transitTo(kb.resource(base + "tA1"), kb.resource("gl:Completed"));
-//		m.transitTo(kb.resource(base + "tA2"), kb.resource("gl:Completed"));
-//		m.printAllTransits();
+		Log.i("\n>> moving tAx tasks to completed (iteration 1)");
+		m.transitTo(kb.resource(base + "tA1"), kb.resource("gl:Completed"));
+		m.transitTo(kb.resource(base + "tA2"), kb.resource("gl:Completed"));
+		m.printAllTransits(true);
+
+		Log.i("\n>> moving tAx tasks to completed (iteration 2)");
+
+		m.removeConditionPremise(kb.resource(base + "will"), kb.resource(base + "hasHR"), null);
+		m.transitTo(kb.resource(base + "tA1"), kb.resource("gl:Completed"));
+		m.transitTo(kb.resource(base + "tA2"), kb.resource("gl:Completed"));
+		m.printAllTransits(true);
 
 		Log.i("\n>> moving tBx tasks to completed (iteration 1)");
 		m.transitTo(kb.resource(base + "tB1"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tB2"), kb.resource("gl:Completed"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		Log.i("\n>> moving tBx tasks to completed (iteration 2)");
 		m.transitTo(kb.resource(base + "tB1"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tB2"), kb.resource("gl:Completed"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 //
 		Log.i("\n>> moving tBx tasks to completed (iteration 3)");
 		m.transitTo(kb.resource(base + "tB1"), kb.resource("gl:Completed"));
 		m.transitTo(kb.resource(base + "tB2"), kb.resource("gl:Completed"));
-		m.printAllTransits();
+		m.printAllTransits(true);
 
 		long end = System.currentTimeMillis();
 

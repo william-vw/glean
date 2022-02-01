@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,8 @@ import org.apache.log4j.Logger;
 
 import wvw.semweb.kb.jena.JenaKb;
 import wvw.utils.log.Log;
+import wvw.utils.map.HashMultiMap;
+import wvw.utils.map.MultiMap;
 import wvw.utils.rdf.NS;
 
 public abstract class WorkflowModel {
@@ -47,7 +51,7 @@ public abstract class WorkflowModel {
 
 	protected String base = NS.glean;
 	protected String condInf = NS.cond + "conditionMet";
-	
+
 	protected Resource condInfPrp;
 	protected Resource condPrp;
 	protected Resource statePrp;
@@ -221,17 +225,45 @@ public abstract class WorkflowModel {
 	public abstract List<TaskState> transitAll(Resource workflow);
 
 	public void printAllTransits() {
-		printAllTransits((Resource) null);
+		printAllTransits((Resource) null, false);
+	}
+
+	public void printAllTransits(boolean groupPerState) {
+		printAllTransits((Resource) null, groupPerState);
 	}
 
 	public void printAllTransits(Resource workflow) {
+		printAllTransits(workflow, false);
+	}
+
+	public void printAllTransits(Resource workflow, boolean groupPerState) {
 		List<TaskState> states = transitAll(workflow);
 
-		printAllTransits(states);
+		printAllTransits(states, groupPerState);
 	}
 
 	public void printAllTransits(List<TaskState> states) {
-		states.forEach(state -> System.out.println(state));
+		printAllTransits(states, false);
+	}
+
+	public void printAllTransits(List<TaskState> states, boolean groupPerState) {
+		if (groupPerState) {
+			MultiMap<String, TaskState> map = new HashMultiMap<>();
+			states.stream()
+					.forEach(state -> map.putValue(state.getAtomicState().getLocalName(), state));
+
+			Iterator<Entry<String, List<TaskState>>> it = map.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<String, List<TaskState>> e = it.next();
+				
+				System.out.println(e.getKey() + ":");
+				e.getValue().forEach(state -> System.out.println(state));
+				
+				System.out.println();
+			}
+
+		} else
+			states.forEach(state -> System.out.println(state));
 	}
 
 	public JenaKb getInputData(Resource task) {

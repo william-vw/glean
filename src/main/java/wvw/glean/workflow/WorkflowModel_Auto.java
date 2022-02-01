@@ -145,11 +145,11 @@ public class WorkflowModel_Auto extends WorkflowModel {
 	}
 
 	@Override
-	public void printAllTransits(List<TaskState> states) {
+	public void printAllTransits(List<TaskState> states, boolean groupPerState) {
 		// involves printing current states & transit logs
 
 		Log.i("- current states:");
-		super.printAllTransits(states);
+		super.printAllTransits(states, groupPerState);
 
 		Log.i("\n- transit log:");
 		MultiMap<Calendar, String> logs = new TreeMultiMap<>();

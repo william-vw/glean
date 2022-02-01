@@ -33,7 +33,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		
-		
 		gl:precondition [
 			rdfs:label "yes" ;
 			cond:allOf ( [ cond:premise 
@@ -46,7 +45,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [ 
 		state:in gl:Inactive ;
-		
 		
 		gl:precondition [
 			rdfs:label "no" ;
@@ -80,7 +78,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		
-		
 		gl:precondition [
 			rdfs:label "receiving statins" ;
 			cond:allOf ( [ cond:premise 
@@ -93,7 +90,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [
 		state:in gl:Inactive ;
-		
 		
 		gl:precondition [
 			rdfs:label "no statins" ;
@@ -127,7 +123,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		
-		
 		gl:precondition [
 			rdfs:label "yes" ;
 			cond:allOf ( [ cond:premise 
@@ -140,7 +135,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [
 		state:in gl:Inactive ;
-		
 		
 		gl:precondition [
 			rdfs:label "no" ;
