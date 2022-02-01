@@ -23,9 +23,6 @@ public class WorkflowTest {
 	private static String condTestFolder = root + "test/condition/";
 
 	public static void main(String[] args) throws Exception {
-//		testCondition();
-//		testRederive();
-
 		N3ModelSpec spec = N3ModelSpec.get(Types.N3_MEM_FP_INF);
 		spec.setFeedback(new N3Feedback(N3MistakeTypes.INFER_UNBOUND_GLOBALS, FeedbackTypes.WARN,
 				FeedbackActions.LOG));
@@ -33,12 +30,18 @@ public class WorkflowTest {
 				FeedbackActions.LOG));
 		spec.setFeedback(new N3Feedback(N3MistakeTypes.BUILTIN_UNBOUND_VARS, FeedbackTypes.WARN,
 				FeedbackActions.LOG));
+		
+		// test condition satisfaction
+//		testCondition();
+		// (test re-derivation of conditional inferences) 
+//		testRederive();
 
+		// test TNM constructs
 //		test_next(spec);
 //		test_composite(spec);
 //		test_decision(spec);
 //		test_split(spec);
-		test_cycle(spec);
+//		test_cycle(spec);
 	}
 
 	public static void testCondition() throws Exception {
