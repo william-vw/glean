@@ -1,0 +1,41 @@
+@prefix : <http://niche.cs.dal.ca/ns/cig/cig.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/cig.owl> .
+
+<http://niche.cs.dal.ca/ns/glean/cig.owl> rdf:type owl:Ontology ;
+	owl:imports <http://niche.cs.dal.ca/ns/state.owl> , <http://niche.cs.dal.ca/ns/glean/base.owl> .
+	
+
+#################################################################
+#    Classes
+#################################################################
+
+
+###  http://niche.cs.dal.ca/ns/cig/cig.owl#MedicalWorkflow
+:MedicalWorkflow rdf:type owl:Class ;
+	rdfs:subClassOf gl:Workflow .
+	
+
+###  http://niche.cs.dal.ca/ns/cig/cig.owl#Patient
+:Patient rdf:type owl:Class .
+
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://niche.cs.dal.ca/ns/cig/cig.owl#input
+:input rdf:type owl:ObjectProperty ;
+              rdfs:domain :ClinicalTask .
+              
+
+###  http://niche.cs.dal.ca/ns/cig/cig.owl#inputFile
+:inputFile rdf:type owl:DatatypeProperty ;
+              rdfs:domain :MedicalWorkflow ;
+              rdfs:range xsd:string .

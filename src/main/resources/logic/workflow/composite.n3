@@ -1,0 +1,76 @@
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+base <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+
+# - if a composite task is active, then ready all non-next subtasks 
+# (i.e., not relying on another task to finish first)
+
+{	{	?composite a :CompositeTask ;
+			state:in :Active ; # active composite task
+			:subTask ?sub .
+
+		# subtask does not need another task to complete first
+		# (i.e., not the object of a sequential relation; in that case, next.n3 governs the task state)	
+		<> log:notIncludes { ?prev :next ?sub }
+	
+	} a state:Guard .
+	
+	?sub state:in :Inactive # subtask in inactive state
+	
+} state:transit { ?sub state:in :Ready } ; # ready subtask
+  state:reason :readySubTasksOfActiveComposite .
+
+
+# - if a composite task is discarded, then discard all its not-done subtasks 
+
+{	{	?composite a :CompositeTask ;
+			state:in :Discarded ; # discarded composite task
+			:subTask ?sub
+	
+	} a state:Guard .
+	
+	# subtask is not done yet (i.e., inactive/active)
+	?sub state:in :NotDone .
+	
+} state:transit { ?sub state:in :Discarded } ; # discarded subtask
+  state:reason :discardSubTasksOfDiscardedComposite .
+
+
+# if a composite task is active, and all its subtasks are done 
+# (i.e., at least one completed subtask, and all other subtasks are done (completed or discarded)), 
+# then complete the composite task
+
+
+{	{	?composite a :CompositeTask ;	
+			:subTask ?complSub .
+		# composite task has at least one completed subtask
+		?complSub state:in :Completed . 
+	
+		# true if, for all subtasks of composite tasks, that subtask is done
+		# (i.e., completed or discarded)
+		( { ?composite :subTask ?sub } { ?sub state:in :Done } ) log:forAllIn <>
+	
+	} a state:Guard .
+
+	?composite state:in :Active # composite task in active state
+
+} state:transit { ?composite state:in :Completed } ; # complete composite task
+  state:reason :completeCompositeWithAllCompletedSubTasks .
+
+
+# - if a composite task is not done, and all its subtasks are discarded, then discard the composite task
+{	{	?composite a :CompositeTask ;
+			:subTask ?oneSub . # at least one subtask
+		
+		# true if, for all subtasks of the composite task, that subtask is discarded
+		( { ?composite :subTask ?sub } { ?sub state:in :Discarded } ) log:forAllIn <>
+		
+	} a state:Guard .
+	
+	?composite state:in :NotDone # composite task in not-done state
+	
+} state:transit { ?composite state:in :Discarded } ; # discard composite task
+  state:reason :discardedCompositeWithAllDiscardedSubTasks .

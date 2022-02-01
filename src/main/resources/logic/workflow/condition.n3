@@ -1,0 +1,31 @@
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+
+# if an entity is ready, marked as conditional, and its precondition was met, 
+# then activate the entry
+
+{	{	?entity :conditional true . # conditional entity
+			# only entities with "preconditions" (see cycle.n3 for dealing with cycles)
+			# entity pre-condition was met (see ../condition/condition.n3)
+		?entity!:precondition cond:conditionMet true
+	
+	} a state:Guard .
+	
+	?entity state:in :Ready . # entity in ready state
+
+} state:transit { ?entity state:in :Active } ; # activate entity
+  state:reason :activateTaskWithConditionMet .
+ 
+
+# - if an entity is ready and not marked as conditional, 
+# then activate the entity 
+
+{	{	?entity :conditional false } a state:Guard .
+
+	?entity state:in :Ready .
+
+} state:transit { ?entity state:in :Active } ;
+  state:reason :activateNonConditionalTask .

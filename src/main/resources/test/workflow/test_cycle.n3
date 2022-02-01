@@ -1,0 +1,35 @@
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+:will :hasHR 151 .
+
+:tA a gl:WhileLoop ;
+	state:in gl:Ready ;
+	gl:subTask :tA1 , :tA2 ;
+	gl:whileCondition [ 
+		cond:anyOf ( [ cond:premise { :will :hasHR ?hr . ?hr math:greaterThan 150 } ] )
+	] .
+	
+:tA1 state:in gl:Inactive ;
+	gl:conditional false .
+:tA2 state:in gl:Inactive ;
+	gl:conditional false .
+
+:tA1 gl:next :tA2 .
+
+
+:tB a gl:ForLoop ;
+	state:in gl:Ready ;
+	gl:subTask :tB1 , :tB2 ;
+	gl:numIterations 3 ;
+	gl:currentIteration 0 ;
+	gl:conditional false .
+	
+:tB1 state:in gl:Inactive ;
+	gl:conditional false .
+:tB2 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tB1 gl:next :tB2 .

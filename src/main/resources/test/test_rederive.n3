@@ -1,0 +1,34 @@
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/test.owl#>
+base <http://niche.cs.dal.ca/ns/glean/test.owl#>
+
+:tHR1 a gl:Task .
+:tHR2 a gl:Task .
+:tSys1 a gl:Task .
+:tSys2 a gl:Task .
+
+:will :hasHR 151 .
+:will :hasSysBP 119 .
+
+
+{ :will :hasHR ?hr . ?hr math:greaterThan 150 
+
+} => { :tHR1 cond:conditionMet true } . 
+
+
+{ :will :hasHR ?hr . ?hr math:lessThan 150 
+
+} => { :tHR2 cond:conditionMet true } .
+
+
+{ :will :hasSysBP ?sys . ?sys math:greaterThan 120 
+
+} => { :tSys1 cond:conditionMet true } .
+
+
+{ :will :hasSysBP ?sys . ?sys math:lessThan 120 
+
+} => { :tSys2 cond:conditionMet true } .

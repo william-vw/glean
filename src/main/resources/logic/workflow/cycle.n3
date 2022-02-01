@@ -1,0 +1,152 @@
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+
+# We need an intermediary "resetting" state for resetting cycle subtasks after an iteration:
+# - This state is temporary: only "ready" and "de-activate" tasks while in this state 
+#	(if this is done within active state, the tasks will directly be readied/de-activated upon completion)  
+# - Subtasks only go into this state when there will be another iteration
+
+# see "resetting cycles" section below
+
+
+# > while-loop
+
+# - given a ready while-loop, if its while-condition is met, then activate cycle
+# (cannot rely on standard precondition: before re-activating the cycle, we need the resetting mode)
+
+{	{ ?cycle a :WhileLoop .
+	# while-condition was met (see ../condition/condition.n3)
+	?cycle!:whileCondition cond:conditionMet true
+		
+	} a state:Guard .
+	
+	?cycle state:in :Ready . # cycle is in ready state
+
+} state:transit { ?cycle state:in :Active } ; # activate cycle
+  state:reason :activateCycleWithConditionMet .
+
+
+# Note that cycles are subclasses of composite tasks (see composite.n3 for details):
+# - if cycle is in active state, then all subtasks (not target of sequential relation) will be readied
+# - if all subtasks are completed, then cycle will be completed 
+
+
+# - given a completed while-loop, if its while-condition is still met, then *reset* cycle
+# (after reset is done, cycle will move to ready state)
+
+{	{ ?cycle a :WhileLoop .
+	  ?cycle!:whileCondition cond:conditionMet true # while-condition is (still) met
+		
+	} a state:Guard .
+	
+	?cycle state:in :Completed # cycle in completed state
+	
+} state:transit { ?cycle state:in :Resetting } ; # reset cycle
+  state:reason :resetCycleThatIsCompleted .
+
+
+# - given a ready (initially) or completed (after x iterations) while-loop ("new-iteration"), 
+# if its while-condition is unmet, then discard cycle
+
+# This is in contrast to a DecisionTask; at runtime, one of its branches will be followed *once* their condition holds.
+# However, once a while-loop is reached and its condition does not hold, it is discarded. 
+# This is in line with the common understanding of while-loops.  
+
+{	{ ?cycle a :WhileLoop .
+	  # cycle has an unmet condition
+	  <> log:notIncludes { ?cycle!:whileCondition cond:conditionMet true }
+	  
+	} a state:Guard .
+	
+	?cycle state:in :NewIteration # cycle in new-iteration state (ready/completed)
+	
+} state:transit { ?cycle state:in :Discarded } ; # discard cycle
+  state:reason :discardCycleWithUnmetCondition .
+
+
+# > for-loop
+
+# - given a ready for-loop, if a sane number of iterations is given, then activate cycle
+
+{	{ ?cycle a :ForLoop ;
+		:currentIteration 0 ; # no iterations yet
+		:numIterations ?num . # required number of iterations
+		
+	  0 math:lessThan ?num # at least 1 required iteration  
+	
+	} a state:Guard .
+	
+	?cycle state:in :Ready # cycle is in ready state
+	
+} state:transit { ?cycle state:in :Active } ; # activate cycle
+  state:reason :activateForLoopWithSaneNumIterations .
+
+
+# - given a completed for-loop, if number of iterations is not exceeded, then reset cycle
+# and update current iteration number
+
+{	{ ?cycle a :ForLoop ;
+		:currentIteration ?cur ;
+		:numIterations ?num .
+
+	  (?cur 1) math:sum ?new .
+	  ?new math:lessThan ?num .
+	  
+	} a state:Guard .
+	
+	?cycle state:in :Completed ;
+		:currentIteration ?cur
+	
+} state:transit { 
+	?cycle state:in :Resetting ;
+		:currentIteration ?new
+} ;
+  state:reason :resetForLoopWithRemainingIterations .
+
+
+# - given a completed for-loop, if number of iterations is exceeded, then discard cycle
+{	{ ?cycle a :ForLoop ;
+		:currentIteration ?cur ; # current iteration number
+		:numIterations ?num . # required number of iterations
+	
+	  # next iteration number (?cur + 1) is not less than required number
+	  (?cur 1)!math:sum math:notLessThan ?num
+	
+	} a state:Guard .
+	
+	?cycle state:in :Completed ; # cycle is in completed state
+	
+} state:transit { ?cycle state:in :Discarded } ; # discard cycle
+  state:reason :discardForLoopWithoutRemainingIterations .
+
+
+# > resetting cycles
+
+# - given a resetting cycle, deactivate all completed sub-tasks
+{	{ ?cycle a :Cycle ;
+		state:in :Resetting ; # cycle in resetting state
+		:subTask ?sub
+	
+	} a state:Guard .
+
+	?sub state:in :Completed . # completed sub-task of currently re-setting cycle 
+	
+} state:transit { ?sub state:in :Inactive } ; # de-activate task
+  state:reason :deactivateSubTasksOfResettingCycle .
+
+
+# - given a resetting cycle, where all sub-tasks have been reset, ready cycle
+{	{ ?cycle a :Cycle .
+	 # none of the cycle's subtasks are still in completed state
+	 <> log:notIncludes { ?cycle :subTask ?st . ?st state:in :Completed } 
+	
+	} a state:Guard .
+	
+	?cycle state:in :Resetting . # cycle in resetting state
+	
+} state:transit { ?cycle state:in :Ready } ; # ready cycle
+  state:reason :readyCycleWithAllSubTasksReset .

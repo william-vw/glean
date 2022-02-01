@@ -1,0 +1,247 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
+prefix fhir: <http://hl7.org/fhir/>
+prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
+
+:Evaluate_Lipid_Profile a cig:MedicalWorkflow ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Evaluate lipid profile" ;
+	
+	#gl:root true ;
+	#state:in gl:Active ;
+	
+	cig:inputFile "/cig/lipid/input/evaluate_lipid_profile.n3" ;
+	
+	gl:subTask 
+		:measure_lipid_profile , :no_dyslipidemia , :rule_out_secondary_causes , :secondary_causes_found ,  
+		:evaluate_severity_dyslipidemia , :severe_dyslipidemia , :Dyslipidemia_Treatment .
+	
+	
+:measure_lipid_profile a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Measure lipid profile" ;
+	
+	rdfs:comment """1.	Total cholesterol
+2.	LDL cholesterol 
+3.	HDL cholesterol 
+4.	Triglycerides""" ;
+	
+	cig:input :measure_lipid_profile_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [ 
+			rdfs:label "abnormal" ;
+			rdfs:comment "Abnormal lipid profile." ;
+			
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+	
+		gl:branchTarget :rule_out_secondary_causes
+		 
+	] , [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [ 
+			rdfs:label "normal" ;
+			rdfs:comment "No abnormal lipid profile." ;
+			
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		
+		gl:branchTarget :no_dyslipidemia
+	] .
+	
+	
+:rule_out_secondary_causes a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Rule out secondary causes" ; 
+	
+	cig:input :rule_out_secondary_causes_report ;
+	
+	rdfs:comment """Investigate and treat remediable secondary causes of dyslipidemia.""" ;
+#1.	Nephrotic syndrome
+#2.	Hypothyroidism 
+#3.	Diabetes
+#4.	Excessive alcohol consumption
+#5.	Liver disease 
+#6.	13-cis-retinioc acid
+#7.	Anti-convulsant
+#8.	Highly active anti-retroviral therapy
+#9.	Diuretics 
+#10.	Beta blockers 
+#11.	Androgens 
+#12.	Oral contraceptives
+#13.	Corticosteroids 
+#14.	Cyclosporine
+#15.	Sirolimus
+		
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "secondary causes" ;
+			rdfs:comment "Some secondary causes found." ;
+			
+			cond:anyOf ( 
+				[ cond:premise { ?obs fhir:Observation.code :code_nephrotic_syndrome ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_hypothyroidism ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_diabetes ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_excessive_alcohol_consumption ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_liver_disease ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_13-cis-retinioc_acid ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_anti-convulsant ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_highly_active_anti-retroviral_therapy ; fhir:Observation.valueBoolean true } ]
+				#[ cond:premise { ?obs fhir:Observation.code :code_diuretics ; fhir:Observation.valueBoolean true } ]
+				#[ cond:premise { ?obs fhir:Observation.code :code_beta_blockers ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_androgens ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_oral_contraceptives ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_corticosteroids ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_cyclosporine ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_sirolimus ; fhir:Observation.valueBoolean true } ]
+			)
+		] ;
+		
+		gl:branchTarget :secondary_causes_found
+		
+	] , [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment "No secondary causes found." ;
+			
+			cond:allOf (
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_no_secondary_causes ; 
+						fhir:Observation.valueBoolean true }
+				] )
+		] ;
+		
+		gl:branchTarget :evaluate_severity_dyslipidemia 
+	
+	] .
+	
+	
+:evaluate_severity_dyslipidemia a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Evaluate severity dyslipidemia" ;
+	
+	cig:input :evaluate_dyslipidemia_severity_report ;
+	
+	rdfs:comment """Assess fasting triglycerides and LDL-C""" ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "severe" ;
+			rdfs:comment """1.Fasting Triglycerides > 11.3mmol/l (1000 mg/dl); or
+2. LDL-C > 4.9 mmol/l(190 mg/dl)""" ;
+			
+			cond:anyOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_triglycerides ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:greaterThan 11.3 }
+				
+				] [ cond:premise 	
+					{ ?obs fhir:Observation.code :code_ldl_cholesterol ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:greaterThan 4.9 }
+				] )
+		] ;
+		
+		gl:branchTarget :severe_dyslipidemia 
+	
+	] , [ 
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "not severe" ;
+			rdfs:comment """1.Fasting Triglycerides <= 11.3mmol/l (1000 mg/dl); and
+2. LDL-C <= 4.9 mmol/l(190 mg/dl)""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_triglycerides ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notGreaterThan 11.3 }
+				
+				] [ cond:premise  
+					{ ?obs fhir:Observation.code :code_ldl_cholesterol ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notGreaterThan 4.9 }
+				] )
+		] ;
+		
+		gl:branchTarget :Dyslipidemia_Treatment
+	] .
+	
+
+:secondary_causes_found a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Treatment or specialist referral" ;
+	rdfs:comment "Remediable (secondary) causes of dyslipidemia found. Treat secondary causes or refer to specialist." .
+	
+	
+#:severe_dyslipidemia a gl:EndPoint ;
+#	state:in gl:Inactive ;
+#	gl:conditional false ; 
+#	
+#	rdfs:label "specialist referral" ;
+#	rdfs:comment "Refer to specialist for further evaluation" .
+
+
+:Dyslipidemia_Treatment a cig:MedicalWorkflow ; # gl:CompositeTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Dyslipidemia Treatment" ;
+	gl:source "/cig/lipid/dyslipidemia_treatment.n3" .
+	
+:no_dyslipidemia a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No action" ;
+	rdfs:comment "No further measurement of lipid profile." .
+	
+	
+:severe_dyslipidemia a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Referral" ;
+	rdfs:comment "Consider referral to a specialist for further evaluation." .

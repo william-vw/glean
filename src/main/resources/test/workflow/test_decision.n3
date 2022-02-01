@@ -1,0 +1,54 @@
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+
+:will :hasHR 149 .
+
+:tA a gl:DecisionTask ;
+	state:in gl:Active ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		gl:precondition [ 
+			rdfs:label ":will :hasHR ?hr . ?hr math:greaterThan 150" ;
+			cond:anyOf ( [ cond:premise { :will :hasHR ?hr . ?hr math:greaterThan 150 } ] )
+		] ;
+		gl:branchTarget :tA1 
+	
+	], [
+		state:in gl:Inactive ;
+		gl:precondition [
+			rdfs:label ":will :hasHR ?hr . ?hr math:lessThan 150" ;
+			cond:anyOf ( [ cond:premise { :will :hasHR ?hr . ?hr math:lessThan 150 } ] )
+		] ;
+		gl:branchTarget :tA2
+	] .
+	
+:tA1 state:in gl:Inactive .
+:tA2 state:in gl:Inactive .
+	
+:tB a gl:DecisionTask ;
+	state:in gl:Active ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		gl:precondition [ 
+			rdfs:label ":will :hasHR ?hr . ?hr math:lessThan 150" ;
+			cond:anyOf ( [ cond:premise { :will :hasHR ?hr . ?hr math:lessThan 150 } ] ) 
+		] ;
+		gl:branchTarget :tB1 
+		
+	], [
+		state:in gl:Inactive ;
+		gl:precondition [
+			rdfs:label ":will :hasHR ?hr . ?hr math:lessThan 150" ;
+			cond:anyOf ( [ cond:premise { :will :hasHR ?hr . ?hr math:lessThan 150 } ] ) 
+		] ;
+		gl:branchTarget :tB2
+	] . 
+	
+:tB1 state:in gl:Inactive .
+:tB2 state:in gl:Inactive .

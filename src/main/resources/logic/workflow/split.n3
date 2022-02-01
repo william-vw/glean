@@ -1,0 +1,191 @@
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+
+# - if a parallel split is active, then ready its parallel branches
+
+{	{ ?split a :ParallelSplit ;
+		state:in :Active ; # active parallel split
+		:parallelBranch ?branch 
+		
+	} a state:Guard . 
+	
+	?branch state:in :Inactive . # branch in inactive state
+
+} state:transit { ?branch state:in :Ready } ; # ready branch
+  state:reason :readyBranchesOfActiveSplit .
+
+
+# - given a merge-any sync point, if at least one branch is completed,
+# then ready the sync point
+
+{ 	{ ?split a :ParallelSplit ;
+		state:in :Active ;
+		:syncPoint ?sync . # sync point of an active parallel-split
+	  
+	  ?sync a :MergeAny . # merge-any sync point
+	  
+	  # at least one branch is completed
+	  ?split!:parallelBranch state:in :Completed . 
+	  
+	} a state:Guard .
+	
+	?sync state:in :Inactive . # sync point in inactive state
+
+} state:transit { ?sync state:in :Ready } ; # ready sync point
+  state:reason :readyMergeAnyIfOneCompletedBranch .
+
+
+# - given a merge-all sync point, if all branches are *done*,
+# then ready the sync point
+# (done here means at least one completed branch, and all others are completed or discarded) 
+
+{	{ ?split a :ParallelSplit ;
+		state:in :Active ;
+		:syncPoint ?sync . # sync point of an active parallel-split
+		
+	  ?sync a :MergeAll . # merge-all sync point
+	
+	  # at least one completed branch 
+	  # (all branches being discarded is handled by other rule)
+	  ?split!:parallelBranch state:in :Completed .
+	
+	  # true if, for all branches of the parallel split, 
+	  # they are in the done state (i.e., completed or discarded) 
+
+	  ( { ?split :parallelBranch ?branch } { ?branch state:in :Done }) log:forAllIn <> .
+	
+	} a state:Guard .
+	
+	?sync state:in :Inactive . # sync point in inactive state
+	
+} state:transit { ?sync state:in :Ready } ; # ready sync point
+  state:reason :readyMergeAllIfAllBranchesDone .
+
+
+# - given a merge-nr sync point, if specified number of branches are *done*,
+# then ready the sync point
+# (done here means at least one completed branch, and all others are completed or discarded) 
+
+{	{ ?split a :ParallelSplit ;
+		state:in :Active ;
+		:syncPoint ?sync . # sync point of an active parallel-split
+		
+	  ?sync a :MergeNr ; :mergeNr ?nr . # merge-nr of sync point
+		
+	  # collect all currently completed branches in "completed" list
+	  (?branch
+	  {	?split :parallelBranch ?branch .
+	  	  ?branch state:in :Completed
+		
+	  } ?completed) log:collectAllIn <> .
+	
+	  # merge-nr of sync point does not exceed size of completed list (= number of completed branches) 
+	  ?completed list:length ?nr2 .
+	  ?nr math:notGreaterThan ?nr2
+	  
+	} a state:Guard .
+	
+	?sync state:in :Inactive ; # sync point in inactive state
+	
+} state:transit { ?sync state:in :Ready } ; # ready sync point
+  state:reason :readyMergeNrIfNrBranchesCompleted .
+
+
+# - given any type of sync point, if all branches were discarded, 
+# then discard the sync point
+# (make sure we don't get stuck if all branches were discarded)
+
+{ 	{ ?split a :ParallelSplit ;
+		state:in :Active ;
+		:syncPoint ?sync . # sync point of an active parallel-split
+	  
+		# at least one discarded branch 
+		?split!:parallelBranch state:in :Discarded .
+	
+		# true if, for all branches of the parallel split, they are discarded
+		( { ?split :parallelBranch ?branch } { ?branch state:in :Discarded }) log:forAllIn <>
+	
+	} a state:Guard .
+	
+	?sync state:in :Inactive . # sync point in inactive state
+	
+} state:transit { ?sync state:in :Discarded } ; # discard sync point
+  state:reason :discardSyncPointIfAllBranchesDiscarded .
+
+
+# - given a merge-nr sync point, if the number of discarded branches is larger than the number of required merges, 
+# then discard the sync point 
+# (make sure we don't get stuck if too many branches were discarded)
+
+{	{ ?split a :ParallelSplit ;
+		state:in :Active ;
+		:syncPoint ?sync . # sync point of an active parallel-split
+	  ?sync a :MergeNr ; :mergeNr ?nr . # merge-nr sync point
+		
+	  # collect all branches into "allBranches" list
+	  (?branch
+	  {	?split :parallelBranch ?branch 
+  		
+	  } ?allBranches) log:collectAllIn <> .
+	
+	  # collect all discarded branches into "allDiscarded" list
+	  (?discarded
+	  {	?split :parallelBranch ?discarded .
+  		?discarded state:in :Discarded
+		
+	  } ?allDiscarded) log:collectAllIn <> .
+	
+	  ?allBranches list:length ?numBranches .
+	  ?allDiscarded list:length ?numDiscards .
+	  
+	  # subtract number of discarded branches from total number of branches
+	  ( ?numBranches ?numDiscards ) math:difference ?numLeft .
+	
+	  # true if number of remaining branches is less than number of required merges 
+	  ?numLeft math:lessThan ?nr .
+	
+	} a state:Guard .
+	
+	?sync state:in :Inactive . # sync point in inactive state
+	
+} state:transit { ?sync state:in :Discarded } ; # discard sync point
+  state:reason :discardMergeNrIfNoLongerSatisfiable .
+
+
+# - if a sync point was discarded (see above), then discard its parallel split  
+
+{	{ 
+		?split!:syncPoint state:in :Discarded # discarded sync point 
+	} a state:Guard .
+ 
+ 	?split state:in :Active # parallel split in active state
+
+} state:transit { ?split state:in :Discarded } ; # discard parallel split
+  state:reason :discardedSplitIfAllBranchesDiscarded .
+
+
+# - if a sync point was activated, then complete it
+# rules above "ready" sync point when branches meet conditions, so:
+# a) sync point moves through same cycle as other tasks
+# b) sync point can have its own precondition
+
+{	{ ?sync a :SyncPoint } a state:Guard .
+	
+	?sync state:in :Active # sync point in active state
+
+} state:transit { ?sync state:in :Completed } ; # complete sync point
+  state:reason :completeActiveSyncPoint .
+
+
+# - if a parallel split has a completed sync point, then complete parallel split
+
+{	{ ?split!:syncPoint state:in :Completed # parallel split with completed sync point 
+	} a state:Guard .
+ 
+ 	?split state:in :Active # parallel split is in active state
+
+} state:transit { ?split state:in :Completed } ; # complete parallel split
+  state:reason :completeSplitOfCompletedSyncPoint .

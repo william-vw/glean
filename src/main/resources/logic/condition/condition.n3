@@ -1,0 +1,30 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix list: <http://www.w3.org/2000/10/swap/list#>
+prefix : <http://niche.cs.dal.ca/ns/condition/base.owl#>
+
+# when inferring a rule with blank node '?x' directly embedded, 
+# a new blank node will be minted in its conclusion
+
+{	?x :premise ?clause .
+	(?x) log:skolem ?id .
+	
+} => { ?clause => { ?id :conditionMet true } } .
+
+
+{	?x :premise ?clause .
+	(?x)!log:skolem :conditionMet true .
+	
+} => { ?x :conditionMet true } .
+
+
+{	?x :anyOf ?disjunction .
+	?disjunction!list:member :conditionMet true .
+	
+} => { ?x :conditionMet true } .
+
+
+{	?x :allOf ?conjunction .
+	( { ?clause list:in ?conjunction } { ?clause :conditionMet true } ) log:forAllIn <> . 
+	
+} => { ?x :conditionMet true } .

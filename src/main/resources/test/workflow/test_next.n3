@@ -1,0 +1,27 @@
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+:will :hasHR 149 .
+
+:tB a gl:Task;
+	state:in gl:Inactive ;
+	gl:conditional true ;
+	gl:precondition [
+		cond:anyOf ( [
+			cond:premise { :will :hasHR ?hr . ?hr math:greaterThan 150 }
+		] )
+	] .
+
+:tA gl:next :tB .
+:tA a gl:Task ; state:in gl:Completed .
+
+
+:tC gl:next :tD . :tD gl:next :tE , :tF .
+
+:tC a gl:Task ; state:in gl:Discarded ; gl:conditional false .
+:tD a gl:Task ; state:in gl:Inactive ; gl:conditional false .
+:tE a gl:Task ; state:in gl:Inactive ; gl:conditional false .
+:tF a gl:Task ; state:in gl:Inactive ; gl:conditional false .

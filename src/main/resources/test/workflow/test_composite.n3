@@ -1,0 +1,44 @@
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+:will :hasHR 149 .
+
+:tC a gl:CompositeTask ;
+	gl:subTask :tC1 ;
+	gl:subTask :tC2 ;
+	gl:subTask :tC3 .
+	
+:tC state:in gl:Active ;
+	gl:conditional false .
+
+:tC1 state:in gl:Inactive ;
+	gl:conditional false .
+:tC2 state:in gl:Inactive ;
+	gl:conditional false .
+:tC3 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tC0 gl:next :tC1 . 
+:tC0 state:in gl:Completed .
+	
+:tD a gl:CompositeTask ;
+	state:in gl:Active ;
+	gl:conditional false ;
+	gl:subTask :tD1 , :tD2 , :tD3 .
+
+:tD1 state:in gl:Inactive ;
+	gl:conditional false .
+:tD2 state:in gl:Inactive ;
+	gl:conditional false .
+:tD3 state:in gl:Inactive ;
+	gl:conditional false .
+	
+
+:tE a gl:CompositeTask ;
+	gl:conditional false ;
+	state:in gl:Active ;
+	gl:subTask :tE1 , :tE2 .
+	
+:tE1 state:in gl:Active ; gl:conditional false .
+:tE2 state:in gl:Active ; gl:conditional false .

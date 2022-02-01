@@ -1,0 +1,28 @@
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+
+# - given a sequential relation, if the prior entity is complete, then ready the following entity  
+
+{	{	?e1 :next ?e2 . # sequential relation between ?e1 and ?e2
+		?e1 state:in :Completed # completed prior entity
+	} a state:Guard .
+	
+	?e2 state:in :Inactive . # following entity in inactive state
+
+} state:transit { ?e2 state:in :Ready } ; # ready following entity
+  state:reason :readyNextOfCompletedEntity .
+
+  
+# - given a sequential relation, if the prior entity is discarded, then discard the following entity 
+# (propagate discarded state to all following entities)
+
+{	{	?e1 :next ?e2 . # sequential relation between ?e1 and ?e2
+		?e1 state:in :Discarded # discarded prior entity 
+	} a state:Guard .
+		
+	?e2 state:in :Inactive . # following entity in inactive state
+	
+} state:transit { ?e2 state:in :Discarded } ; # discarded following entity
+  state:reason :discardNextOfDiscardedEntity .

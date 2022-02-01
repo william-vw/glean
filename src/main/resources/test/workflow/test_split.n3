@@ -1,0 +1,109 @@
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+:tA a gl:ParallelSplit ;
+	state:in gl:Inactive ;
+	gl:parallelBranch :tA1 , :tA2 ;
+	gl:syncPoint :tASync ;
+	gl:conditional false .
+	
+:tA1 state:in gl:Inactive ;
+	gl:conditional false .
+:tA2 state:in gl:Inactive ;
+	gl:conditional false .
+
+:tA1 a gl:CompositeTask ;
+	gl:subTask :tA11 , :tA12 .
+	
+:tA2 a gl:CompositeTask ;
+	gl:subTask :tA21 , :tA22 .
+	
+:tA11 state:in gl:Inactive ;
+	gl:conditional false .
+:tA12 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tA11 gl:next :tA12 .
+	
+:tA21 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tA22 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tA21 gl:next :tA22 .
+	
+:tASync a gl:MergeAny ; 
+	state:in gl:Inactive ;
+	gl:conditional false .
+	
+	
+:tB a gl:ParallelSplit ;
+	state:in gl:Active ;
+	gl:parallelBranch :tB1 , :tB2 ;
+	gl:syncPoint :tBSync ;
+	gl:conditional false .
+	
+:tBSync a gl:MergeAll ; 
+	state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tB1 state:in gl:Inactive ;
+	gl:conditional false .
+:tB2 state:in gl:Inactive ;
+	gl:conditional false .
+	
+	
+:tC a gl:ParallelSplit ;
+	state:in gl:Active ;
+	gl:parallelBranch :tC1 , :tC2 , :tC3 ;
+	gl:syncPoint :tCSync ;
+	gl:conditional false .
+	
+:tC1 state:in gl:Inactive ;
+	gl:conditional false .
+:tC2 state:in gl:Inactive ;
+	gl:conditional false .
+:tC3 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tCSync a gl:MergeNr ; 
+	state:in gl:Inactive ;
+	gl:mergeNr 2 ;
+	gl:conditional false .
+	
+	
+:tD a gl:ParallelSplit ;
+	state:in gl:Active ;
+	gl:parallelBranch :tD1 , :tD2 ;
+	gl:syncPoint :tDSync ;
+	gl:conditional false .
+	
+:tD1 state:in gl:Inactive ;
+	gl:conditional false .
+:tD2 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tDSync a gl:MergeAll ;
+	state:in gl:Inactive ;
+	gl:conditional false .
+	
+
+:tE a gl:ParallelSplit ;
+	state:in gl:Active ;
+	gl:parallelBranch :tE1 , :tE2 , :tE3 ;
+	gl:syncPoint :tESync ;
+	gl:conditional false .
+	
+:tE1 state:in gl:Inactive ;
+	gl:conditional false .
+:tE2 state:in gl:Inactive ;
+	gl:conditional false .
+:tE3 state:in gl:Inactive ;
+	gl:conditional false .
+	
+:tESync a gl:MergeNr ; 
+	state:in gl:Inactive ;
+	gl:mergeNr 2 ;
+	gl:conditional false .

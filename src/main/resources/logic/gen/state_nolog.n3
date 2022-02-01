@@ -1,0 +1,124 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix list: <http://www.w3.org/2000/10/swap/list#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix time: <http://www.w3.org/2000/10/swap/time#>
+prefix graph: <http://www.w3.org/2000/10/swap/graph#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix ex: <http://example.org#>
+prefix : <http://niche.cs.dal.ca/ns/state.owl#>
+
+
+{	?entity state:in ?state .
+	?compositeState state:includes ?state .
+
+} => { ?entity state:in ?compositeState } .
+
+
+# generally, we assume states are mutually exclusive
+# (an entity cannot be member of several states in the union list) 
+
+# START example states
+#ex:Done state:includes ex:Completed , ex:Discarded ; a state:CompoundState .
+#ex:Idle state:includes ex:Inactive , ex:Completed , ex:Discarded ; a state:CompoundState .
+#ex:NotDone state:includes ex:Inactive , ex:Active ; a state:CompoundState .
+
+#ex:Inactive a state:AtomicState .
+#ex:Active a state:AtomicState .
+#ex:Completed a state:AtomicState .
+#ex:Discarded a state:AtomicState .
+# END example states
+
+
+# START example state transitions
+#{	?entity state:in ex:Inactive .
+#	{ ?entity ex:inactiveToActive true ; ex:discoTrut false } a state:Guard .
+#
+#} state:transit { ?entity state:in ex:Active } . 
+#
+#{	?entity state:in ex:Active .
+#	{ ?entity ex:activeToCompleted true ; ex:blah false } a state:Guard .
+#
+#} state:transit { ?entity state:in ex:Completed } . 
+
+#{	?entity state:in ex:NotDone .
+#	{ ?entity ex:notDoneToCompleted true } a state:Guard .
+#
+#} state:transit { ?entity state:in ex:Completed } . 
+# END example state transitions:
+
+
+
+# state transitions from *atomic* states
+{	?premise state:transit ?conclusion ;
+		log:includes { ?target state:in ?atomState . ?guard a state:Guard } .
+	?conclusion log:includes { ?target state:in ?newState } .
+	
+	(?premise { ?target state:in ?atomState . ?guard a state:Guard } ) 
+		graph:difference ?otherRetracts .
+	
+	?atomState a state:AtomicState .
+	
+	(?inCmpd
+	{
+		?cmpdState state:includes ?atomState .
+		?inCmpd log:equalTo { ?target state:in ?cmpdState } .	
+	
+	} ?inCmpdList) log:collectAllIn <> .
+	
+	# inCmpdList is empty if state is not part of any compound state
+	
+	?inCmpdList log:conjunction ?inCmpdGraph .
+	( { ?target state:in ?atomState } ?inCmpdGraph ) log:conjunction ?retractStates .
+	
+	( ?guard { <> time:currentTime ?now } ) log:conjunction ?newGuard .
+	( { ?newGuard a log:StableTruth } ?retractStates ?otherRetracts ) log:conjunction ?llPremise . 
+	
+	#?premise state:reason ?reason .
+	
+	#( ?conclusion 
+	#	{ [ a state:Log ; state:target ?target ; state:reason ?reason ;
+	#		state:from ?atomState ; state:to ?newState ; state:time ?now ] } 
+	#) log:conjunction ?llConclusion
+	
+} => { ?llPremise log:becomes ?conclusion } .
+
+
+# state transitions from *compound* states
+{	?premise state:transit ?conclusion ;
+		log:includes { ?target state:in ?cmpdState . ?guard a state:Guard } .
+	?conclusion log:includes { ?target state:in ?newState } .
+	
+	(?premise { ?target state:in ?cmpdState . ?guard a state:Guard } ) 
+		graph:difference ?otherRetracts .
+	
+	?cmpdState a state:CompoundState .
+	?cmpdState state:includes ?atomState .
+	
+	(?inCmpd2
+	{
+		?cmpdState2 state:includes ?atomState .
+		?cmpdState2 log:notEqualTo ?cmpdState .
+		?inCmpd2 log:equalTo { ?target state:in ?cmpdState2 } .	
+	
+	} ?inCmpd2List) log:collectAllIn <> .
+	
+	# inCmpd2List is empty if state is not part of any *other* compound state
+	
+	?inCmpd2List log:conjunction ?inCmpd2Graph .
+	( 	{ ?target state:in ?cmpdState } 
+		{ ?target state:in ?atomState } 
+		?inCmpd2Graph ) 
+	log:conjunction ?retractStates .
+	
+	( ?guard { <> time:currentTime ?now } ) log:conjunction ?newGuard .
+	( { ?newGuard a log:StableTruth } ?retractStates ?otherRetracts ) log:conjunction ?llPremise . 
+	
+	#?premise state:reason ?reason .
+	
+	#( ?conclusion 
+	#  { [ a state:Log ; state:target ?target ; state:reason ?reason ;
+	#		state:from ?atomState ; state:to ?newState ; state:time ?now ] } 
+	#) log:conjunction ?llConclusion
+	
+} => { ?llPremise log:becomes ?conclusion } .

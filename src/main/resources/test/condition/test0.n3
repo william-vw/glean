@@ -1,0 +1,18 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix list: <http://www.w3.org/2000/10/swap/list#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix cig: <http://niche.cs.dal.ca/ns/glean/cig.owl#>
+prefix : <http://niche.cs.dal.ca/ns/condition/base.owl#>
+
+:patient0 a cig:Patient ; :ckd_status :not_newly_identified ; :ckd_treatment :kidney_transplant .
+
+:testa cond:anyOf (
+	[ cond:premise { ?patient a cig:Patient ; :ckd_status :newly_identified } ] 
+	[ cond:premise { ?patient a cig:Patient ; :ckd_status :not_newly_identified } ] 
+) .
+
+
+{ 	:testa cond:conditionMet true
+	
+} => { :test0 a :SUCCESS } .
