@@ -1,6 +1,6 @@
 # GuideLine Execution and Abstraction in N3 (GLEAN)
 
-See [here](https://projects.cs.dal.ca/niche/glean/) for general GLEAN documentation, which accompanies the paper "Explainable Decision Support Using Task Network Models in Notation3: Computerizing Lipid Management Clinical Guidelines as Interactive Task Networks" submitted to the AIME conference. It provides all the same core GLEAN resources; this project adds testing code.
+The [GLEAN documentation (link)](https://projects.cs.dal.ca/niche/glean/) accompanies the paper "Explainable Decision Support Using Task Network Models in Notation3: Computerizing Lipid Management Clinical Guidelines as Interactive Task Networks" submitted to the AIME conference. It provides all the same core GLEAN resources; this project adds testing code.
 
 You can clone this repo and create a Java project to execute the tests. It will be easier to use [Eclipse](https://www.eclipse.org/ide/) as the repo already includes the necessary project files (but you can use any IDE really). The repo directly includes all dependencies as jar files ([lib/](https://github.com/william-vw/glean/tree/main/lib) folder).
 
