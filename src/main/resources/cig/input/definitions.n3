@@ -1,0 +1,113 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+
+
+# data types
+
+:1_5_scale a fhir:Range ;
+	fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+	fhir:Range.high [ fhir:Quantity.value 5 ] ;
+	rdfs:label "(1-5, 1 is least, 3 is same, 5 is worst)" .
+
+:1_10_scale a fhir:Range ;
+	fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+	fhir:Range.high [ fhir:Quantity.value 10 ] ;
+	rdfs:label "(1-10, 1 is least, 5 is same, 10 is worst)" .
+
+:0_100_scale a fhir:Range ;
+	fhir:Range.low  [ fhir:Quantity.value 0 ] ;
+	fhir:Range.high [ fhir:Quantity.value 100 ] ;
+	rdfs:label "(1-100)" .
+
+:dt_boolean 
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://hl7.org/fhir/permitted-data-type> ;
+		fhir:Coding.code "boolean"
+	] .
+
+:dt_integer
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://hl7.org/fhir/permitted-data-type> ;
+		fhir:Coding.code "integer"
+	] .
+	
+:dt_decimal 
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://hl7.org/fhir/permitted-data-type> ;
+		fhir:Coding.code "decimal" # not in http://hl7.org/fhir/R4/valueset-permitted-data-type.html ??
+	] .
+	
+	
+# severities
+	
+:severity_mild
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "mild"
+	] .	
+
+:severity_moderate
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "moderate"
+	] .
+	
+:severity_severe
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "severe"
+	] .
+	
+
+# categories
+
+:borg_scale
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "263487004" # Borg scale (assessment scale)
+	] .
+
+:category_survey
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://terminology.hl7.org/CodeSystem/observation-category> ;
+		fhir:Coding.code "survey"
+	] .
+	
+:category_activity
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://terminology.hl7.org/CodeSystem/observation-category> ;
+		fhir:Coding.code "activity"
+	] .
+	
+:category_vital_signs
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://terminology.hl7.org/CodeSystem/observation-category> ;
+		fhir:Coding.code "vital-signs"
+	] .
+	
+:category_cmp_symptom_to_usual
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "cmp-symptom-to-usual"
+    ] .
+
+:category_rate_sympom
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "rate-symptom"
+    ] .
+
+:category_symptom_present
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "symptom-present"
+    ] .
+    
+:category_sensor_data
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "sensor-data"
+    ] .

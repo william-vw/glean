@@ -8,7 +8,7 @@ prefix fhir: <http://hl7.org/fhir/>
 prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
 
-:Dyslipidemia_Treatment a cig:MedicalWorkflow ;
+:Dyslipidemia_Treatment-2 a cig:MedicalWorkflow ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -19,29 +19,29 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	cig:inputFile "/cig/lipid/input/dyslipidemia_treatment.n3" ;
 	
-	gl:subTask :Pharmacological_Cholesterol_Lowering_Treatment ,
-		:statin_prescribed , :no_statin_no_followup ,
+	gl:subTask :Pharmacological_Cholesterol_Lowering_Treatment-2 ,
+		:statin_prescribed-2 , :no_statin_no_followup-2 ,
 		
-		:fasting_serum_tgs_values , :assess_malnutrition , :low_fasting_serum_no_followup ,
-			:prescribe_lifestyle_changes_judiciously , :prescribe_lifestyle_changes ,
+		:fasting_serum_tgs_values-2 , :assess_malnutrition-2 , :low_fasting_serum_no_followup-2 ,
+			:prescribe_lifestyle_changes_judiciously-2 , :prescribe_lifestyle_changes-2 ,
 		
-		:fasting_serum_tgs_values2 , :low_fasting_serum_no_followup2 ,
+		:fasting_serum_tgs_values2-2 , :low_fasting_serum_no_followup2-2 ,
 		
-		:avoid_nicotinic_acid , :assess_prevent_pancreatitis , :prescribe_fibric_acid_pancreatitis ,
-		:do_not_prescribe_fibric_acid_pancreatitis .
+		:avoid_nicotinic_acid-2 , :assess_prevent_pancreatitis-2 , :prescribe_fibric_acid_pancreatitis-2 ,
+		:do_not_prescribe_fibric_acid_pancreatitis-2 .
 	
 	
-:Pharmacological_Cholesterol_Lowering_Treatment a cig:MedicalWorkflow ; # gl:CompositeTask ;
+:Pharmacological_Cholesterol_Lowering_Treatment-2 a cig:MedicalWorkflow ; # gl:CompositeTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	gl:next :statin_prescribed ;
+	gl:next :statin_prescribed-2 ;
 	
 	rdfs:label "Pharmacological Cholesterol Lowering Treatment" ;
-	gl:source "/cig/lipid/pharmacological_cholesterol_lowering_treatment.n3" .
+	gl:source "/cig/lipid/pharmacological_cholesterol_lowering_treatment-2.n3" .
 	
 	
-:statin_prescribed a gl:DecisionTask ;
+:statin_prescribed-2 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -64,7 +64,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 	
-		gl:branchTarget :fasting_serum_tgs_values
+		gl:branchTarget :fasting_serum_tgs_values-2
 		 
 	] , [
 		state:in gl:Inactive ;
@@ -79,18 +79,18 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		
-		gl:branchTarget :no_statin_no_followup
+		gl:branchTarget :no_statin_no_followup-2
 	] .
 	
 	
-:no_statin_no_followup a gl:EndPoint ;
+:no_statin_no_followup-2 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "No followup" .
 	
 	
-:fasting_serum_tgs_values a gl:DecisionTask ;
+:fasting_serum_tgs_values-2 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -116,7 +116,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		
-		gl:branchTarget :assess_malnutrition
+		gl:branchTarget :assess_malnutrition-2
 	
 	] , [
 		state:in gl:Inactive ;
@@ -136,18 +136,18 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		
-		gl:branchTarget :low_fasting_serum_no_followup
+		gl:branchTarget :low_fasting_serum_no_followup-2
 	] .
 	
 	
-:low_fasting_serum_no_followup a gl:EndPoint ;
+:low_fasting_serum_no_followup-2 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "No followup" .
 	
 	
-:assess_malnutrition a gl:DecisionTask ;
+:assess_malnutrition-2 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -169,7 +169,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		
-		gl:branchTarget :prescribe_lifestyle_changes_judiciously
+		gl:branchTarget :prescribe_lifestyle_changes_judiciously-2
 	
 	] , [
 		state:in gl:Inactive ;
@@ -185,25 +185,25 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		 
-		gl:branchTarget :prescribe_lifestyle_changes
+		gl:branchTarget :prescribe_lifestyle_changes-2
 	] .
 	
 	
-:prescribe_lifestyle_changes_judiciously a gl:Task ;
+:prescribe_lifestyle_changes_judiciously-2 a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	gl:next :fasting_serum_tgs_values2 ;
+	gl:next :fasting_serum_tgs_values2-2 ;
 	
 	rdfs:label "Judicious lifestyle changes" ;
 	rdfs:comment """Prescribe Therapeutic Lifestyle Changes judiciously with caution.""" .
 	
 
-:prescribe_lifestyle_changes a gl:Task ;
+:prescribe_lifestyle_changes-2 a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	gl:next :fasting_serum_tgs_values2 ;
+	gl:next :fasting_serum_tgs_values2-2 ;
 	
 	rdfs:label "Lifestyle changes" ;
 	rdfs:comment """Prescribe Therapeutic Lifestyle Changes:
@@ -213,7 +213,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 •	Use fish oils to replace some long-chain TGs""" .
 	
 	
-:fasting_serum_tgs_values2 a gl:DecisionTask ;
+:fasting_serum_tgs_values2-2 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -239,7 +239,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		
-		gl:branchTarget :avoid_nicotinic_acid
+		gl:branchTarget :avoid_nicotinic_acid-2
 	
 	] , [
 		state:in gl:Inactive ;
@@ -259,27 +259,27 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		
-		gl:branchTarget :low_fasting_serum_no_followup2
+		gl:branchTarget :low_fasting_serum_no_followup2-2
 	] .
 	
-:low_fasting_serum_no_followup2 a gl:EndPoint ;
+:low_fasting_serum_no_followup2-2 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "No followup" .
 	
 	
-:avoid_nicotinic_acid a gl:Task ;
+:avoid_nicotinic_acid-2 a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	gl:next :assess_prevent_pancreatitis ;
+	gl:next :assess_prevent_pancreatitis-2 ;
 	
 	rdfs:label "Avoid nicotinic acid" ;
 	rdfs:comment """Nicotinic Acid has not been well studied in advanced CKD and therefore is not recommended for the treatment of severe hypertriglyceridemia.""" .
 	
 	
-:assess_prevent_pancreatitis a gl:DecisionTask ;
+:assess_prevent_pancreatitis-2 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -302,7 +302,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		
-		gl:branchTarget :prescribe_fibric_acid_pancreatitis
+		gl:branchTarget :prescribe_fibric_acid_pancreatitis-2
 	
 	] , [
 		state:in gl:Inactive ;
@@ -318,11 +318,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		 
-		gl:branchTarget :do_not_prescribe_fibric_acid_pancreatitis
+		gl:branchTarget :do_not_prescribe_fibric_acid_pancreatitis-2
 	] .
 	
 	
-:prescribe_fibric_acid_pancreatitis a gl:EndPoint ;
+:prescribe_fibric_acid_pancreatitis-2 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -332,7 +332,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	Fibric acid derivatives might be warranted in patients who place a relatively high value in preventing pancreatitis and a relatively low value on the risk of CV disease.""" .
 
 
-:do_not_prescribe_fibric_acid_pancreatitis a gl:EndPoint ;
+:do_not_prescribe_fibric_acid_pancreatitis-2 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	

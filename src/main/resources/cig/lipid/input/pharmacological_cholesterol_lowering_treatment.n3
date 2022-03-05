@@ -1,0 +1,272 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+
+:assess_age_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_age
+	] ) .
+
+:action_assess_age a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_assess_age" ;
+	fhir:ActivityDefinition.title "Age?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_age ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "year" ;
+					rdfs:label "years"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 200 ] ;
+				rdfs:label "(1-200)"
+			]
+		]
+	] .
+	
+	
+:assess_egfr_value_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_egfr_value
+	] ) .
+
+:action_assess_egfr_value a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_assess_egfr_value" ;
+	fhir:ActivityDefinition.title "eGFR value?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_egfr ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "ml/min/ 1.73m2" ; # unsure whether this is in ucum
+					rdfs:label "ml/min/ 1.73m2"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 200 ] ;
+				rdfs:label "(1-200)"
+			]
+		]
+	] .
+	
+	
+:assess_kidney_transplant_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_kidney_transplant
+	] ) .
+
+:action_assess_kidney_transplant a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_assess_kidney_transplant" ;
+	fhir:ActivityDefinition.title "Kidney transplant?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_kidney_transplant ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:assess_dialysis_treatment_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_dialysis_treatment
+	] ) .
+
+:action_assess_dialysis_treatment a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_assess_dialysis_treatment" ;
+	fhir:ActivityDefinition.title "Treatment with dialysis?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_dialysis_treatment ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:assess_statin_use_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_statin_use
+	] ) .
+
+:action_assess_statin_use a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_assess_statin_use" ;
+	fhir:ActivityDefinition.title "Using statins or statin/ezetimibe?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_statin_ezetimibe ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+
+
+:assess_cv_risk_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action (
+		[ fhir:PlanDefinition.action.definitionUri :action_no_cv_risk ]
+		[ fhir:PlanDefinition.action.definitionUri :action_prior_mi ]
+		[ fhir:PlanDefinition.action.definitionUri :action_prior_coronary_revascularization ]
+		[ fhir:PlanDefinition.action.definitionUri :action_prior_ischemic_stroke ]
+		[ fhir:PlanDefinition.action.definitionUri :action_prior_transient_ischemic_attack ]
+		[ fhir:PlanDefinition.action.definitionUri :action_diabetes ]
+		[ fhir:PlanDefinition.action.definitionUri :action_estimated_10-year_incidence_coronary_death ]
+		[ fhir:PlanDefinition.action.definitionUri :action_likelihood_non_fatal_mi ]
+	) .
+
+:action_no_cv_risk a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_no_cv_risk" ;
+	fhir:ActivityDefinition.title "No CV risk factors" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_no_cv_risk_factors ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:code_prior_mi
+			:code_prior_coronary_revascularization
+			:code_prior_ischemic_stroke
+			:code_prior_transient_ischemic_attack
+			:code_diabetes
+			:code_estimated_10-year_incidence_coronary_death
+			:code_likelihood_non_fatal_mi
+		)
+	] .
+	
+:action_prior_mi a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_prior_mi" ;
+	fhir:ActivityDefinition.title "Prior MI?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_prior_mi ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:code_no_cv_risk_factors
+		)
+	] .
+	
+:action_prior_coronary_revascularization a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_prior_coronary_revascularization" ;
+	fhir:ActivityDefinition.title "Prior Coronary Revascularization?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_prior_coronary_revascularization ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:code_no_cv_risk_factors
+		)
+	] .
+	
+:action_prior_ischemic_stroke a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_prior_ischemic_stroke" ;
+	fhir:ActivityDefinition.title "Prior ischemic stroke?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_prior_ischemic_stroke ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:code_no_cv_risk_factors
+		)
+	] .
+	
+:action_prior_transient_ischemic_attack a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_prior_transient_ischemic_attack" ;
+	fhir:ActivityDefinition.title "Prior transient ischemic attack?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_prior_transient_ischemic_attack ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:code_no_cv_risk_factors
+		)
+	] .
+	
+:action_diabetes a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_diabetes" ;
+	fhir:ActivityDefinition.title "Diabetes?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_diabetes ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:code_no_cv_risk_factors
+		)
+	] .
+	
+:action_estimated_10-year_incidence_coronary_death a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_estimated_10-year_incidence_coronary_death" ;
+	fhir:ActivityDefinition.title "Estimated 10-year incidence of coronary death?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_estimated_10-year_incidence_coronary_death ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:code_no_cv_risk_factors
+		)
+	] .
+	
+:action_likelihood_non_fatal_mi a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_likelihood_non_fatal_mi" ;
+	fhir:ActivityDefinition.title "Likelihood of non-fatal MI (using a validated risk calculator)" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_likelihood_non_fatal_mi ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "%" ;
+					rdfs:label "%"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 100 ] ;
+				rdfs:label "(1-100)"
+			]
+		]
+	] .
+
+
+# codes
+    
+# TODO

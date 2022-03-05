@@ -10,7 +10,7 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 # (if a branch's precondition is met, then it will be activated; condition.n3)
 
 {	{ 	?decision a :DecisionTask ;
-			state:in :Active ; # active decision task
+			state:in :Activated ; # activated decision task (not inactive)
 			:decisionBranch ?branch
 		
 	} a state:Guard .
@@ -42,19 +42,16 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 # - if at least one branch is active, then discard other branches
 
 {	{	?decision a :DecisionTask ;
-			state:in :Active .
-		
 		# at least one branch was activated
-		?decision :decisionBranch ?branch .
-		?branch state:in :Active .
+			state:in :Completed .
 		
 		# discard the remaining branches 
-		# (in the ready state: see below)
+		# (i.e., those in the ready state: see below)
 		?decision :decisionBranch ?branch .
 	
 	} a state:Guard .
 	
-	 ?branch state:in :Ready . # branch in ready state
+	?branch state:in :Ready . # branch in ready state
 
 } state:transit { ?branch state:in :Discarded } ; # discard branch
   state:reason :discardRemainingBranchesInCaseOfActiveBranch .

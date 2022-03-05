@@ -1,0 +1,164 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
+prefix fhir: <http://hl7.org/fhir/>
+prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
+
+:Followup_Lipid_Profile-2 a cig:MedicalWorkflow ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Followup Lipid Profile" ;
+	rdfs:comment """Follow-up measurement of LDL-C (or entire lipid profile) should be reserved for instances where the results would alter management.""" ;
+	
+	cig:inputFile "/cig/lipid/input/followup_lipid_profile-gw.n3" ;
+	
+	gl:subTask :assess_suspect_sec_cause-2 , :sec_cause_followup-2 , 
+		:assess_current_treatment-2 , :yes_statins_no_followup-2 , 
+		:reassess_10_year_cv_risk-2 , :yes_reassess_followup-2 , :no_reassess_no_followup-2 .
+	
+
+:assess_suspect_sec_cause-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Suspect secondary dyslipidemia cause?" ;
+	rdfs:comment "Do you suspect the patient has developed a new secondary cause of dyslipidemia?" ;
+	
+	cig:input :assess_suspect_sec_cause_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_sec_cause ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+		
+		gl:branchTarget :sec_cause_followup-2
+	
+	] , [ 
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_sec_cause ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		
+		gl:branchTarget :assess_current_treatment-2
+	] .
+	
+
+:sec_cause_followup-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Followup lipid profile" ;
+	rdfs:comment "Follow-up measurement of the lipid profile is suggested." .
+
+
+:assess_current_treatment-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Already on statins?" ;
+	rdfs:comment """Is the patient already on a statin?""" ;
+	
+	cig:input :assess_current_treatment_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "receiving statins" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_patient_on_statins ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+		
+		gl:branchTarget :yes_statins_no_followup-2
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "no statins" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_patient_on_statins ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		 
+		gl:branchTarget :reassess_10_year_cv_risk-2
+	] .
+	
+
+:yes_statins_no_followup-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No followup" ;
+	rdfs:comment "No follow-up measurement of the lipid profile is suggested." .
+
+
+:reassess_10_year_cv_risk-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Reassessing 10 year CV risk?" ;
+	rdfs:comment """Are you reassessing 10 year CV risk to look for an indication for statin treatment?""" ;
+	
+	cig:input :reassess_10_year_cv_risk_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_10_year_cv_risk ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+		
+		gl:branchTarget :yes_reassess_followup-2
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_10_year_cv_risk ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		
+		gl:branchTarget :no_reassess_no_followup-2 
+	] . 
+
+
+:yes_reassess_followup-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Followup lipid profile" ;
+	rdfs:comment "Follow-up measurement of the lipid profile is suggested." .
+
+
+:no_reassess_no_followup-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No followup" ;
+	rdfs:comment "No follow-up measurement of the lipid profile is suggested." .

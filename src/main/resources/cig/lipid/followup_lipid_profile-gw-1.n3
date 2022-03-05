@@ -7,7 +7,7 @@ prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
 prefix fhir: <http://hl7.org/fhir/>
 prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
-:Followup_Lipid_Profile a cig:MedicalWorkflow ;
+:Followup_Lipid_Profile-1 a cig:MedicalWorkflow ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -16,12 +16,12 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	cig:inputFile "/cig/lipid/input/followup_lipid_profile-gw.n3" ;
 	
-	gl:subTask :assess_suspect_sec_cause , :sec_cause_followup , 
-		:assess_current_treatment , :yes_statins_no_followup , 
-		:reassess_10_year_cv_risk , :yes_reassess_followup , :no_reassess_no_followup .
+	gl:subTask :assess_suspect_sec_cause-1 , :sec_cause_followup-1 , 
+		:assess_current_treatment-1 , :yes_statins_no_followup-1 , 
+		:reassess_10_year_cv_risk-1 , :yes_reassess_followup-1 , :no_reassess_no_followup-1 .
 	
 
-:assess_suspect_sec_cause a gl:DecisionTask ;
+:assess_suspect_sec_cause-1 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -41,7 +41,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		
-		gl:branchTarget :sec_cause_followup
+		gl:branchTarget :sec_cause_followup-1
 	
 	] , [ 
 		state:in gl:Inactive ;
@@ -54,11 +54,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		
-		gl:branchTarget :assess_current_treatment
+		gl:branchTarget :assess_current_treatment-1
 	] .
 	
 
-:sec_cause_followup a gl:EndPoint ;
+:sec_cause_followup-1 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -66,7 +66,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	rdfs:comment "Follow-up measurement of the lipid profile is suggested." .
 
 
-:assess_current_treatment a gl:DecisionTask ;
+:assess_current_treatment-1 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -86,7 +86,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		
-		gl:branchTarget :yes_statins_no_followup
+		gl:branchTarget :yes_statins_no_followup-1
 	
 	] , [
 		state:in gl:Inactive ;
@@ -99,11 +99,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		 
-		gl:branchTarget :reassess_10_year_cv_risk
+		gl:branchTarget :reassess_10_year_cv_risk-1
 	] .
 	
 
-:yes_statins_no_followup a gl:EndPoint ;
+:yes_statins_no_followup-1 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -111,7 +111,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	rdfs:comment "No follow-up measurement of the lipid profile is suggested." .
 
 
-:reassess_10_year_cv_risk a gl:DecisionTask ;
+:reassess_10_year_cv_risk-1 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -131,7 +131,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		
-		gl:branchTarget :yes_reassess_followup
+		gl:branchTarget :yes_reassess_followup-1
 	
 	] , [
 		state:in gl:Inactive ;
@@ -144,11 +144,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 						] )
 		] ;
 		
-		gl:branchTarget :no_reassess_no_followup 
+		gl:branchTarget :no_reassess_no_followup-1 
 	] . 
 
 
-:yes_reassess_followup a gl:EndPoint ;
+:yes_reassess_followup-1 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -156,7 +156,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	rdfs:comment "Follow-up measurement of the lipid profile is suggested." .
 
 
-:no_reassess_no_followup a gl:EndPoint ;
+:no_reassess_no_followup-1 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	

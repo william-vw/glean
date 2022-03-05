@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.jen3.rdf.model.Resource;
 import org.apache.jen3.rdf.model.Statement;
 import org.apache.jen3.rdf.model.StmtIterator;
+import org.apache.jen3.util.iterator.ExtendedIterator;
 import org.apache.jen3.vocabulary.RDF;
 import org.apache.jen3.vocabulary.RDFS;
 import org.apache.log4j.Logger;
@@ -20,10 +21,12 @@ import wvw.utils.IOUtils;
 
 public abstract class WorkflowPrinter {
 
+	protected final static Logger LOG = Logger.getLogger(WorkflowPrinter.class.getName());
+
 	public static void main(String[] args) throws Exception {
 		long start = System.currentTimeMillis();
 
-		String name = "ckd_dyslipidemia-v2";
+		String name = "ckd_dyslipidemia";
 		String path = "cig/lipid/" + name + ".n3";
 
 		WorkflowModel wf = new CIGModel(NS.ckd).initialize().load(WorkflowPrinter.class, path,
@@ -43,18 +46,16 @@ public abstract class WorkflowPrinter {
 
 		String out = printer.getString();
 //		System.out.println(out);
-		
-		String outFolder = "/Users/wvw/git/cig/visualize/json/";
+
+		String outFolder = "/Users/wvw/git/cig/visualize/json/lipid/";
 		String outPath = outFolder + name + ".json";
 		IOUtils.writeFile(outPath, out, false);
 
 		long end = System.currentTimeMillis();
 		LOG.info("writing workflow: " + (end - start) + "ms");
-		
+
 		LOG.info("written to " + outPath);
 	}
-
-	protected final static Logger LOG = Logger.getLogger(WorkflowPrinter.class.getName());
 
 	protected JenaKb kb;
 	protected StringBuffer str = new StringBuffer();
@@ -86,14 +87,20 @@ public abstract class WorkflowPrinter {
 		return ret;
 	}
 
-	protected List<Resource> getFollowing(Resource e) {
+	protected List<Resource> getComposed(Resource e) {
 		List<Resource> ret = new ArrayList<>();
 
-		if (e.hasProperty(RDF.type, kb.resource("gl:DecisionBranch")))
-			e = e.getPropertyResourceValue(kb.resource("gl:branchTarget"));
-
 		if (e.hasProperty(RDF.type, kb.resource("gl:CompositeTask"))) {
-			StmtIterator it = e.listProperties(kb.resource("gl:subTask"));
+			ExtendedIterator<Statement> it = null;
+
+			// if workflow-id is given, then include those sub-tasks
+			if (e.hasProperty(kb.resource("gl:workflowId"))) {
+				Resource id = kb.getObject(e, kb.resource("gl:workflowId"));
+				it = id.listProperties(kb.resource("gl:subTask"));
+
+				// else, include the direct sub-tasks
+			} else
+				it = e.listProperties(kb.resource("gl:subTask"));
 
 			while (it.hasNext()) {
 				Statement stmt = it.next();
@@ -108,10 +115,18 @@ public abstract class WorkflowPrinter {
 			}
 		}
 
+		return ret;
+	}
+
+	protected List<Resource> getNext(Resource e) {
+		List<Resource> ret = new ArrayList<>();
+
+		if (e.hasProperty(RDF.type, kb.resource("gl:DecisionBranch")))
+			e = e.getPropertyResourceValue(kb.resource("gl:branchTarget"));
+
 		ret.addAll(e.listProperties(kb.resource("gl:next")).toList().stream()
 				.map(stmt -> stmt.getObject()).collect(Collectors.toList()));
 
-//		System.out.println(e + " -> " + ret);
 		return ret;
 	}
 
@@ -154,6 +169,16 @@ public abstract class WorkflowPrinter {
 		e = getTask(e);
 
 		return (e.isURI() ? e.getLocalName() : e.toString());
+	}
+
+	protected String getWorkflowId(Resource e) {
+		e = getTask(e);
+
+		if (e.isURI() && e.hasProperty(kb.resource("gl:workflowId")))
+			return e.getProperty(kb.resource("gl:workflowId")).getObject().getLocalName();
+
+		return null;
+
 	}
 
 	protected String getType(Resource task) {

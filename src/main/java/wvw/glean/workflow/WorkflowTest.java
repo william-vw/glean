@@ -39,9 +39,9 @@ public class WorkflowTest {
 		// test TNM constructs
 //		test_next(spec);
 //		test_composite(spec);
-//		test_decision(spec);
+		test_decision(spec);
 //		test_split(spec);
-		test_cycle(spec);
+//		test_cycle(spec);
 	}
 
 	public static void testCondition() throws Exception {

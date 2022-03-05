@@ -1,6 +1,6 @@
 package wvw.glean.workflow.print;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jen3.rdf.model.Resource;
@@ -15,7 +15,7 @@ public class WorkflowStringPrinter extends WorkflowPrinter {
 
 	public WorkflowStringPrinter() {
 	}
-	
+
 	public void print(WorkflowModel m) {
 		this.kb = m.getKb();
 
@@ -33,16 +33,16 @@ public class WorkflowStringPrinter extends WorkflowPrinter {
 
 	protected void printNext(Resource e) {
 //		runTaskHook(getTask(e));
-		
+
 		newLevel();
 
-		Iterator<Resource> it = getFollowing(e).iterator();
+		List<Resource> follows = getNext(e);
+		follows.addAll(getComposed(e));
 
-		while (it.hasNext()) {
-			Resource next = it.next();
-			next = print(next);
+		for (Resource follow : follows) {
+			follow = print(follow);
 
-			printNext(next);
+			printNext(follow);
 		}
 
 		priorLevel();

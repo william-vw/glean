@@ -1,0 +1,71 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+
+:assess_current_treatment_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_patient_on_statins
+	] ) .
+
+:action_patient_on_statins a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_patient_on_statins" ;
+	fhir:ActivityDefinition.title "Patient already receiving statins?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_patient_on_statins ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+
+
+:assess_change_cv_sec_cond_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_change_cv_sec_cond
+	] ) .
+
+:action_assess_change_cv_sec_cond a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "assess_change_cv_sec_cond" ;
+	fhir:ActivityDefinition.title "Change in CV or sec. condition?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_change_cv_sec_cond ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:assess_statin_indication_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_statin_indication
+	] ) .
+
+:action_assess_statin_indication a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_assess_statin_indication" ;
+	fhir:ActivityDefinition.title "Clear statin indication?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_clear_statin_indication ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+
+	
+
+# codes
+    
+# TODO

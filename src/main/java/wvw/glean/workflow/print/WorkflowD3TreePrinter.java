@@ -16,7 +16,7 @@ import wvw.glean.workflow.WorkflowModel;
 public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 	private Map<String, Node> nodeMap = new HashMap<>();
-
+	
 	public WorkflowD3TreePrinter() {
 	}
 
@@ -33,23 +33,20 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 		LOG.info("printing: " + wf.getLocalName());
 
-		prepare(wf);
-//			System.out.println(nodeMap);
-
-		Node wfNode = nodeMap.get(getId(wf));
+		Node wfNode = prepare(wf);
 		print(new NodeLink(wf, wfNode));
 	}
 
-	protected void prepare(Resource wf) {
+	protected Node prepare(Resource wf) {
 		nodeMap.clear();
-
-		prepare(wf, null, 0);
+		
+		return prepare(wf, null, 0, false);
 	}
 
-	protected void prepare(Resource entity, Node parent, int depth) {
+	protected Node prepare(Resource entity, Node parent, int depth, boolean composed) {
 		Resource task = getTask(entity);
 		String id = getId(task);
-
+		
 		Node node = nodeMap.get(id);
 		if (node == null) {
 			node = new Node(task);
@@ -57,13 +54,21 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		}
 
 		if (parent != null)
-			node.addParent(entity, parent, depth);
+			node.addParent(entity, parent, depth, composed);
 
-		Iterator<Resource> it = getFollowing(task).iterator();
+		Iterator<Resource> it = getComposed(task).iterator();
+		while (it.hasNext()) {
+			Resource sub = it.next();
+			prepare(sub, node, depth + 1, true);
+		}
+
+		it = getNext(task).iterator();
 		while (it.hasNext()) {
 			Resource next = it.next();
-			prepare(next, node, depth + 1);
+			prepare(next, node, depth + 1, false);
 		}
+
+		return node;
 	}
 
 	protected boolean print(NodeLink link) {
@@ -81,8 +86,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		// could skip this child but layout gets wonky
 		// try to bias layout by adding 'hidden' children
 
-//		System.out.println("node: " + curNode + " - " + curDepth + " <> " + curNode.getMaxDepth());
-
+//		LOG.info("node: " + curNode + " - " + curDepth + " <> " + curNode.getMaxDepth());
 		if (curNode.getParents().size() > 1) {
 
 			// only print at lowest-down level
@@ -113,12 +117,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 		str.append(printKeyString("name", label, true));
 
-		if (curParent != null) {
-			Resource parentTask = curParent.getTask();
-
-			boolean composed = kb.contains(parentTask, kb.resource("gl:subTask"), task);
-			str.append(printKeyValue("composed", composed, true));
-		}
+		str.append(printKeyValue("composed", link.isComposed(), true));
 
 		// we're at lowest-down position for this node
 		// and the node has multiple parents
@@ -126,6 +125,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		// so, list the other parents as a property
 
 		if (curNode.getParents().size() > 1) {
+
 			str.append(printKeyArray("otherParents", curNode.getParents().stream()
 					.filter(p -> !p.getParent().equals(curParent))
 					.map(p -> "{" + printKeyString("id", getId(p.getParent().getTask()), true)
@@ -158,6 +158,12 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		if (descr != null) {
 			str.append(",");
 			str.append(printKeyString("description", txtToJson(descr)));
+		}
+
+		if (kb.contains(task, kb.resource("gl:workflowId"), null)) {
+			str.append(",");
+			str.append(printKeyString("workflow_id",
+					kb.getObject(task, kb.resource("gl:workflowId")).getLocalName()));
 		}
 
 		runTaskHook(task);
@@ -250,11 +256,12 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			this.task = task;
 		}
 
-		public void addParent(Resource entity, Node parent, int depth) {
+		public void addParent(Resource entity, Node parent, int depth, boolean composed) {
+			// only add the same parent once
 			if (!parents.stream().anyMatch(l -> l.getParent().equals(parent))) {
-				NodeLink l = new NodeLink(entity, this, parent, depth);
-				parents.add(l);
+				NodeLink l = new NodeLink(entity, this, parent, depth, composed);
 
+				parents.add(l);
 				parent.addChild(l);
 			}
 		}
@@ -315,6 +322,13 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			return false;
 		}
 
+		public boolean sameWorkflow(Node n) {
+			String wfId = getWorkflowId(task);
+			String wfId2 = getWorkflowId(n.getTask());
+
+			return wfId != null && wfId2 != null && wfId.equals(wfId2);
+		}
+
 		@Override
 		public boolean equals(Object o) {
 			if (!(o instanceof Node))
@@ -341,17 +355,19 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		private Node child;
 		private Node parent;
 		private int depth = 0;
+		private boolean composed;
 
 		public NodeLink(Resource wf, Node node) {
 			this.entity = wf;
 			this.child = node;
 		}
 
-		public NodeLink(Resource entity, Node child, Node parent, int depth) {
+		public NodeLink(Resource entity, Node child, Node parent, int depth, boolean composed) {
 			this.entity = entity;
 			this.parent = parent;
 			this.child = child;
 			this.depth = depth;
+			this.composed = composed;
 		}
 
 		public Resource getEntity() {
@@ -368,6 +384,14 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 		public int getDepth() {
 			return depth;
+		}
+
+		public boolean isComposed() {
+			return composed;
+		}
+
+		public void setComposed(boolean composed) {
+			this.composed = composed;
 		}
 
 		public String toString() {

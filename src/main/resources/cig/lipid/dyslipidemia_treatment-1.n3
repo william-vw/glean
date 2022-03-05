@@ -1,0 +1,340 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
+prefix fhir: <http://hl7.org/fhir/>
+prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
+
+
+:Dyslipidemia_Treatment-1 a cig:MedicalWorkflow ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	#state:in gl:Active ;
+	#gl:root true ;	
+	
+	rdfs:label "Dyslipidemia_Treatment" ;
+	
+	cig:inputFile "/cig/lipid/input/dyslipidemia_treatment.n3" ;
+	
+	gl:subTask :Pharmacological_Cholesterol_Lowering_Treatment-1 ,
+		:statin_prescribed-1 , :no_statin_no_followup-1 ,
+		
+		:fasting_serum_tgs_values-1 , :assess_malnutrition-1 , :low_fasting_serum_no_followup-1 ,
+			:prescribe_lifestyle_changes_judiciously-1 , :prescribe_lifestyle_changes-1 ,
+		
+		:fasting_serum_tgs_values2-1 , :low_fasting_serum_no_followup2-1 ,
+		
+		:avoid_nicotinic_acid-1 , :assess_prevent_pancreatitis-1 , :prescribe_fibric_acid_pancreatitis-1 ,
+		:do_not_prescribe_fibric_acid_pancreatitis-1 .
+	
+	
+:Pharmacological_Cholesterol_Lowering_Treatment-1 a cig:MedicalWorkflow ; # gl:CompositeTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	gl:next :statin_prescribed-1 ;
+	
+	rdfs:label "Pharmacological Cholesterol Lowering Treatment" ;
+	gl:source "/cig/lipid/pharmacological_cholesterol_lowering_treatment-1.n3" .
+	
+	
+:statin_prescribed-1 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Statins prescribed?" ;
+	
+	rdfs:comment """Were any statins prescribed for cholesterol lowering treatment?""" ;
+	
+	cig:input :statin_prescribed_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [ 
+			rdfs:label "yes" ;
+			
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_statin_prescribed ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+	
+		gl:branchTarget :fasting_serum_tgs_values-1
+		 
+	] , [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [ 
+			rdfs:label "no" ;
+			
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_statin_prescribed ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		
+		gl:branchTarget :no_statin_no_followup-1
+	] .
+	
+	
+:no_statin_no_followup-1 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No followup" .
+	
+	
+:fasting_serum_tgs_values-1 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Check Fasting Serum TGs Values" ;
+	
+	cig:input :fasting_serum_tgs_values_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label ">5.65mmol/l" ;
+			rdfs:comment """>5.65mmol/l (>500mg/dl)""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
+						fhir:Observation.valueQuantity ?quantity . 
+					  ?quantity fhir:Quantity.value ?value .
+					  ?value math:greaterThan 5.65
+					} 
+				] )
+		] ;
+		
+		gl:branchTarget :assess_malnutrition-1
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "<=5.65mmol/l" ;
+			rdfs:comment """<=5.65mmol/l (>500mg/dl)""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
+						fhir:Observation.valueQuantity ?quantity . 
+					  ?quantity fhir:Quantity.value ?value .
+					  ?value math:notGreaterThan 5.65
+					} 
+				] )
+		] ;
+		
+		gl:branchTarget :low_fasting_serum_no_followup-1
+	] .
+	
+	
+:low_fasting_serum_no_followup-1 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No followup" .
+	
+	
+:assess_malnutrition-1 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Malnutrition?" ;
+	
+	cig:input :assess_malnutrition_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			rdfs:comment "Malnutrition found." ;
+			
+			cond:allOf (
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_malnutrition ; fhir:Observation.valueBoolean true }
+				] )
+		] ;
+		
+		gl:branchTarget :prescribe_lifestyle_changes_judiciously-1
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment "No malnutrition found." ;
+			
+			cond:allOf (
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_malnutrition ; fhir:Observation.valueBoolean false }
+				] )
+		] ;
+		 
+		gl:branchTarget :prescribe_lifestyle_changes-1
+	] .
+	
+	
+:prescribe_lifestyle_changes_judiciously-1 a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	gl:next :fasting_serum_tgs_values2-1 ;
+	
+	rdfs:label "Judicious lifestyle changes" ;
+	rdfs:comment """Prescribe Therapeutic Lifestyle Changes judiciously with caution.""" .
+	
+
+:prescribe_lifestyle_changes-1 a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	gl:next :fasting_serum_tgs_values2-1 ;
+	
+	rdfs:label "Lifestyle changes" ;
+	rdfs:comment """Prescribe Therapeutic Lifestyle Changes:
+•	Low Fat diet (<15% total calories)
+•	Reduce monosaccharides & disaccharides intake
+•	Reduce total amount of dietary carbohydrates
+•	Use fish oils to replace some long-chain TGs""" .
+	
+	
+:fasting_serum_tgs_values2-1 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Check Fasting Serum TGs Values (2)" ;
+	
+	cig:input :fasting_serum_tgs_values_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label ">11.3mmol/l" ;
+			rdfs:comment """>11.3mmol/l (<=1000mg/dl)""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
+						fhir:Observation.valueQuantity ?quantity . 
+					  ?quantity fhir:Quantity.value ?value .
+					  ?value math:greaterThan 11.3
+					} 
+				] )
+		] ;
+		
+		gl:branchTarget :avoid_nicotinic_acid-1
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "<=11.3mmol/l" ;
+			rdfs:comment """<=11.3mmol/l (<=1000mg/dl)""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
+						fhir:Observation.valueQuantity ?quantity . 
+					  ?quantity fhir:Quantity.value ?value .
+					  ?value math:notGreaterThan 11.3
+					} 
+				] )
+		] ;
+		
+		gl:branchTarget :low_fasting_serum_no_followup2-1
+	] .
+	
+:low_fasting_serum_no_followup2-1 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No followup" .
+	
+	
+:avoid_nicotinic_acid-1 a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	gl:next :assess_prevent_pancreatitis-1 ;
+	
+	rdfs:label "Avoid nicotinic acid" ;
+	rdfs:comment """Nicotinic Acid has not been well studied in advanced CKD and therefore is not recommended for the treatment of severe hypertriglyceridemia.""" .
+	
+	
+:assess_prevent_pancreatitis-1 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Prevent pancreatitis?" ;
+	rdfs:comment """Have a conversation with patient regarding pros and cons of treatment with statin vs. fibric acid derivatives and their preference, especially regarding prevention of pancreatitis. (Concomitant therapy with fibric acid derivative and a statin is not recommended in patient with CKD due to the potential for toxicity.)""" ;
+		
+	cig:input :assess_prevent_pancreatitis_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			rdfs:comment "Patient places high value on preventing pancreatitis." ;
+			
+			cond:allOf ( [ cond:premise { 
+								?obs fhir:Observation.code :code_prevent_pancreatitis ; 
+									fhir:Observation.valueBoolean true }
+						] )
+		] ;
+		
+		gl:branchTarget :prescribe_fibric_acid_pancreatitis-1
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment "Patient does not place high value on preventing pancreatitis." ;
+			
+			cond:allOf ( [ cond:premise { 
+								?obs fhir:Observation.code :code_prevent_pancreatitis ; 
+									fhir:Observation.valueBoolean false }
+						] )
+		] ;
+		 
+		gl:branchTarget :do_not_prescribe_fibric_acid_pancreatitis-1
+	] .
+	
+	
+:prescribe_fibric_acid_pancreatitis-1 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Prescribe fibric acid" ;
+	rdfs:comment """Fibric acid derivatives could be considered. 
+	If considered, fibric acid should be dose adjusted for kidney function. 
+	Fibric acid derivatives might be warranted in patients who place a relatively high value in preventing pancreatitis and a relatively low value on the risk of CV disease.""" .
+
+
+:do_not_prescribe_fibric_acid_pancreatitis-1 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No fibric acid" ;
+	rdfs:comment """Fibric acid derivatives should not be considered.""" .

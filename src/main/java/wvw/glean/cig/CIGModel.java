@@ -20,6 +20,10 @@ public class CIGModel extends WorkflowModel_Auto {
 		setup();
 	}
 
+	public String getNs() {
+		return ns;
+	}
+
 	public void resetAll(String taskId) {
 		resetAll(kb.resource(ns + taskId));
 	}

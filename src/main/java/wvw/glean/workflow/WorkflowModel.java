@@ -153,6 +153,10 @@ public abstract class WorkflowModel {
 	}
 
 	protected void resolveReferences(JenaKb kb) {
+		resolveReferences(kb, new ArrayList<>());
+	}
+
+	protected void resolveReferences(JenaKb kb, List<String> sources) {
 		boolean added = false;
 
 		// support recursively resolving workflow references
@@ -169,6 +173,12 @@ public abstract class WorkflowModel {
 
 					Resource src = wf.getPropertyResourceValue(kb.resource("gl:source"));
 					String srcStr = src.asLiteral().getString();
+
+					if (sources.contains(srcStr))
+						continue;
+					else
+						sources.add(srcStr);
+
 					Log.i("(resolving: " + srcStr + ")");
 
 					long start = System.currentTimeMillis();
@@ -255,10 +265,10 @@ public abstract class WorkflowModel {
 			Iterator<Entry<String, List<TaskState>>> it = map.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<String, List<TaskState>> e = it.next();
-				
+
 				System.out.println(e.getKey() + ":");
 				e.getValue().forEach(state -> System.out.println(state));
-				
+
 				System.out.println();
 			}
 

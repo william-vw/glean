@@ -1,0 +1,67 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+
+:fasting_serum_tgs_values_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_fasting_serum_tgs_value
+	] ) .
+	
+:action_fasting_serum_tgs_value a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_fasting_serum_tgs_value" ;
+	fhir:ActivityDefinition.title "Fasting serum TGs value" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_fasting_serum_tg ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "mmol/L" ; # millimole per liter
+					rdfs:label "mmol/L"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 2
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 100 ] ;
+				rdfs:label "(1-100)"
+			]
+		]
+	] .
+	
+
+:assess_malnutrition_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_assess_malnutrition
+	] ) .
+	
+:action_assess_malnutrition a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_assess_malnutrition" ;
+	fhir:ActivityDefinition.title "Malnutrition?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_malnutrition ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+		
+	] .
+
+
+
+# codes
+    
+# TODO

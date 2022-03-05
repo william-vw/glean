@@ -19,8 +19,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	cig:inputFile "/cig/lipid/input/evaluate_lipid_profile.n3" ;
 	
 	gl:subTask 
-		:measure_lipid_profile , :no_dyslipidemia , :rule_out_secondary_causes , :secondary_causes_found ,  
-		:evaluate_severity_dyslipidemia , :severe_dyslipidemia , :Dyslipidemia_Treatment .
+		:measure_lipid_profile , :no_dyslipidemia , :rule_out_secondary_causes , :secondary_causes_found, :no_secondary_causes_found .
 	
 	
 :measure_lipid_profile a gl:DecisionTask ;
@@ -139,109 +138,28 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		
-		gl:branchTarget :evaluate_severity_dyslipidemia 
+		gl:branchTarget :no_secondary_causes_found 
 	
 	] .
-	
-	
-:evaluate_severity_dyslipidemia a gl:DecisionTask ;
+
+:no_dyslipidemia a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
+	gl:involvesAction false ;
 	
-	rdfs:label "Evaluate severity dyslipidemia" ;
-	
-	cig:input :evaluate_dyslipidemia_severity_report ;
-	
-	rdfs:comment """Assess fasting triglycerides and LDL-C""" ;
-	
-	gl:decisionBranch [
-		state:in gl:Inactive ;
-		
-		
-		gl:precondition [
-			rdfs:label "severe" ;
-			rdfs:comment """1.Fasting Triglycerides > 11.3mmol/l (1000 mg/dl); or
-2. LDL-C > 4.9 mmol/l(190 mg/dl)""" ;
-			
-			cond:anyOf ( 
-				[ cond:premise 
-					{ ?obs fhir:Observation.code :code_fasting_triglycerides ; 
-						fhir:Observation.valueQuantity ?quantity . 
-						?quantity fhir:Quantity.value ?value .
-						?value math:greaterThan 11.3 }
-				
-				] [ cond:premise 	
-					{ ?obs fhir:Observation.code :code_ldl_cholesterol ; 
-						fhir:Observation.valueQuantity ?quantity . 
-						?quantity fhir:Quantity.value ?value .
-						?value math:greaterThan 4.9 }
-				] )
-		] ;
-		
-		gl:branchTarget :severe_dyslipidemia 
-	
-	] , [ 
-		state:in gl:Inactive ;
-		
-		
-		gl:precondition [
-			rdfs:label "not severe" ;
-			rdfs:comment """1.Fasting Triglycerides <= 11.3mmol/l (1000 mg/dl); and
-2. LDL-C <= 4.9 mmol/l(190 mg/dl)""" ;
-			
-			cond:allOf ( 
-				[ cond:premise 
-					{ ?obs fhir:Observation.code :code_fasting_triglycerides ; 
-						fhir:Observation.valueQuantity ?quantity . 
-						?quantity fhir:Quantity.value ?value .
-						?value math:notGreaterThan 11.3 }
-				
-				] [ cond:premise  
-					{ ?obs fhir:Observation.code :code_ldl_cholesterol ; 
-						fhir:Observation.valueQuantity ?quantity . 
-						?quantity fhir:Quantity.value ?value .
-						?value math:notGreaterThan 4.9 }
-				] )
-		] ;
-		
-		gl:branchTarget :Dyslipidemia_Treatment
-	] .
-	
+	rdfs:label "No action" ;
+	rdfs:comment "No further measurement of lipid profile." .
 
 :secondary_causes_found a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	rdfs:label "Treatment or specialist referral" ;
+	rdfs:label "Treatment or referral" ;
 	rdfs:comment "Remediable (secondary) causes of dyslipidemia found. Treat secondary causes or refer to specialist." .
 	
-	
-#:severe_dyslipidemia a gl:EndPoint ;
-#	state:in gl:Inactive ;
-#	gl:conditional false ; 
-#	
-#	rdfs:label "specialist referral" ;
-#	rdfs:comment "Refer to specialist for further evaluation" .
-
-
-:Dyslipidemia_Treatment a cig:MedicalWorkflow ; # gl:CompositeTask ;
+:no_secondary_causes_found a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	rdfs:label "Dyslipidemia Treatment" ;
-	gl:source "/cig/lipid/dyslipidemia_treatment.n3" .
-	
-:no_dyslipidemia a gl:EndPoint ;
-	state:in gl:Inactive ;
-	gl:conditional false ; 
-	
-	rdfs:label "No action" ;
-	rdfs:comment "No further measurement of lipid profile." .
-	
-	
-:severe_dyslipidemia a gl:EndPoint ;
-	state:in gl:Inactive ;
-	gl:conditional false ; 
-	
-	rdfs:label "Referral" ;
-	rdfs:comment "Consider referral to a specialist for further evaluation." .
+	rdfs:label "No secondary causes" ;
+	rdfs:comment "No remediable (secondary) causes of dyslipidemia found." .

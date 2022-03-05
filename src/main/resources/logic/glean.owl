@@ -8,7 +8,7 @@
 @base <http://niche.cs.dal.ca/ns/glean/base.owl> .
 
 <http://niche.cs.dal.ca/ns/glean/base.owl> rdf:type owl:Ontology ;
-                                               owl:imports <http://niche.cs.dal.ca/ns/state.owl> .
+                                            owl:imports <http://niche.cs.dal.ca/ns/state.owl> .
 
 #################################################################
 #    Annotation properties
@@ -98,6 +98,11 @@ cond:anyOf rdf:type owl:ObjectProperty .
                 rdfs:domain :WhileLoop .
 
 
+###  http://niche.cs.dal.ca/ns/glean/base.owl#workflowId
+:workflowId rdf:type owl:ObjectProperty ;
+            rdfs:domain :Workflow .
+
+
 #################################################################
 #    Data properties
 #################################################################
@@ -117,6 +122,12 @@ cond:conditionMet rdf:type owl:DatatypeProperty ;
 :currentIteration rdf:type owl:DatatypeProperty ;
                   rdfs:domain :ForLoop ;
                   rdfs:range xsd:integer .
+
+
+###  http://niche.cs.dal.ca/ns/glean/base.owl#involvesAction
+:involvesAction rdf:type owl:DatatypeProperty ;
+                rdfs:domain :Task ;
+                rdfs:range xsd:boolean .
 
 
 ###  http://niche.cs.dal.ca/ns/glean/base.owl#loaded
@@ -143,14 +154,6 @@ cond:conditionMet rdf:type owl:DatatypeProperty ;
 
 ###  http://niche.cs.dal.ca/ns/condition/base.owl#Condition
 cond:Condition rdf:type owl:Class .
-
-
-###  http://niche.cs.dal.ca/ns/state.owl#AtomicState
-<http://niche.cs.dal.ca/ns/state.owl#AtomicState> rdf:type owl:Class .
-
-
-###  http://niche.cs.dal.ca/ns/state.owl#CompoundState
-<http://niche.cs.dal.ca/ns/state.owl#CompoundState> rdf:type owl:Class .
 
 
 ###  http://niche.cs.dal.ca/ns/glean/base.owl#Argument
@@ -276,6 +279,14 @@ cond:Condition rdf:type owl:Class .
           rdfs:subClassOf :CompositeTask .
 
 
+###  http://niche.cs.dal.ca/ns/state.owl#AtomicState
+<http://niche.cs.dal.ca/ns/state.owl#AtomicState> rdf:type owl:Class .
+
+
+###  http://niche.cs.dal.ca/ns/state.owl#CompoundState
+<http://niche.cs.dal.ca/ns/state.owl#CompoundState> rdf:type owl:Class .
+
+
 #################################################################
 #    Individuals
 #################################################################
@@ -283,6 +294,14 @@ cond:Condition rdf:type owl:Class .
 ###  http://niche.cs.dal.ca/ns/condition/base.owl#Other
 cond:Other rdf:type owl:NamedIndividual ,
                     cond:Condition .
+
+
+###  http://niche.cs.dal.ca/ns/glean/base.owl#Activated
+:Activated rdf:type owl:NamedIndividual ,
+                    <http://niche.cs.dal.ca/ns/state.owl#CompoundState> ;
+           <http://niche.cs.dal.ca/ns/state.owl#includes> :Active ,
+                                                          :Completed ,
+                                                          :Discarded .
 
 
 ###  http://niche.cs.dal.ca/ns/glean/base.owl#Active
