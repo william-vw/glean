@@ -21,9 +21,9 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
 	gl:root true ;
 	gl:subTask :prior_lipid_profile , 
-		:Evaluate_Lipid_Profile , :Dyslipidemia_Treatment_Evaluate , :evaluate_severity_dyslipidemia , 
-			:severe_dyslipidemia , :Followup_Lipid_Profile_after_evaluate ,
-		:Dyslipidemia_Treatment_Followup , :Followup_Lipid_Profile .
+		:Evaluate_Lipid_Profile , :Dyslipidemia_Treatment-1 , :evaluate_severity_dyslipidemia , 
+			:severe_dyslipidemia , :Followup_Lipid_Profile-1 ,
+		:Dyslipidemia_Treatment-2 , :Followup_Lipid_Profile-2 .
 
 
 :prior_lipid_profile a gl:DecisionTask ;
@@ -64,7 +64,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 			)
 		] ;
 		
-		gl:branchTarget :Dyslipidemia_Treatment_Followup
+		gl:branchTarget :Dyslipidemia_Treatment-2
 	] .
 
 
@@ -72,13 +72,13 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	state:in gl:Inactive ;
 	gl:conditional false ;  
 	
-	gl:next :Dyslipidemia_Treatment_Evaluate ;
+	gl:next :Dyslipidemia_Treatment-1 ;
 	
 	rdfs:label "Evaluate Lipid Profile" ;
 	
 	gl:source "/cig/lipid/evaluate_lipid_profile.n3" .
 
-:Dyslipidemia_Treatment_Evaluate a cig:MedicalWorkflow ;
+:Dyslipidemia_Treatment-1 a cig:MedicalWorkflow ;
 	state:in gl:Inactive ;
 	gl:conditional false ;
 	
@@ -86,7 +86,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	rdfs:label "Dyslipidemia Treatment" ;
 	
-	gl:workflowId :Dyslipidemia_Treatment-1 ;
 	gl:source "/cig/lipid/dyslipidemia_treatment-1.n3" .	
 
 :evaluate_severity_dyslipidemia a gl:DecisionTask ;
@@ -147,7 +146,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 				] )
 		] ;
 		
-		gl:branchTarget :Followup_Lipid_Profile_after_evaluate
+		gl:branchTarget :Followup_Lipid_Profile-1
 	] .
 
 :severe_dyslipidemia a gl:EndPoint ;
@@ -157,33 +156,30 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	rdfs:label "Referral" ;
 	rdfs:comment "Consider referral to a specialist for further evaluation." .
 
-:Followup_Lipid_Profile_after_evaluate a cig:MedicalWorkflow ; 
+:Followup_Lipid_Profile-1 a cig:MedicalWorkflow ; 
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "Followup Lipid Profile" ;
 	
-	gl:workflowId :Followup_Lipid_Profile-1 ;
 	gl:source "/cig/lipid/followup_lipid_profile-gw-1.n3" .
 	
 	
 
-:Dyslipidemia_Treatment_Followup a cig:MedicalWorkflow ;
+:Dyslipidemia_Treatment-2 a cig:MedicalWorkflow ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	gl:next :Followup_Lipid_Profile ;
+	gl:next :Followup_Lipid_Profile-2 ;
 	
 	rdfs:label "Dyslipidemia Treatment" ;
 	
-	gl:workflowId :Dyslipidemia_Treatment-2 ;
 	gl:source "/cig/lipid/dyslipidemia_treatment-2.n3" .
 	
-:Followup_Lipid_Profile a cig:MedicalWorkflow ; 
+:Followup_Lipid_Profile-2 a cig:MedicalWorkflow ; 
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "Followup Lipid Profile" ;
 	
-	gl:workflowId :Followup_Lipid_Profile-2 ;
 	gl:source "/cig/lipid/followup_lipid_profile-gw-2.n3" .

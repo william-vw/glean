@@ -160,12 +160,6 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			str.append(printKeyString("description", txtToJson(descr)));
 		}
 
-		if (kb.contains(task, kb.resource("gl:workflowId"), null)) {
-			str.append(",");
-			str.append(printKeyString("workflow_id",
-					kb.getObject(task, kb.resource("gl:workflowId")).getLocalName()));
-		}
-
 		runTaskHook(task);
 
 		List<NodeLink> children = curNode.getChildren();
@@ -320,13 +314,6 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			}
 
 			return false;
-		}
-
-		public boolean sameWorkflow(Node n) {
-			String wfId = getWorkflowId(task);
-			String wfId2 = getWorkflowId(n.getTask());
-
-			return wfId != null && wfId2 != null && wfId.equals(wfId2);
 		}
 
 		@Override

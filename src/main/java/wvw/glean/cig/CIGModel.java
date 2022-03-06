@@ -28,7 +28,7 @@ public class CIGModel extends WorkflowModel_Auto {
 		resetAll(kb.resource(ns + taskId));
 	}
 
-	public List<TaskState> transitAll(String workflowId) {
+	public List<EntityState> transitAll(String workflowId) {
 		return transitAll(kb.resource(ns + workflowId));
 	}
 

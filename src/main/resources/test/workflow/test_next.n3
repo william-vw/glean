@@ -25,3 +25,15 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 :tD a gl:Task ; state:in gl:Inactive ; gl:conditional false .
 :tE a gl:Task ; state:in gl:Inactive ; gl:conditional false .
 :tF a gl:Task ; state:in gl:Inactive ; gl:conditional false .
+
+:tX1 a gl:Task ;
+	state:in gl:Discarded .
+:tX2 a gl:Task ;
+	# state:in gl:Active .
+	state:in gl:Discarded .
+	
+:tY a gl:Task ; 
+	state:in gl:Inactive .
+
+:tX1 gl:next :tY .
+:tX2 gl:next :tY .

@@ -97,7 +97,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		
-		
 		gl:precondition [
 			rdfs:label "secondary causes" ;
 			rdfs:comment "Some secondary causes found." ;
@@ -126,7 +125,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	] , [
 		state:in gl:Inactive ;
 		
-		
 		gl:precondition [
 			rdfs:label "no" ;
 			rdfs:comment "No secondary causes found." ;
@@ -145,7 +143,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 :no_dyslipidemia a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
-	gl:involvesAction false ;
 	
 	rdfs:label "No action" ;
 	rdfs:comment "No further measurement of lipid profile." .

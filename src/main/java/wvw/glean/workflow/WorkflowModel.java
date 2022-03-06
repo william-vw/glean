@@ -228,11 +228,11 @@ public abstract class WorkflowModel {
 		listeners.remove(listener);
 	}
 
-	public List<TaskState> transitAll() {
+	public List<EntityState> transitAll() {
 		return transitAll(null);
 	}
 
-	public abstract List<TaskState> transitAll(Resource workflow);
+	public abstract List<EntityState> transitAll(Resource workflow);
 
 	public void printAllTransits() {
 		printAllTransits((Resource) null, false);
@@ -247,24 +247,20 @@ public abstract class WorkflowModel {
 	}
 
 	public void printAllTransits(Resource workflow, boolean groupPerState) {
-		List<TaskState> states = transitAll(workflow);
+		List<EntityState> states = transitAll(workflow);
 
 		printAllTransits(states, groupPerState);
 	}
 
-	public void printAllTransits(List<TaskState> states) {
-		printAllTransits(states, false);
-	}
-
-	public void printAllTransits(List<TaskState> states, boolean groupPerState) {
+	protected void printAllTransits(List<EntityState> states, boolean groupPerState) {
 		if (groupPerState) {
-			MultiMap<String, TaskState> map = new HashMultiMap<>();
+			MultiMap<String, EntityState> map = new HashMultiMap<>();
 			states.stream()
 					.forEach(state -> map.putValue(state.getAtomicState().getLocalName(), state));
 
-			Iterator<Entry<String, List<TaskState>>> it = map.entrySet().iterator();
+			Iterator<Entry<String, List<EntityState>>> it = map.entrySet().iterator();
 			while (it.hasNext()) {
-				Entry<String, List<TaskState>> e = it.next();
+				Entry<String, List<EntityState>> e = it.next();
 
 				System.out.println(e.getKey() + ":");
 				e.getValue().forEach(state -> System.out.println(state));
@@ -434,6 +430,23 @@ public abstract class WorkflowModel {
 		kb.close();
 	}
 
+	protected String findEntityLabel(Resource entity, JenaKb kb) {
+		if (entity.isURI())
+			return entity.getLocalName();
+		else {
+			Statement condStmt = entity.getProperty(kb.resource("gl:precondition"));
+			if (condStmt.getObject().equals(kb.resource("gl:Other")))
+				return "OTHER";
+			else {
+				Statement labelStmt = condStmt.getObject().getProperty(RDFS.label);
+				if (labelStmt != null)
+					return "\"" + labelStmt.getObject().asLiteral().getString() + "\"";
+				else
+					return entity.toString();
+			}
+		}
+	}
+
 	public interface WorkflowUpdateListener {
 
 		public void workflowUpdated();
@@ -448,20 +461,26 @@ public abstract class WorkflowModel {
 		}
 	}
 
-	public static class TaskState {
+	public class EntityState {
 
-		private Resource task;
+		private Resource entity;
 		private Resource atomicState;
 		private List<Resource> compoundStates;
 
-		public TaskState(Resource task, Resource atomicState, List<Resource> compoundStates) {
-			this.task = task;
+		private String label;
+
+		public EntityState(Resource entity, Resource atomicState, List<Resource> compoundStates,
+				JenaKb kb) {
+
+			this.entity = entity;
 			this.atomicState = atomicState;
 			this.compoundStates = compoundStates;
+
+			label = findEntityLabel(entity, kb);
 		}
 
-		public Resource getTask() {
-			return task;
+		public Resource getEntity() {
+			return entity;
 		}
 
 		public boolean hasAtomicState() {
@@ -476,11 +495,14 @@ public abstract class WorkflowModel {
 			return compoundStates;
 		}
 
+		public String getLabel() {
+			return label;
+		}
+
 		@Override
 		public String toString() {
-			return (task.isAnon() ? task : task.getLocalName()) + " is "
-					+ (atomicState != null ? atomicState.getLocalName() : "unknown") + " ("
-					+ compoundStates.stream().map(c -> c.getLocalName())
+			return label + " is " + (atomicState != null ? atomicState.getLocalName() : "unknown")
+					+ " (" + compoundStates.stream().map(c -> c.getLocalName())
 							.collect(Collectors.joining(", "))
 					+ ")";
 		}

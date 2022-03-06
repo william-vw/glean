@@ -15,7 +15,6 @@ import org.apache.jen3.rdf.model.Resource;
 import org.apache.jen3.rdf.model.Statement;
 import org.apache.jen3.rdf.model.StmtIterator;
 import org.apache.jen3.vocabulary.RDF;
-import org.apache.jen3.vocabulary.RDFS;
 
 import wvw.utils.log.Log;
 import wvw.utils.map.MultiMap;
@@ -100,52 +99,59 @@ public class WorkflowModel_Auto extends WorkflowModel {
 
 	// TODO only return tasks with *changed* states ..
 	// (will require keeping a map in this class; or keeping timestamp before adding
-	// data, and checking transit logs for younger transits).
+	// data, and checking transit logs for younger transits)
 
 	@Override
-	public List<TaskState> transitAll(Resource workflow) {
+	public List<EntityState> transitAll(Resource workflow) {
 		// so tasks are neatly ordered by their URI
-		Map<Resource, TaskState> states = new TreeMap<>();
+		Map<Resource, EntityState> states = new TreeMap<>();
 
-		// @formatter:off
-		StmtIterator stmts = (workflow == null ? 
-			kb.list(null, RDF.type, kb.resource("gl:Task")) :
-			kb.list(workflow, kb.resource("gl:subTask"), null)
-		);
-		// @formatter:on
+		StmtIterator stmts = null;
+		if (workflow != null) {
+			transit(workflow, states);
+			stmts = kb.list(workflow, kb.resource("gl:subTask"), null);
+
+		} else
+			stmts = kb.list(null, RDF.type, kb.resource("gl:Task"));
 
 		while (stmts.hasNext()) {
 			Statement stmt = stmts.next();
-			// @formatter:off
-			Resource task = (workflow == null ? 
-				stmt.getSubject() : 
-				stmt.getObject()
-			);
-			// @formatter:on
 
-			List<Resource> atom = new ArrayList<>();
-			List<Resource> compound = new ArrayList<>();
+			Resource task = (workflow == null ? stmt.getSubject() : stmt.getObject());
+			transit(task, states);
 
-			StmtIterator stmts2 = kb.list(task, statePrp, null);
+			// comment this out if branches should not be included
+			StmtIterator stmts2 = kb.list(task, kb.resource("gl:decisionBranch"), null);
 			while (stmts2.hasNext()) {
 				Statement stmt2 = stmts2.next();
-
-				Resource state = stmt2.getObject();
-				if (state.hasProperty(RDF.type, kb.resource("state:AtomicState")))
-					atom.add(state);
-
-				else
-					compound.add(state);
+				transit(stmt2.getObject(), states);
 			}
-
-			states.put(task, new TaskState(task, (!atom.isEmpty() ? atom.get(0) : null), compound));
 		}
 
 		return new ArrayList<>(states.values());
 	}
 
+	private void transit(Resource entity, Map<Resource, EntityState> states) {
+		List<Resource> atom = new ArrayList<>();
+		List<Resource> compound = new ArrayList<>();
+
+		StmtIterator stmts2 = kb.list(entity, statePrp, null);
+		while (stmts2.hasNext()) {
+			Statement stmt2 = stmts2.next();
+
+			Resource state = stmt2.getObject();
+			if (state.hasProperty(RDF.type, kb.resource("state:AtomicState")))
+				atom.add(state);
+			else
+				compound.add(state);
+		}
+
+		states.put(entity,
+				new EntityState(entity, (!atom.isEmpty() ? atom.get(0) : null), compound, kb));
+	}
+
 	@Override
-	public void printAllTransits(List<TaskState> states, boolean groupPerState) {
+	public void printAllTransits(List<EntityState> states, boolean groupPerState) {
 		// involves printing current states & transit logs
 
 		Log.i("- current states:");
@@ -160,21 +166,7 @@ public class WorkflowModel_Auto extends WorkflowModel {
 			Resource log = stmt.getSubject();
 
 			Resource targetRes = log.getPropertyResourceValue(kb.resource("state:target"));
-			String target = null;
-			if (targetRes.isURI())
-				target = targetRes.getLocalName();
-			else {
-				Statement condStmt = targetRes.getProperty(kb.resource("gl:precondition"));
-				if (condStmt.getObject().equals(kb.resource("gl:Other")))
-					target = "OTHER";
-				else {
-					Statement labelStmt = condStmt.getObject().getProperty(RDFS.label);
-					if (labelStmt != null)
-						target = "\"" + labelStmt.getObject().asLiteral().getString() + "\"";
-					else
-						target = targetRes.toString();
-				}
-			}
+			String target = findEntityLabel(targetRes, kb);
 
 			String from = log.getPropertyResourceValue(kb.resource("state:from")).getLocalName();
 			String to = log.getPropertyResourceValue(kb.resource("state:to")).getLocalName();

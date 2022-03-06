@@ -37,9 +37,9 @@ public class WorkflowTest {
 //		testRederive();
 
 		// test TNM constructs
-//		test_next(spec);
+		test_next(spec);
 //		test_composite(spec);
-		test_decision(spec);
+//		test_decision(spec);
 //		test_split(spec);
 //		test_cycle(spec);
 	}
@@ -85,10 +85,10 @@ public class WorkflowTest {
 		JenaKb kb = m.getKb();
 
 		m.printAllTransits(true);
-
-		Log.i("\n>> adding profile that meets condition");
-		kb.add(kb.resource(base + "will"), kb.resource(base + "hasHR"), 151);
-		m.printAllTransits(true);
+//
+//		Log.i("\n>> adding profile that meets condition");
+//		kb.add(kb.resource(base + "will"), kb.resource(base + "hasHR"), 151);
+//		m.printAllTransits(true);
 
 //		kb.printAll();
 //		kb.printDerivations();

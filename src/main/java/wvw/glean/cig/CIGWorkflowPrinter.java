@@ -6,10 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.jen3.n3.N3Model;
@@ -43,7 +41,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 	private final static Logger LOG = Logger.getLogger(CIGWorkflowPrinter.class.getName());
 
 	private Map<Resource, JenaKb> inputDatas = new HashMap<>();
-	private Set<Resource> inputs = new HashSet<>();
+	private Map<Resource, String> inputHtml = new HashMap<>();
 
 	private UiGen uiGen = new UiGen();
 
@@ -72,7 +70,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 	}
 
 	public void printUi(String inputPath, String inputRes) throws Exception {
-		JenaKb inputData = getInputData(inputPath);
+		JenaKb inputData = loadInputData(inputPath);
 //		inputData.printAll();
 
 		N3Model reportNeeds = getReportNeeds(inputData.resource(inputRes), inputData);
@@ -117,73 +115,83 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		LOG.info("written to " + outPath);
 	}
 
-	// return whether json was updated by this hook
+	// (returns whether json was updated by this hook)
 	public Boolean apply(Resource t, JenaKb kb, WorkflowJsonPrinter printer) {
 		if (!t.isURI())
 			return false;
 
 		Resource input = t.getPropertyResourceValue(kb.resource("cig:input"));
 		if (input != null) {
+			String html = null;
 
 			// already encountered this particular input
 			// (e.g., in case of multiple occurrences of same workflow)
-			if (inputs.contains(input))
-				return false;
-
-			inputs.add(input);
-
-			Resource inputFile = findClosestInputData(t, kb);
-			if (inputFile == null) {
-				LOG.error("cannot find closest inputFile for input: " + input);
-				return false;
+			if (inputHtml.containsKey(input))
+				html = inputHtml.get(input);
+			else {
+				html = generateHtml(t, kb, input);
+				inputHtml.put(input, html);
 			}
 
-			if (!inputDatas.containsKey(inputFile)) {
-				String inPath = inputFile.asLiteral().getString();
-
-				try {
-					JenaKb inputData = getInputData(inPath);
-					inputDatas.put(inputFile, inputData);
-
-					LOG.info("loaded input file: " + inPath);
-
-				} catch (IOException e) {
-					LOG.error("cannot load inputFile: " + inPath, e);
-					return false;
-				}
-			}
-
-			JenaKb inputData = inputDatas.get(inputFile);
-
-			LOG.info(t.getLocalName() + ": input = " + input.getLocalName() + " ("
-					+ inputFile.asLiteral().getValue() + ")");
-
-			N3Model reportNeeds = getReportNeeds(input, inputData);
-//				reportNeeds.write(System.out);
-
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			try {
-				uiGen.generate(EhrStandards.FHIR, UiFormats.HTML_RDFA, reportNeeds, tmpDir, out,
-						OutputOptions.TABLE);
-
-				String html = new String(out.toByteArray()).trim();
-//				System.out.println(html);
-				html = Pattern.compile(">\\s+<", Pattern.DOTALL).matcher(html).replaceAll("><");
-
+			if (html != null) {
 				printer.appendKeyString("html", printer.txtToJson(html));
-
 				// added some stuff to the json
 				return true;
-
-			} catch (Exception e) {
-				LOG.error("cannot generate UI code", e);
 			}
 		}
 
 		return false;
 	}
 
-	private JenaKb getInputData(String inPath) throws IOException {
+	private String generateHtml(Resource t, JenaKb kb, Resource input) {
+		Resource inputFile = findClosestInputData(t, kb);
+		if (inputFile == null) {
+			LOG.error("cannot find closest inputFile for input: " + input);
+			return null;
+		}
+
+		if (!inputDatas.containsKey(inputFile)) {
+			String inPath = inputFile.asLiteral().getString();
+
+			try {
+				JenaKb inputData = loadInputData(inPath);
+				inputDatas.put(inputFile, inputData);
+
+				LOG.info("loaded input file: " + inPath);
+
+			} catch (IOException e) {
+				LOG.error("cannot load inputFile: " + inPath, e);
+				return null;
+			}
+		}
+
+		JenaKb inputData = inputDatas.get(inputFile);
+
+		LOG.info(t.getLocalName() + ": input = " + input.getLocalName() + " ("
+				+ inputFile.asLiteral().getValue() + ")");
+
+		N3Model reportNeeds = getReportNeeds(input, inputData);
+//			reportNeeds.write(System.out);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			uiGen.generate(EhrStandards.FHIR, UiFormats.HTML_RDFA, reportNeeds, tmpDir, out,
+					OutputOptions.TABLE);
+
+			String html = new String(out.toByteArray()).trim();
+//			System.out.println(html);
+			html = Pattern.compile(">\\s+<", Pattern.DOTALL).matcher(html).replaceAll("><");
+
+			return html;
+
+		} catch (Exception e) {
+			LOG.error("cannot generate UI code", e);
+
+			return null;
+		}
+	}
+
+	private JenaKb loadInputData(String inPath) throws IOException {
 		File reportNeeds = Paths.get("src/main/resources" + inPath).toFile();
 
 		N3Model model = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));

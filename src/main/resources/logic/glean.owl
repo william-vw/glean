@@ -98,10 +98,6 @@ cond:anyOf rdf:type owl:ObjectProperty .
                 rdfs:domain :WhileLoop .
 
 
-###  http://niche.cs.dal.ca/ns/glean/base.owl#workflowId
-:workflowId rdf:type owl:ObjectProperty ;
-            rdfs:domain :Workflow .
-
 
 #################################################################
 #    Data properties
@@ -300,8 +296,7 @@ cond:Other rdf:type owl:NamedIndividual ,
 :Activated rdf:type owl:NamedIndividual ,
                     <http://niche.cs.dal.ca/ns/state.owl#CompoundState> ;
            <http://niche.cs.dal.ca/ns/state.owl#includes> :Active ,
-                                                          :Completed ,
-                                                          :Discarded .
+                                                          :Completed .
 
 
 ###  http://niche.cs.dal.ca/ns/glean/base.owl#Active

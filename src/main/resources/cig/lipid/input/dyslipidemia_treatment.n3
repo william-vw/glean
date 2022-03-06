@@ -17,9 +17,9 @@
 	
 :action_assess_patient_statin a fhir:ActivityDefinition ;
 	fhir:ActivityDefinition.name "action_assess_patient_statin" ;
-	fhir:ActivityDefinition.title "Were any statins prescribed for cholesterol lowering treatment?" ;
+	fhir:ActivityDefinition.title "Any statins prescribed for cholesterol lowering treatment?" ;
 	fhir:ActivityDefinition.observationResultRequirement [
-		fhir:ObservationDefinition.code :code_statin ;
+		fhir:ObservationDefinition.code :code_statin_prescribed ;
 		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
 		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
 		fhir:ObservationDefinition.mutexWith ( )

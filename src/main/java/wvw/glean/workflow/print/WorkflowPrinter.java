@@ -91,16 +91,7 @@ public abstract class WorkflowPrinter {
 		List<Resource> ret = new ArrayList<>();
 
 		if (e.hasProperty(RDF.type, kb.resource("gl:CompositeTask"))) {
-			ExtendedIterator<Statement> it = null;
-
-			// if workflow-id is given, then include those sub-tasks
-			if (e.hasProperty(kb.resource("gl:workflowId"))) {
-				Resource id = kb.getObject(e, kb.resource("gl:workflowId"));
-				it = id.listProperties(kb.resource("gl:subTask"));
-
-				// else, include the direct sub-tasks
-			} else
-				it = e.listProperties(kb.resource("gl:subTask"));
+			ExtendedIterator<Statement> it = e.listProperties(kb.resource("gl:subTask"));
 
 			while (it.hasNext()) {
 				Statement stmt = it.next();
@@ -169,16 +160,6 @@ public abstract class WorkflowPrinter {
 		e = getTask(e);
 
 		return (e.isURI() ? e.getLocalName() : e.toString());
-	}
-
-	protected String getWorkflowId(Resource e) {
-		e = getTask(e);
-
-		if (e.isURI() && e.hasProperty(kb.resource("gl:workflowId")))
-			return e.getProperty(kb.resource("gl:workflowId")).getObject().getLocalName();
-
-		return null;
-
 	}
 
 	protected String getType(Resource task) {
