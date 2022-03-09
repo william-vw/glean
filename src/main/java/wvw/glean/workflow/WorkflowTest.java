@@ -37,8 +37,8 @@ public class WorkflowTest {
 //		testRederive();
 
 		// test TNM constructs
-		test_next(spec);
-//		test_composite(spec);
+//		test_next(spec);
+		test_composite(spec);
 //		test_decision(spec);
 //		test_split(spec);
 //		test_cycle(spec);
@@ -89,7 +89,7 @@ public class WorkflowTest {
 //		Log.i("\n>> adding profile that meets condition");
 //		kb.add(kb.resource(base + "will"), kb.resource(base + "hasHR"), 151);
 //		m.printAllTransits(true);
-
+		
 //		kb.printAll();
 //		kb.printDerivations();
 	}
@@ -115,7 +115,7 @@ public class WorkflowTest {
 		m.transitTo(kb.resource(base + "tE1"), kb.resource("gl:Discarded"));
 		m.transitTo(kb.resource(base + "tE2"), kb.resource("gl:Discarded"));
 		m.printAllTransits(true);
-
+		
 //		kb.printAll();
 //		kb.printDerivations();
 	}

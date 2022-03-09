@@ -39,10 +39,9 @@ base <http://niche.cs.dal.ca/ns/glean/base.owl#>
   state:reason :discardSubTasksOfDiscardedComposite .
 
 
-# if a composite task is active, and all its subtasks are done 
+# - if a composite task is active, and all its subtasks are done 
 # (i.e., at least one completed subtask, and all other subtasks are done (completed or discarded)), 
 # then complete the composite task
-
 
 {	{	?composite a :CompositeTask ;	
 			:subTask ?complSub .
@@ -61,7 +60,27 @@ base <http://niche.cs.dal.ca/ns/glean/base.owl#>
   state:reason :completeCompositeWithAllCompletedSubTasks .
 
 
+# these rollbacks are awkward (and easily open the door for infinite loops) 
+# much easier to deal with these in the client code
+
+# - [ROLLBACK] if a composite task is completed, but one of its subtasks is no longer done,  
+# then re-activate the composite task (makes system more interactive)
+
+#{	{	?composite a :CompositeTask ;	
+#			:subTask ?complSub .
+#		# composite task has at least one not-done subtask
+#		?complSub state:in :NotDone . 
+#	
+#	} a state:Guard .
+#
+#	?composite state:in :Completed # composite task in completed state
+#
+#} state:transit { ?composite state:in :Active } ; # complete composite task
+#  state:reason :rollbackCompletedCompositeWithNotDoneSubTask .
+  
+
 # - if a composite task is not done, and all its subtasks are discarded, then discard the composite task
+
 {	{	?composite a :CompositeTask ;
 			:subTask ?oneSub . # at least one subtask
 		

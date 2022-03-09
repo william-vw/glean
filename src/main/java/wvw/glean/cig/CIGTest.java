@@ -6,19 +6,19 @@ import wvw.semweb.kb.jena.NS;
 
 public class CIGTest {
 
-//	private static String cigPath = "cig/lipid/ckd_dyslipidemia.n3";
-	private static String cigPath = "cig/lipid/evaluate_lipid_profile.n3";
+	private static String cigPath = "cig/lipid/ckd_dyslipidemia.n3";
+//	private static String cigPath = "cig/lipid/evaluate_lipid_profile.n3";
 
 	public static void main(String[] args) throws Exception {
 		CIGModel cig = (CIGModel) new CIGModel(NS.ckd)
 				.initialize(InitOptions.DO_TRANSIT, InitOptions.LOGGING)
 				.load(CIGModel.class, cigPath, LoadOptions.RECURSIVELY);
 
-//		cig.transitAll("Dyslipidemia_CKD");
-		cig.transitAll("Evaluate_Lipid_Profile");
+		cig.transitAll("Dyslipidemia_CKD");
+//		cig.transitAll("Evaluate_Lipid_Profile");
 
-//		followupLipidProfileCase(cig);
-		evaluateLipidProfileCase(cig);
+		followupLipidProfileCase(cig);
+//		evaluateLipidProfileCase(cig);
 	}
 
 	public static void followupLipidProfileCase(CIGModel cig) throws Exception {

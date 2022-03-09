@@ -219,9 +219,13 @@ public class WorkflowModel_Auto extends WorkflowModel {
 	@Override
 	public boolean transitTo(Resource task, Resource newState) {
 		List<Statement> stmts2 = kb.list(task, statePrp, null).toList();
-		for (Statement stmt2 : stmts2)
+		for (Statement stmt2 : stmts2) {
+//			Log.i("removing: " + stmt2);
 			// don't want to trigger a rebind
 			kb.removeQuietly(stmt2);
+		}
+
+//		Log.i("adding: " + task + " " + statePrp + " " + newState);
 
 		if (bulkTransit)
 			kb.addQuietly(task, statePrp, newState);

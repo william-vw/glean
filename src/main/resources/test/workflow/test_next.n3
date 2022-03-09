@@ -37,3 +37,7 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 
 :tX1 gl:next :tY .
 :tX2 gl:next :tY .
+
+:tK a gl:Task ; state:in gl:Completed .
+:tL a gl:Task ; state:in gl:Inactive ; gl:conditional false .
+:tK gl:next :tL .

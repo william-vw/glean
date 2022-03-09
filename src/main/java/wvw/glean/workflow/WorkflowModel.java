@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -18,8 +19,10 @@ import org.apache.jen3.n3.N3ModelSpec.Types;
 import org.apache.jen3.rdf.model.Collection;
 import org.apache.jen3.rdf.model.Resource;
 import org.apache.jen3.rdf.model.Statement;
+import org.apache.jen3.rdf.model.StmtIterator;
 import org.apache.jen3.reasoner.InfGraph;
 import org.apache.jen3.reasoner.rulesys.builtins.n3.log.Skolem;
+import org.apache.jen3.util.iterator.ExtendedIterator;
 import org.apache.jen3.vocabulary.RDFS;
 import org.apache.log4j.Logger;
 
@@ -298,95 +301,156 @@ public abstract class WorkflowModel {
 	public abstract boolean transitTo(Resource task, Resource newState);
 
 	public void resetAll(Resource task) {
-		// collects all tasks occurring *after* the given task
-		Set<Resource> found = new HashSet<>();
-		// removes all "raw" statements that pertain to input // and associated
-		// derivations (i.e., conditionMet) that occur *after* the given task
-		deleteInputsAndConditionsRecursively(task, found);
+		// removes all "raw" statements that pertain to input and associated
+		// derivations (i.e., conditionMet) for the task and its successors
 
-		startBulkTransit();
-		resetStatesRecursively(task);
-		endBulkTransit();
+		// will return false if there aren't any inputs associated with the given task
+		// (in that case, there are no states to reset)
+
+//		Log.i("start resetting");
+
+		if (resetInputsAndConditionsRecursively(task))
+			resetStatesRecursively(task);
+
+//		Log.i("done resetting");
 	}
 
 	private void resetStatesRecursively(Resource task) {
-//		LOG.info("resetting: " + task);
+		List<Statement> toRemove = new ArrayList<>();
+		List<Statement> toAdd = new ArrayList<>();
 
+		propagateThroughWorkflow(task, (t) -> {
+//			Log.i("resetting: " + t);
+			getResetState(t, toRemove, toAdd);
+			return true;
+		});
+
+		startBulkTransit();
+
+		toRemove.forEach(stmt -> kb.removeQuietly(stmt));
+		toAdd.forEach(stmt -> kb.addQuietly(stmt));
+
+//		kb.printAll();
+
+		endBulkTransit();
+	}
+
+	private void getResetState(Resource task, List<Statement> toRemove, List<Statement> toAdd) {
 		Resource target = null;
 		if (task.hasProperty(kb.resource("gl:root"), kb.literal(true)))
 			target = kb.resource("gl:Active");
 		else
 			target = kb.resource("gl:Inactive");
 
-		transitTo(task, target);
+		List<Statement> stmts2 = kb.list(task, statePrp, null).toList();
+		toRemove.addAll(stmts2);
 
-		task.listProperties(kb.resource("gl:subTask"))
-				.andThen(task.listProperties(kb.resource("gl:next"))).forEachRemaining(stmt -> {
-					Resource task2 = stmt.getObject();
-
-					resetStatesRecursively(task2);
-				});
+		toAdd.add(kb.getModel().createStatement(task, statePrp, target));
 	}
 
-	public void deleteInputs(Resource task, boolean rederive) {
-		List<Statement> toDelete = getInputs(task);
+	private boolean resetInputsAndConditionsRecursively(Resource task) {
+		List<Statement> toRemove = new ArrayList<>();
 
-		if (!toDelete.isEmpty()) {
-			startConditionUpdate();
+		propagateThroughWorkflow(task, new Function<Resource, Boolean>() {
 
-			toDelete.forEach(stmt -> removeConditionPremise(stmt.getSubject(), stmt.getPredicate(),
-					stmt.getObject()));
+			private Set<Resource> set = new HashSet<>();
 
-			endConditionUpdate(rederive);
+			@Override
+			public Boolean apply(Resource t) {
+				if (set.contains(t))
+					return false;
+
+				set.add(t);
+
+//				Log.i("deleting: " + t);
+				getResetInputsAndConditions(t, toRemove);
+
+				return true;
+			}
+		});
+
+		startBulkTransit();
+
+		toRemove.forEach(stmt -> kb.removeQuietly(stmt));
+
+//		kb.printAll();
+
+		endBulkTransit();
+
+		return true;
+	}
+
+	private void propagateThroughWorkflow(Resource task, Function<Resource, Boolean> op) {
+		propagateThroughWorkflow(task, op, true, false);
+	}
+
+	private void propagateThroughWorkflow(Resource task, Function<Resource, Boolean> op,
+			boolean first, boolean isSuper) {
+
+//		if (!op.apply(task))
+//			return;
+
+		op.apply(task);
+
+		ExtendedIterator<Statement> it = task.listProperties(kb.resource("gl:next"));
+		if (!isSuper)
+			it = it.andThen(task.listProperties(kb.resource("gl:subTask")));
+
+		while (it.hasNext()) {
+			Statement stmt = it.next();
+			Resource task2 = stmt.getObject();
+
+//			Log.i("next: " + task2);
+			propagateThroughWorkflow(task2, op, false, false);
+		}
+
+		// for first-task & super-tasks, propagate *up* through workflow
+		if (first || isSuper) {
+			StmtIterator superTasks = kb.list(null, kb.resource("gl:subTask"), task);
+
+			while (superTasks.hasNext()) {
+				Statement stmt0 = superTasks.next();
+				Resource superTask = stmt0.getSubject();
+
+//				Log.i("super: " + superTask);
+				propagateThroughWorkflow(superTask, op, false, true);
+			}
 		}
 	}
 
-	public void deleteInputsAndConditionsRecursively(Resource task, Set<Resource> met) {
-		if (met.contains(task))
-			return;
-
-		met.add(task);
-
-//		LOG.info("deleting inputs: " + task);
-
+	private boolean getResetInputsAndConditions(Resource task, List<Statement> toRemove) {
 		// only interested in removing "raw" underlying data
-		getInputs(task).forEach(
-				stmt -> kb.removeRaw(stmt.getSubject(), stmt.getPredicate(), stmt.getObject()));
+		List<Statement> inputs = getInputs(task);
 
-		// (does not re-derive them; assumption is that only the task's inputs determine
-		// whether the task's condition is met; and we just deleted all those inputs)
+		toRemove.addAll(inputs);
 
-		resetTaskCondition(task);
+		getResetTaskCondition(task, toRemove);
 
-		task.listProperties(kb.resource("gl:subTask"))
-				.andThen(task.listProperties(kb.resource("gl:next"))).forEachRemaining(stmt -> {
-					Resource task2 = stmt.getObject();
-					deleteInputsAndConditionsRecursively(task2, met);
-				});
+		return true;
 	}
 
-	private void resetTaskCondition(Resource task) {
-		kb.removeDeduction(task, condInfPrp, null);
+	private void getResetTaskCondition(Resource task, List<Statement> toRemove) {
+		kb.list(task, condInfPrp, null).forEachRemaining(stmt -> toRemove.add(stmt));
 
 		kb.list(task, condPrp, null).forEachRemaining(condStmt -> {
 			Resource cond = condStmt.getObject();
-			resetConditionOperand(cond);
+
+			getResetConditionOperand(cond, toRemove);
 		});
 	}
 
-	private void resetConditionOperand(Resource cond) {
-		kb.removeDeduction(cond, condInfPrp, null);
+	private void getResetConditionOperand(Resource cond, List<Statement> toRemove) {
+		kb.list(cond, condInfPrp, null).forEachRemaining(stmt -> toRemove.add(stmt));
 
 		Resource skolem = kb.toResource(Skolem.gen(cond.asNode()));
-		kb.removeDeduction(skolem, condInfPrp, null);
+		kb.list(skolem, condInfPrp, null).forEachRemaining(stmt -> toRemove.add(stmt));
 
 		kb.list(cond, kb.property("cond:allOf"), null)
 				.andThen(kb.list(cond, kb.property("cond:anyOf"), null)).forEachRemaining(stmt -> {
 					Collection coll = stmt.getObject().asCollection();
 
-					coll.getElements().forEachRemaining(el -> {
-						resetConditionOperand(el);
-					});
+					coll.getElements()
+							.forEachRemaining(el -> getResetConditionOperand(el, toRemove));
 				});
 	}
 
@@ -398,14 +462,6 @@ public abstract class WorkflowModel {
 		});
 
 		return inputs;
-	}
-
-	public void removeQuietly(Statement stmt) {
-		kb.removeQuietly(stmt.getSubject(), stmt.getPredicate(), stmt.getObject());
-	}
-
-	public void removeQuietly(Resource s, Resource p, Resource o) {
-		kb.removeQuietly(s, p, o);
 	}
 
 	public void startConditionUpdate() {

@@ -192,6 +192,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 :prescribe_lifestyle_changes_judiciously-2 a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
+	gl:involvesAction false ;
 	
 	gl:next :fasting_serum_tgs_values2-2 ;
 	
@@ -202,6 +203,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 :prescribe_lifestyle_changes-2 a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
+	gl:involvesAction false ;
 	
 	gl:next :fasting_serum_tgs_values2-2 ;
 	
@@ -272,6 +274,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 :avoid_nicotinic_acid-2 a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
+	gl:involvesAction false ;
 	
 	gl:next :assess_prevent_pancreatitis-2 ;
 	
