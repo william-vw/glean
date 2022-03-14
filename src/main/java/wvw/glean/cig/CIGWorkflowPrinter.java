@@ -50,8 +50,9 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// - print html separately
 
-//		printer.printUi("/cig/lipid/input/dyslipidemia_treatment.n3",
-//				"ckd:statin_prescribed_report");
+		// (NOTE: when editing ui_codes, need to re-run UiGen!)
+		
+//		printer.printUi("/cig/lipid/input/ckd_dyslipidemia.n3", "ckd:prior_lipid_profile_report");
 
 		// - print workflow
 

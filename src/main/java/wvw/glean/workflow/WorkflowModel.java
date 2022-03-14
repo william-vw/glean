@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -40,6 +40,10 @@ public abstract class WorkflowModel {
 
 	public enum InitOptions {
 		DO_TRANSIT, LOAD_GEN, LOGGING
+	}
+
+	protected enum ResetCmds {
+		ALL, STOP, ONLY_STATES;
 	}
 
 	protected final static Logger LOG = Logger.getLogger(WorkflowModel.class.getName());
@@ -302,27 +306,86 @@ public abstract class WorkflowModel {
 
 	public void resetAll(Resource task) {
 		// removes all "raw" statements that pertain to input and associated
-		// derivations (i.e., conditionMet) for the task and its successors
+		// derivations (i.e., conditionMet) for the task and its successors;
+		// as well as its associated states
 
-		// will return false if there aren't any inputs associated with the given task
-		// (in that case, there are no states to reset)
+		// in case no prior input data was given for this task,
+		// no need to reset (couldn't have influenced following tasks)
+
+		if (!task.hasProperty(kb.resource("gl:hasInputData"))) {
+			Log.i("no need to reset: " + task);
+			return;
+		}
 
 //		Log.i("start resetting");
 
-		if (resetInputsAndConditionsRecursively(task))
-			resetStatesRecursively(task);
+		resetRecursively(task);
 
 //		Log.i("done resetting");
 	}
 
-	private void resetStatesRecursively(Resource task) {
+	private void resetRecursively(Resource task) {
 		List<Statement> toRemove = new ArrayList<>();
 		List<Statement> toAdd = new ArrayList<>();
 
-		propagateThroughWorkflow(task, (t) -> {
-//			Log.i("resetting: " + t);
-			getResetState(t, toRemove, toAdd);
-			return true;
+		propagateThroughWorkflow(task, new BiFunction<Resource, ResetCmds, ResetCmds>() {
+
+			private Set<Resource> set = new HashSet<>();
+
+			@Override
+			public ResetCmds apply(Resource t, ResetCmds curCmd) {
+				if (set.contains(t))
+					return ResetCmds.STOP;
+
+				set.add(t);
+
+				Log.i("reset: " + t + " ? " + curCmd);
+
+				switch (curCmd) {
+
+				case ALL:
+					getResetInputsAndConditions(t, toRemove);
+
+					// fallthrough! :-)
+				case ONLY_STATES:
+					getResetStates(t, toRemove, toAdd);
+					break;
+
+				default:
+					break;
+				}
+
+				// - assumes that influence of decision task doesn't extend beyond the next
+				// decision task (else, all following conditions & states also need to be reset)
+
+				// TODO this assumption turns out to be wrong in our CKD use case
+				
+				// - reset *states* for discarded branches (these propagate throughout the
+				// following workflow)
+
+				// (re simply checking for inactive tasks: just because a task is inactive,
+				// doesn't mean it doesn't have any input; or any of its (disjunctive)
+				// conditions aren't met (simply means not (all) its conditions have been met))
+
+//				if (t.hasProperty(RDF.type, kb.resource("gl:DecisionTask"))
+//						&& !t.hasProperty(kb.resource("gl:hasInputData"))) {
+//
+//					if (t.hasProperty(kb.resource("state:in"), kb.resource("gl:Discarded")))
+//						return ResetCmds.ONLY_STATES;
+//					else {
+//						// also reset the states of its (possibly readied) branches
+//						t.listProperties(kb.resource("gl:decisionBranch"))
+//								.forEachRemaining(stmt -> {
+//									Resource b = stmt.getObject();
+//									getResetStates(b, toRemove, toAdd);
+//								});
+//
+//						return ResetCmds.STOP;
+//					}
+//				}
+
+				return ResetCmds.ALL;
+			}
 		});
 
 		startBulkTransit();
@@ -335,73 +398,41 @@ public abstract class WorkflowModel {
 		endBulkTransit();
 	}
 
-	private void getResetState(Resource task, List<Statement> toRemove, List<Statement> toAdd) {
-		Resource target = null;
-		if (task.hasProperty(kb.resource("gl:root"), kb.literal(true)))
-			target = kb.resource("gl:Active");
-		else
-			target = kb.resource("gl:Inactive");
+	private void propagateThroughWorkflow(Resource task,
+			BiFunction<Resource, ResetCmds, ResetCmds> op) {
 
-		List<Statement> stmts2 = kb.list(task, statePrp, null).toList();
-		toRemove.addAll(stmts2);
-
-		toAdd.add(kb.getModel().createStatement(task, statePrp, target));
+		propagateThroughWorkflow(task, op, ResetCmds.ALL, true, false);
 	}
 
-	private boolean resetInputsAndConditionsRecursively(Resource task) {
-		List<Statement> toRemove = new ArrayList<>();
+	private void propagateThroughWorkflow(Resource task,
+			BiFunction<Resource, ResetCmds, ResetCmds> op, ResetCmds curCmd, boolean first,
+			boolean isSuper) {
 
-		propagateThroughWorkflow(task, new Function<Resource, Boolean>() {
-
-			private Set<Resource> set = new HashSet<>();
-
-			@Override
-			public Boolean apply(Resource t) {
-				if (set.contains(t))
-					return false;
-
-				set.add(t);
-
-//				Log.i("deleting: " + t);
-				getResetInputsAndConditions(t, toRemove);
-
-				return true;
-			}
-		});
-
-		startBulkTransit();
-
-		toRemove.forEach(stmt -> kb.removeQuietly(stmt));
-
-//		kb.printAll();
-
-		endBulkTransit();
-
-		return true;
-	}
-
-	private void propagateThroughWorkflow(Resource task, Function<Resource, Boolean> op) {
-		propagateThroughWorkflow(task, op, true, false);
-	}
-
-	private void propagateThroughWorkflow(Resource task, Function<Resource, Boolean> op,
-			boolean first, boolean isSuper) {
-
-//		if (!op.apply(task))
-//			return;
-
-		op.apply(task);
+		ResetCmds newCmd = op.apply(task, curCmd);
+		if (newCmd == ResetCmds.STOP)
+			return;
 
 		ExtendedIterator<Statement> it = task.listProperties(kb.resource("gl:next"));
-		if (!isSuper)
-			it = it.andThen(task.listProperties(kb.resource("gl:subTask")));
-
 		while (it.hasNext()) {
 			Statement stmt = it.next();
 			Resource task2 = stmt.getObject();
 
-//			Log.i("next: " + task2);
-			propagateThroughWorkflow(task2, op, false, false);
+			Log.i("next: " + task + " - " + task2);
+			propagateThroughWorkflow(task2, op, newCmd, false, false);
+		}
+
+		if (!isSuper) {
+			it = it.andThen(task.listProperties(kb.resource("gl:subTask")));
+			while (it.hasNext()) {
+				Statement stmt = it.next();
+				Resource task2 = stmt.getObject();
+
+				// first task of the (sub)workflow
+				if (!kb.contains(null, kb.resource("gl:next"), task2)) {
+					Log.i("first-sub: " + task + " - " + task2);
+					propagateThroughWorkflow(task2, op, newCmd, false, false);
+				}
+			}
 		}
 
 		// for first-task & super-tasks, propagate *up* through workflow
@@ -412,21 +443,17 @@ public abstract class WorkflowModel {
 				Statement stmt0 = superTasks.next();
 				Resource superTask = stmt0.getSubject();
 
-//				Log.i("super: " + superTask);
-				propagateThroughWorkflow(superTask, op, false, true);
+				Log.i("super: " + task + " - " + superTask);
+				propagateThroughWorkflow(superTask, op, newCmd, false, true);
 			}
 		}
 	}
 
-	private boolean getResetInputsAndConditions(Resource task, List<Statement> toRemove) {
-		// only interested in removing "raw" underlying data
+	private void getResetInputsAndConditions(Resource task, List<Statement> toRemove) {
 		List<Statement> inputs = getInputs(task);
-
 		toRemove.addAll(inputs);
 
 		getResetTaskCondition(task, toRemove);
-
-		return true;
 	}
 
 	private void getResetTaskCondition(Resource task, List<Statement> toRemove) {
@@ -462,6 +489,19 @@ public abstract class WorkflowModel {
 		});
 
 		return inputs;
+	}
+
+	private void getResetStates(Resource task, List<Statement> toRemove, List<Statement> toAdd) {
+		Resource target = null;
+		if (task.hasProperty(kb.resource("gl:root"), kb.literal(true)))
+			target = kb.resource("gl:Active");
+		else
+			target = kb.resource("gl:Inactive");
+
+		List<Statement> stmts2 = kb.list(task, statePrp, null).toList();
+		toRemove.addAll(stmts2);
+
+		toAdd.add(kb.getModel().createStatement(task, statePrp, target));
 	}
 
 	public void startConditionUpdate() {

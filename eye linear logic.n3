@@ -1,0 +1,25 @@
+@prefix e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>.
+@prefix state: <http://niche.cs.dal.ca/ns/state.owl#>.
+@prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>.
+
+:task1 :next :task2 ; state:in :Completed .
+:task2 state:in :Inactive .
+
+{	?e1 :next ?e2 ; state:in :Completed .
+    { ?e2 state:in :Inactive } e:becomes { ?e2 state:in :Ready }
+} => {
+	:x :out :success
+} .
+
+# - backward version: 
+
+#:task1 :next :task2 ; state:in :Completed .
+#:task2 state:in :Inactive .
+
+#{	:x :out :success
+#} <= {
+#	?e1 :next ?e2 ; state:in :Completed .
+#    { ?e2 state:in :Inactive } e:becomes { ?e2 state:in :Ready }
+#} .
+#
+#{:x :out :success} => {:x :out :success}.
