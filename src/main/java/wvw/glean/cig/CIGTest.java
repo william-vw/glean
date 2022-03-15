@@ -1,8 +1,14 @@
 package wvw.glean.cig;
 
+import java.util.List;
+
+import org.apache.jen3.reasoner.rulesys.impl.BindingStack;
+
+import wvw.glean.workflow.WorkflowModel.EntityState;
 import wvw.glean.workflow.WorkflowModel.InitOptions;
 import wvw.glean.workflow.WorkflowModel.LoadOptions;
 import wvw.semweb.kb.jena.NS;
+import wvw.utils.log.Log;
 
 public class CIGTest {
 
@@ -10,18 +16,29 @@ public class CIGTest {
 //	private static String cigPath = "cig/lipid/evaluate_lipid_profile.n3";
 
 	public static void main(String[] args) throws Exception {
+		long start = System.currentTimeMillis();
+
 		CIGModel cig = (CIGModel) new CIGModel(NS.ckd)
-				.initialize(InitOptions.DO_TRANSIT, InitOptions.LOGGING)
+				.initialize(InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN) //InitOptions.LOGGING)
 				.load(CIGModel.class, cigPath, LoadOptions.RECURSIVELY);
 
 		cig.transitAll("Dyslipidemia_CKD");
 //		cig.transitAll("Evaluate_Lipid_Profile");
 
-		followupLipidProfileCase(cig);
+		List<EntityState> states = followupLipidProfileCase(cig);
 //		evaluateLipidProfileCase(cig);
+
+		long end = System.currentTimeMillis();
+
+		cig.printAllTransits(states, true);
+
+		Log.i("\ntime: " + (end - start));
+		
+		Log.i("# new graphs: " + BindingStack.nrNewGraphs);
+		Log.i("# new colls: " + BindingStack.nrNewColls);
 	}
 
-	public static void followupLipidProfileCase(CIGModel cig) throws Exception {
+	public static List<EntityState> followupLipidProfileCase(CIGModel cig) throws Exception {
 		// > Follow-up Lipid Profile
 
 		// prior_lipid_profile
@@ -30,29 +47,17 @@ public class CIGTest {
 				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n" + "\n"
 				+ "ns:df_0_0 <http://hl7.org/fhir/Observation.code> ns:code_lipid_profile;\n"
 				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.");
-//
-//		// assess_suspect_sec_cause
-//		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
-//				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
-//				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n" + "\n"
-//				+ "ns:df_1_0 <http://hl7.org/fhir/Observation.code> ns:code_sec_cause;\n"
-//				+ "    <http://hl7.org/fhir/Observation.valueBoolean> false.");
-//
-//		// assess_current_treatment
-//		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
-//				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
-//				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n"
-//				+ "ns:df_2_0 <http://hl7.org/fhir/Observation.code> ns:code_patient_on_statins;\n"
-//				+ "    <http://hl7.org/fhir/Observation.valueBoolean> false.");
-//
-//		// reassess_10_year_cv_risk
-//		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
-//				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
-//				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n"
-//				+ "ns:df_3_0 <http://hl7.org/fhir/Observation.code> ns:code_10_year_cv_risk;\n"
-//				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.");
 
-		cig.printAllTransits(true);
+		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n" + "\n"
+				+ "ns:df_1_0 <http://hl7.org/fhir/Observation.code> ns:code_age;\n"
+				+ "    	<http://hl7.org/fhir/Observation.valueQuantity> ns:df_1_1 ."
+				+ "ns:df_1_1 <http://hl7.org/fhir/Quantity.value> 19 .");
+
+		return cig.transitAll();
+
+//		cig.printAllTransits(true);
 
 //		cig.getKb().printAll();
 //		cig.getKb().printDerivations();
@@ -60,7 +65,7 @@ public class CIGTest {
 
 	public static void evaluateLipidProfileCase(CIGModel cig) throws Exception {
 		System.out.println("START");
-		
+
 		// > Evaluate Lipid Profile
 
 		// prior_lipid_profile

@@ -72,9 +72,9 @@ public class WorkflowModel_Auto extends WorkflowModel {
 						workflowFolder + "next.n3",
 						workflowFolder + "condition.n3",
 						workflowFolder + "composite.n3",
-						workflowFolder + "decision.n3",
-						workflowFolder + "split.n3",
-						workflowFolder + "cycle.n3"
+						workflowFolder + "decision.n3"
+//						workflowFolder + "split.n3",
+//						workflowFolder + "cycle.n3"
 					);
 					kb.fromClsRes(getClass(), base,
 						genFolder + "state" + (log ? "_log.n3" : "_nolog.n3")

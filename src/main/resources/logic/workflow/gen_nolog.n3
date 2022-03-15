@@ -7,12 +7,17 @@
 @prefix list:    <http://www.w3.org/2000/10/swap/list#> .
 
 {
+    ?x  rdf:type ?c1 .
+    ?c1  rdfs:subClassOf ?c2 .}  =>  {
+    ?x  rdf:type ?c2 .} .
+
+{
     ?x  <http://www.w3.org/2002/07/owl#hasValue>
             ?y .
     ?x  <http://www.w3.org/2002/07/owl#onProperty>
             ?p .
-    ?u  ?p  ?y .}  =>  {
-    ?u  rdf:type ?x .} .
+    ?u  rdf:type ?x .}  =>  {
+    ?u  ?p  ?y .} .
 
 {
     ?c1  <http://www.w3.org/2002/07/owl#equivalentClass>
@@ -25,155 +30,147 @@
     ?composite
         rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
     ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .
-    ?composite
         <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?sub .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    {
-    ?composite
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?sub .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    {
-    ?composite
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?sub .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        log:notIncludes {
-            ?prev
-                <http://niche.cs.dal.ca/ns/glean/base.owl#next>
-                    ?sub .        } .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
-    {
-    ?sync
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#SyncPoint> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?sync
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
-
-{
-    {
-    ?composite
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?complSub .
-    ?complSub
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
+            ?oneSub .
     ( {
     ?composite
         <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
             ?sub .} {
     ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
     <http://niche.cs.dal.ca/ns/glean/base.owl>
         <http://www.w3.org/2000/10/swap/time#currentTime>
             ?now .}  rdf:type log:StableTruth .
-    ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
     ?composite
         <http://niche.cs.dal.ca/ns/state.owl#in>
             <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
     ?composite
         <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/state.owl#in>
             <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
             ?composite
                 <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
 
 {
     {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#WhileLoop> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        log:notIncludes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/glean/base.owl#whileCondition>
-                    _:b1 .
-            _:b1  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-                    "true"^^xsd:boolean .        } .
+    ?composite
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
+            ?sub .
     <http://niche.cs.dal.ca/ns/glean/base.owl>
         <http://www.w3.org/2000/10/swap/time#currentTime>
             ?now .}  rdf:type log:StableTruth .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?cycle
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
+            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
+
+{
+    ?c  <http://www.w3.org/2002/07/owl#unionOf>
+            ?x .
+    ?x  list:member ?cl .}  =>  {
+    ?cl  rdfs:subClassOf ?c .} .
+
+{
+    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#allOf>
+            ?conjunction .
+    ( {
+    ?clause
+        list:in ?conjunction .} {
+    ?clause
+        <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
+            "true"^^xsd:boolean .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .}  =>  {
+    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
+            "true"^^xsd:boolean .} .
+
+{
+    ?premise
+        <http://niche.cs.dal.ca/ns/state.owl#transit>
+            ?conclusion .
+    ?premise
+        log:includes {
+            ?target
                 <http://niche.cs.dal.ca/ns/state.owl#in>
+                    ?cmpdState .
+            ?guard
+                rdf:type <http://niche.cs.dal.ca/ns/state.owl#Guard> .        } .
+    ?conclusion
+        log:includes {
+            ?target
+                <http://niche.cs.dal.ca/ns/state.owl#in>
+                    ?newState .        } .
+    ( ?premise {
+    ?target
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            ?cmpdState .
+    ?guard
+        rdf:type <http://niche.cs.dal.ca/ns/state.owl#Guard> .} )  <http://www.w3.org/2000/10/swap/graph#difference>
+            ?otherRetracts .
+    ?cmpdState
+        rdf:type <http://niche.cs.dal.ca/ns/state.owl#CompoundState> .
+    ?cmpdState
+        <http://niche.cs.dal.ca/ns/state.owl#includes>
+            ?atomState .
+    ( ?inCmpd2 {
+    ?cmpdState2
+        <http://niche.cs.dal.ca/ns/state.owl#includes>
+            ?atomState .
+    ?cmpdState2
+        log:notEqualTo ?cmpdState .
+    ?inCmpd2
+        log:equalTo {
+            ?target
+                <http://niche.cs.dal.ca/ns/state.owl#in>
+                    ?cmpdState2 .        } .} ?inCmpd2List )  log:collectAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
+    ?inCmpd2List
+        log:conjunction ?inCmpd2Graph .
+    ( {
+    ?target
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            ?cmpdState .} {
+    ?target
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            ?atomState .} ?inCmpd2Graph )  log:conjunction ?retractStates .
+    ( ?guard {
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .} )  log:conjunction ?newGuard .
+    ( {
+    ?newGuard
+        rdf:type log:StableTruth .} ?retractStates ?otherRetracts )  log:conjunction ?llPremise .}  =>  {
+    ?llPremise
+        log:becomes ?conclusion .} .
+
+{
+    {
+    ?e  <http://niche.cs.dal.ca/ns/glean/base.owl#next>
+            ?e2 .
+    ( {
+    ?e1  <http://niche.cs.dal.ca/ns/glean/base.owl#next>
+            ?e2 .} {
+    ?e1  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
+    ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
+            ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
 
 {
@@ -196,257 +193,6 @@
             ?entity
                 <http://niche.cs.dal.ca/ns/state.owl#in>
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .        } .
-
-{
-    {
-    ?branch
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#DecisionBranch> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/glean/base.owl#branchTarget>
-            ?task .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?task
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
-    {
-    ?decision
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#DecisionTask> .
-    ?decision
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .
-    ?decision
-        <http://niche.cs.dal.ca/ns/glean/base.owl#decisionBranch>
-            ?branch .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?branch
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
-    {
-    ?split
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ParallelSplit> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            ?branch .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?branch
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
-    {
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#syncPoint>
-            _:b2 .
-    _:b2  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?split
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
-
-{
-    {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ForLoop> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#currentIteration>
-            "0"^^xsd:int .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#numIterations>
-            ?num .
-    "0"^^xsd:int
-        math:lessThan ?num .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .        } .
-
-{
-    ?entity
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            ?state .
-    ?compositeState
-        <http://niche.cs.dal.ca/ns/state.owl#includes>
-            ?state .}  =>  {
-    ?entity
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            ?compositeState .} .
-
-{
-    {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#WhileLoop> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        log:notIncludes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/glean/base.owl#whileCondition>
-                    _:b3 .
-            _:b3  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-                    "true"^^xsd:boolean .        } .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .}  log:becomes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ForLoop> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#currentIteration>
-            ?cur .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#numIterations>
-            ?num .
-    ( ?cur "1"^^xsd:int )  math:sum _:b4 .
-    _:b4  math:notLessThan ?num .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#Cycle> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Resetting> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?sub .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .        } .
-
-{
-    ?c  <http://www.w3.org/2002/07/owl#unionOf>
-            ?x .
-    ?x  list:member ?cl .}  =>  {
-    ?cl  rdfs:subClassOf ?c .} .
-
-{
-    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#anyOf>
-            ?disjunction .
-    ?disjunction
-        list:member _:b5 .
-    _:b5  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-            "true"^^xsd:boolean .}  =>  {
-    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-            "true"^^xsd:boolean .} .
-
-{
-    ?x  <http://www.w3.org/2002/07/owl#hasValue>
-            ?y .
-    ?x  <http://www.w3.org/2002/07/owl#onProperty>
-            ?p .
-    ?u  rdf:type ?x .}  =>  {
-    ?u  ?p  ?y .} .
 
 {
     ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#premise>
@@ -458,173 +204,14 @@
             "true"^^xsd:boolean .} .} .
 
 {
-    {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#WhileLoop> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#whileCondition>
-            _:b6 .
-    _:b6  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-            "true"^^xsd:boolean .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .        } .
-
-{
-    {
-    ?split
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ParallelSplit> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#syncPoint>
-            ?sync .
-    ?sync
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#MergeAny> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            _:b7 .
-    _:b7  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?sync
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
-    {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#Cycle> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        log:notIncludes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-                    ?st .
-            ?st  <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Resetting> .}  log:becomes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
-    {
-    ?split
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ParallelSplit> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#syncPoint>
-            ?sync .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            _:b8 .
-    _:b8  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .
-    ( {
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            ?branch .} {
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?sync
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#WhileLoop> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#whileCondition>
-            _:b9 .
-    _:b9  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-            "true"^^xsd:boolean .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?cycle
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Resetting> .        } .
-
-{
-    {
-    ?task
-        <http://niche.cs.dal.ca/ns/glean/base.owl#involvesAction>
-            "false"^^xsd:boolean .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?task
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
+    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#anyOf>
+            ?disjunction .
+    ?disjunction
+        list:member _:b1 .
+    _:b1  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
+            "true"^^xsd:boolean .}  =>  {
+    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
+            "true"^^xsd:boolean .} .
 
 {
     {
@@ -633,9 +220,8 @@
             "true"^^xsd:boolean .
     ?entity
         <http://niche.cs.dal.ca/ns/glean/base.owl#precondition>
-            _:b10 .
-    _:b10
-        <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
+            _:b2 .
+    _:b2  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
             "true"^^xsd:boolean .
     <http://niche.cs.dal.ca/ns/glean/base.owl>
         <http://www.w3.org/2000/10/swap/time#currentTime>
@@ -652,102 +238,6 @@
             ?entity
                 <http://niche.cs.dal.ca/ns/state.owl#in>
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .        } .
-
-{
-    {
-    ?task
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#EndPoint> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?task
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?task
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
-
-{
-    {
-    ?split
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ParallelSplit> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#syncPoint>
-            ?sync .
-    ?sync
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#MergeNr> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/glean/base.owl#mergeNr>
-            ?nr .
-    ( ?branch {
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            ?branch .} ?allBranches )  log:collectAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    ( ?discarded {
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            ?discarded .
-    ?discarded
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .} ?allDiscarded )  log:collectAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    ?allBranches
-        list:length ?numBranches .
-    ?allDiscarded
-        list:length ?numDiscards .
-    ( ?numBranches ?numDiscards )  math:difference ?numLeft .
-    ?numLeft
-        math:lessThan ?nr .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?sync
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    ?x  ?p  ?y .
-    ?p  rdfs:domain ?d .}  =>  {
-    ?x  rdf:type ?d .} .
-
-{
-    {
-    ?composite
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?sub .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
-            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
 
 {
     ?premise
@@ -829,94 +319,140 @@
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
 
 {
-    ?x  ?p  ?y .
-    ?p  rdfs:range ?r .}  =>  {
-    ?y  rdf:type ?r .} .
-
-{
-    ?x  rdf:type ?c1 .
-    ?c1  rdfs:subClassOf ?c2 .}  =>  {
-    ?x  rdf:type ?c2 .} .
-
-{
-    ?x  ?p1 ?y .
-    ?p1  rdfs:subPropertyOf ?p2 .}  =>  {
-    ?x  ?p2 ?y .} .
-
-{
-    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#allOf>
-            ?conjunction .
-    ( {
-    ?clause
-        list:in ?conjunction .} {
-    ?clause
-        <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-            "true"^^xsd:boolean .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .}  =>  {
-    ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
-            "true"^^xsd:boolean .} .
-
-{
     {
-    ?split
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ParallelSplit> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#syncPoint>
-            ?sync .
-    ?sync
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#MergeAll> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            _:b11 .
-    _:b11
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ( {
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            ?branch .} {
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?sync
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
     ?decision
         rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#DecisionTask> .
     ?decision
         <http://niche.cs.dal.ca/ns/state.owl#in>
             <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ( ?active {
     ?decision
         <http://niche.cs.dal.ca/ns/glean/base.owl#decisionBranch>
-            ?active .
-    ?active
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .} ?actives )  log:collectAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    ?actives
-        list:length ?len .
-    ?len  math:greaterThan "1"^^xsd:int .
-    ( "decision task " ?decision " has " ?len " activated branches, which means their conditions are overlapping" )  <http://www.w3.org/2000/10/swap/string#concatenation>
-            ?warning .}  =>  {
+            ?branch .
     <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://niche.cs.dal.ca/ns/glean/base.owl#warning>
-            ?warning .} .
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?branch
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
+    ?branch
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?branch
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
+            ?branch
+                <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
+
+{
+    {
+    ?composite
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
+            ?complSub .
+    ?complSub
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
+    ( {
+    ?composite
+        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
+            ?sub .} {
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?composite
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
+            ?composite
+                <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
+
+{
+    {
+    ?decision
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#DecisionTask> .
+    ?decision
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .
+    ?decision
+        <http://niche.cs.dal.ca/ns/glean/base.owl#decisionBranch>
+            ?branch .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?branch
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
+    ?branch
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?branch
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
+            ?branch
+                <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
+
+{
+    ?x  ?p  ?y .
+    ?p  rdfs:domain ?d .}  =>  {
+    ?x  rdf:type ?d .} .
+
+{
+    {
+    ?task
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#EndPoint> .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?task
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+    ?task
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?task
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
+            ?task
+                <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
+
+{
+    {
+    ?composite
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
+            ?sub .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        log:notIncludes {
+            ?prev
+                <http://niche.cs.dal.ca/ns/glean/base.owl#next>
+                    ?sub .        } .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
+            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
 
 {
     {
@@ -945,6 +481,78 @@
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .
 
 {
+    ?x  ?p  ?y .
+    ?p  rdfs:range ?r .}  =>  {
+    ?y  rdf:type ?r .} .
+
+{
+    ?x  ?p1 ?y .
+    ?p1  rdfs:subPropertyOf ?p2 .}  =>  {
+    ?x  ?p2 ?y .} .
+
+{
+    ?x  <http://www.w3.org/2002/07/owl#hasValue>
+            ?y .
+    ?x  <http://www.w3.org/2002/07/owl#onProperty>
+            ?p .
+    ?u  ?p  ?y .}  =>  {
+    ?u  rdf:type ?x .} .
+
+{
+    {
+    ?composite
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
+            ?sub .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
+            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
+
+{
+    ?c1  <http://www.w3.org/2002/07/owl#equivalentClass>
+            ?c2 .
+    ?x  rdf:type ?c1 .}  =>  {
+    ?x  rdf:type ?c2 .} .
+
+{
+    {
+    ?branch
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#DecisionBranch> .
+    ?branch
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+    ?branch
+        <http://niche.cs.dal.ca/ns/glean/base.owl#branchTarget>
+            ?task .
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://www.w3.org/2000/10/swap/time#currentTime>
+            ?now .}  rdf:type log:StableTruth .
+    ?task
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
+    ?task
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?task
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
+            ?task
+                <http://niche.cs.dal.ca/ns/state.owl#in>
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
+
+{
     {
     ?e1  <http://niche.cs.dal.ca/ns/glean/base.owl#next>
             ?e2 .
@@ -963,151 +571,10 @@
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
 
 {
-    ?c1  <http://www.w3.org/2002/07/owl#equivalentClass>
-            ?c2 .
-    ?x  rdf:type ?c1 .}  =>  {
-    ?x  rdf:type ?c2 .} .
-
-{
-    {
-    ?decision
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#DecisionTask> .
-    ?decision
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ?decision
-        <http://niche.cs.dal.ca/ns/glean/base.owl#decisionBranch>
-            ?branch .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
-            ?branch
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    {
-    ?e  <http://niche.cs.dal.ca/ns/glean/base.owl#next>
-            ?e2 .
-    ( {
-    ?e1  <http://niche.cs.dal.ca/ns/glean/base.owl#next>
-            ?e2 .} {
-    ?e1  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?e2  <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    {
-    ?composite
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?oneSub .
-    ( {
-    ?composite
-        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
-            ?sub .} {
-    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .} )  log:forAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
-    ?composite
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
-            ?composite
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
-
-{
-    ?premise
-        <http://niche.cs.dal.ca/ns/state.owl#transit>
-            ?conclusion .
-    ?premise
-        log:includes {
-            ?target
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    ?cmpdState .
-            ?guard
-                rdf:type <http://niche.cs.dal.ca/ns/state.owl#Guard> .        } .
-    ?conclusion
-        log:includes {
-            ?target
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    ?newState .        } .
-    ( ?premise {
-    ?target
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            ?cmpdState .
-    ?guard
-        rdf:type <http://niche.cs.dal.ca/ns/state.owl#Guard> .} )  <http://www.w3.org/2000/10/swap/graph#difference>
-            ?otherRetracts .
-    ?cmpdState
-        rdf:type <http://niche.cs.dal.ca/ns/state.owl#CompoundState> .
-    ?cmpdState
-        <http://niche.cs.dal.ca/ns/state.owl#includes>
-            ?atomState .
-    ( ?inCmpd2 {
-    ?cmpdState2
-        <http://niche.cs.dal.ca/ns/state.owl#includes>
-            ?atomState .
-    ?cmpdState2
-        log:notEqualTo ?cmpdState .
-    ?inCmpd2
-        log:equalTo {
-            ?target
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    ?cmpdState2 .        } .} ?inCmpd2List )  log:collectAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    ?inCmpd2List
-        log:conjunction ?inCmpd2Graph .
-    ( {
-    ?target
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            ?cmpdState .} {
-    ?target
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            ?atomState .} ?inCmpd2Graph )  log:conjunction ?retractStates .
-    ( ?guard {
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .} )  log:conjunction ?newGuard .
-    ( {
-    ?newGuard
-        rdf:type log:StableTruth .} ?retractStates ?otherRetracts )  log:conjunction ?llPremise .}  =>  {
-    ?llPremise
-        log:becomes ?conclusion .} .
-
-{
     ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#premise>
             ?clause .
-    ( ?x )  log:skolem _:b12 .
-    _:b12
-        <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
+    ( ?x )  log:skolem _:b3 .
+    _:b3  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
             "true"^^xsd:boolean .}  =>  {
     ?x  <http://niche.cs.dal.ca/ns/condition/base.owl#conditionMet>
             "true"^^xsd:boolean .} .
@@ -1133,115 +600,86 @@
             <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
     ?composite
         <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .
     ?composite
         <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .}  log:becomes {
             ?composite
                 <http://niche.cs.dal.ca/ns/state.owl#in>
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
 
 {
     {
-    ?split
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ParallelSplit> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#syncPoint>
-            ?sync .
-    ?sync
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#MergeNr> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/glean/base.owl#mergeNr>
-            ?nr .
-    ( ?branch {
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#parallelBranch>
-            ?branch .
-    ?branch
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .} ?completed )  log:collectAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
-    ?completed
-        list:length ?nr2 .
-    ?nr  math:notGreaterThan ?nr2 .
-    <http://niche.cs.dal.ca/ns/glean/base.owl>
-        <http://www.w3.org/2000/10/swap/time#currentTime>
-            ?now .}  rdf:type log:StableTruth .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?sync
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
-            ?sync
-                <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Ready> .        } .
-
-{
-    {
-    ?split
-        <http://niche.cs.dal.ca/ns/glean/base.owl#syncPoint>
-            _:b13 .
-    _:b13
+    ?composite
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#CompositeTask> .
+    ?composite
         <http://niche.cs.dal.ca/ns/state.owl#in>
             <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .
+    ?composite
+        <http://niche.cs.dal.ca/ns/glean/base.owl#subTask>
+            ?sub .
     <http://niche.cs.dal.ca/ns/glean/base.owl>
         <http://www.w3.org/2000/10/swap/time#currentTime>
             ?now .}  rdf:type log:StableTruth .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
             <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
-    ?split
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
-            ?split
-                <http://niche.cs.dal.ca/ns/state.owl#in>
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Inactive> .
+    ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .}  log:becomes {
+            ?sub  <http://niche.cs.dal.ca/ns/state.owl#in>
                     <http://niche.cs.dal.ca/ns/glean/base.owl#Discarded> .        } .
 
 {
+    ?decision
+        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#DecisionTask> .
+    ?decision
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
+    ( ?active {
+    ?decision
+        <http://niche.cs.dal.ca/ns/glean/base.owl#decisionBranch>
+            ?active .
+    ?active
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .} ?actives )  log:collectAllIn <http://niche.cs.dal.ca/ns/glean/base.owl> .
+    ?actives
+        list:length ?len .
+    ?len  math:greaterThan "1"^^xsd:int .
+    ( "decision task " ?decision " has " ?len " activated branches, which means their conditions are overlapping" )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?warning .}  =>  {
+    <http://niche.cs.dal.ca/ns/glean/base.owl>
+        <http://niche.cs.dal.ca/ns/glean/base.owl#warning>
+            ?warning .} .
+
+{
+    ?entity
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            ?state .
+    ?compositeState
+        <http://niche.cs.dal.ca/ns/state.owl#includes>
+            ?state .}  =>  {
+    ?entity
+        <http://niche.cs.dal.ca/ns/state.owl#in>
+            ?compositeState .} .
+
+{
     {
-    ?cycle
-        rdf:type <http://niche.cs.dal.ca/ns/glean/base.owl#ForLoop> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#currentIteration>
-            ?cur .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#numIterations>
-            ?num .
-    ( ?cur "1"^^xsd:int )  math:sum ?new .
-    ?new  math:lessThan ?num .
+    ?task
+        <http://niche.cs.dal.ca/ns/glean/base.owl#involvesAction>
+            "false"^^xsd:boolean .
     <http://niche.cs.dal.ca/ns/glean/base.owl>
         <http://www.w3.org/2000/10/swap/time#currentTime>
             ?now .}  rdf:type log:StableTruth .
-    ?cycle
+    ?task
         <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .
-    ?cycle
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Active> .
+    ?task
         <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#NewIteration> .
-    ?cycle
+            <http://niche.cs.dal.ca/ns/glean/base.owl#NotDone> .
+    ?task
         <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Idle> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Done> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/state.owl#in>
-            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .
-    ?cycle
-        <http://niche.cs.dal.ca/ns/glean/base.owl#currentIteration>
-            ?cur .}  log:becomes {
-            ?cycle
+            <http://niche.cs.dal.ca/ns/glean/base.owl#Activated> .}  log:becomes {
+            ?task
                 <http://niche.cs.dal.ca/ns/state.owl#in>
-                    <http://niche.cs.dal.ca/ns/glean/base.owl#Resetting> .
-            ?cycle
-                <http://niche.cs.dal.ca/ns/glean/base.owl#currentIteration>
-                    ?new .        } .
+                    <http://niche.cs.dal.ca/ns/glean/base.owl#Completed> .        } .

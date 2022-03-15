@@ -1,0 +1,23 @@
+$ cat multi-query | eye --quiet --nope socrates.n3 --multi-query 2>/dev/null
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX : <http://example.org/socrates#>
+PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
+
+:Plato a :Human.
+:Plato a :Mortal.
+
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX : <http://example.org/socrates#>
+PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
+
+:Socrates a :Human.
+:Socrates a :Mortal.
+
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX : <http://example.org/socrates#>
+PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
+
+:Plato a :Human.
+:Plato a :Mortal.

@@ -287,6 +287,11 @@ public abstract class WorkflowModel {
 			ret.add(stmt);
 		});
 
+//		if (!ret.getModel().isEmpty()) {
+//			Log.i("input data for " + task + ": ");
+//			ret.printAll();
+//		}
+
 		return ret;
 	}
 
@@ -313,7 +318,7 @@ public abstract class WorkflowModel {
 		// no need to reset (couldn't have influenced following tasks)
 
 		if (!task.hasProperty(kb.resource("gl:hasInputData"))) {
-			Log.i("no need to reset: " + task);
+//			Log.i("no need to reset: " + task);
 			return;
 		}
 
@@ -339,8 +344,7 @@ public abstract class WorkflowModel {
 
 				set.add(t);
 
-				Log.i("reset: " + t + " ? " + curCmd);
-
+//				Log.i("reset: " + t + " ? " + curCmd);
 				switch (curCmd) {
 
 				case ALL:
@@ -359,7 +363,7 @@ public abstract class WorkflowModel {
 				// decision task (else, all following conditions & states also need to be reset)
 
 				// TODO this assumption turns out to be wrong in our CKD use case
-				
+
 				// - reset *states* for discarded branches (these propagate throughout the
 				// following workflow)
 
@@ -417,7 +421,7 @@ public abstract class WorkflowModel {
 			Statement stmt = it.next();
 			Resource task2 = stmt.getObject();
 
-			Log.i("next: " + task + " - " + task2);
+//			Log.i("next: " + task + " - " + task2);
 			propagateThroughWorkflow(task2, op, newCmd, false, false);
 		}
 
@@ -429,7 +433,7 @@ public abstract class WorkflowModel {
 
 				// first task of the (sub)workflow
 				if (!kb.contains(null, kb.resource("gl:next"), task2)) {
-					Log.i("first-sub: " + task + " - " + task2);
+//					Log.i("first-sub: " + task + " - " + task2);
 					propagateThroughWorkflow(task2, op, newCmd, false, false);
 				}
 			}
@@ -443,7 +447,7 @@ public abstract class WorkflowModel {
 				Statement stmt0 = superTasks.next();
 				Resource superTask = stmt0.getSubject();
 
-				Log.i("super: " + task + " - " + superTask);
+//				Log.i("super: " + task + " - " + superTask);
 				propagateThroughWorkflow(superTask, op, newCmd, false, true);
 			}
 		}
