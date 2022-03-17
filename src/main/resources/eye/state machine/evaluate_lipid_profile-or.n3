@@ -38,8 +38,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
 	gl:decisionBranch :branch0 , :branch1 .
 	
-:branch0 
-		state:in gl:Inactive ;
+:branch0 state:in gl:Inactive ;
 		gl:conditional true ;
 		
 		gl:precondition :pre0 ;
@@ -51,11 +50,20 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		gl:conditional true ;
 		
 		gl:precondition :pre1 ;
-
 		gl:branchTarget :no_dyslipidemia .
 
-:pre0 cond:conditionMet true .
-:pre1 cond:conditionMet false .
+	# gl:next :rule_out_secondary_causes .
+
+:pre0 cond:anyOf ( :cond0 ) .
+:cond0 cond:premise 
+		{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
+			fhir:Observation.valueBoolean true } .
+
+:pre1 cond:anyOf ( :cond1 ) .
+:cond1 cond:premise 
+		{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
+			fhir:Observation.valueBoolean false } .
+
 
 :rule_out_secondary_causes a gl:DecisionTask ;
 	state:in gl:Inactive ;
