@@ -4,7 +4,7 @@ prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
 prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 
 
-# if an entity is ready, marked as conditional, and its precondition was met, 
+# - if an entity is ready, marked as conditional, and its precondition was met, 
 # then activate the entry
 
 {	{	?entity :conditional true . # conditional entity

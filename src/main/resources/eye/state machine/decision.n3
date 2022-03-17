@@ -1,0 +1,24 @@
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix list: <http://www.w3.org/2000/10/swap/list#>
+prefix string: <http://www.w3.org/2000/10/swap/string#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
+prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
+
+# - if a decision task is active, then ready its branches
+# (if a branch's precondition is met, then it will be activated; condition.n3)
+
+{	?decision a :DecisionTask ;
+		state:in :Active ; # activated task (not inactive or discarded)
+		:decisionBranch ?branch .
+
+	{ ?branch state:in :Inactive } # inactive branch
+		e:becomes
+			{ ?branch state:in :Ready } .
+
+} => { ?branch state:in :Ready ; state:reason :readyBranchesOfActiveDecisionTask } .
+
+
+# Note that decisionBranch and branchTarget are sub-tasks of next (workflow.owl);  
+# so if a DecisionTask is discarded, then this discarded state will be propagated (next.n3)
