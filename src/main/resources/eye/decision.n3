@@ -29,7 +29,7 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 {	?branch a :DecisionBranch ;
 		state:in :Active ; # (this means its precondition was met!)
 		:branchTarget ?task .
-	
+
 	{ ?task state:in :Inactive } 
 		e:becomes
 			{ ?task state:in :Ready ; state:reason :readyTaskOfActiveBranch }

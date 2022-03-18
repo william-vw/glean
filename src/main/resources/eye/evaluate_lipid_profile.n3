@@ -68,3 +68,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	rdfs:label "Rule out secondary causes" ; 
 	
 	rdfs:comment """Investigate and treat remediable secondary causes of dyslipidemia.""" .
+
+
+:no_dyslipidemia a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No action" ;
+	rdfs:comment "No further measurement of lipid profile." .
