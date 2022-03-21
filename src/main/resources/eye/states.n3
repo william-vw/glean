@@ -26,5 +26,5 @@ prefix ckd: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
     _:x e:findall (?atomState { ?cmpdState state:includes ?atomState} ?atomStates) .
     
-} => { ?cmpdType state:atomStateList ?atomStates } .
+} => { ?cmpdState state:atomStateList ?atomStates } .
 
