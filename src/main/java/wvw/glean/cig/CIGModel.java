@@ -3,8 +3,8 @@ package wvw.glean.cig;
 import java.util.List;
 
 import wvw.glean.workflow.WorkflowModel_Auto;
-import wvw.semweb.kb.jena.NS;
 import wvw.utils.IOUtils;
+import wvw.utils.rdf.NS;
 
 public class CIGModel extends WorkflowModel_Auto {
 

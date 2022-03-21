@@ -16,8 +16,8 @@ import wvw.glean.cig.CIGModel;
 import wvw.glean.workflow.WorkflowModel;
 import wvw.glean.workflow.WorkflowModel.LoadOptions;
 import wvw.semweb.kb.jena.JenaKb;
-import wvw.semweb.kb.jena.NS;
 import wvw.utils.IOUtils;
+import wvw.utils.rdf.NS;
 
 public abstract class WorkflowPrinter {
 

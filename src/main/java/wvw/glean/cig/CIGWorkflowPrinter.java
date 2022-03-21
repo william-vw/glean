@@ -33,8 +33,8 @@ import wvw.glean.workflow.print.WorkflowJsonPrinter;
 import wvw.glean.workflow.print.WorkflowJsonPrinter.PrintJsonTaskHook;
 import wvw.glean.workflow.print.WorkflowPrinter;
 import wvw.semweb.kb.jena.JenaKb;
-import wvw.semweb.kb.jena.NS;
 import wvw.utils.IOUtils;
+import wvw.utils.rdf.NS;
 
 public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 

@@ -7,8 +7,8 @@ import org.apache.jen3.reasoner.rulesys.impl.BindingStack;
 import wvw.glean.workflow.WorkflowModel.EntityState;
 import wvw.glean.workflow.WorkflowModel.InitOptions;
 import wvw.glean.workflow.WorkflowModel.LoadOptions;
-import wvw.semweb.kb.jena.NS;
 import wvw.utils.log.Log;
+import wvw.utils.rdf.NS;
 
 public class CIGTest {
 
