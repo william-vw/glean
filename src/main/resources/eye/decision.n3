@@ -35,3 +35,33 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 			{ ?task state:in :Ready ; state:reason :readyTaskOfActiveBranch }
 	
 } => { ?task state:in :Ready } .
+
+
+# - if a decision task has an active branch, then complete the decision task 
+
+{	?decision a :DecisionTask ;
+		:decisionBranch ?branch .
+	?branch state:in :Active . # active branch
+	
+	{ ?decision state:in :Active } # decision task in active state
+		e:becomes
+			{ ?decision state:in :Completed ; state:reason :completeDecisionTaskWithActiveBranch }
+	
+} => { ?decision state:in :Completed } . # complete decision task
+
+
+# - if at least one branch is active, then discard other branches
+
+{	?decision a :DecisionTask ;
+		# at least one branch was activated
+		state:in :Completed .
+	
+	# discard the remaining branches 
+	# (i.e., those in the ready state: see below)
+	?decision :decisionBranch ?branch .
+	
+	{ ?branch state:in :Ready } # branch in ready state
+		e:becomes
+			{ ?branch state:in :Discarded ; state:reason :discardRemainingBranchesInCaseOfActiveBranch }
+
+} => { ?branch state:in :Discarded } . # discard branch

@@ -21,12 +21,12 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	cig:inputFile "/cig/lipid/input/evaluate_lipid_profile.n3" ;
 	
-	gl:subTask :measure_lipid_profile ;
+	gl:subTask :measure_lipid_profile, :rule_out_secondary_causes , :no_dyslipidemia ;
 	gl:firstTask :measure_lipid_profile .
 	
 	
 :measure_lipid_profile a gl:DecisionTask ;
-	state:in gl:Active ;
+	state:in gl:Inactive ;
 	gl:conditional false ;
 	
 	rdfs:label "Measure lipid profile" ;
@@ -61,7 +61,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		gl:branchTarget :no_dyslipidemia
 	] .
 
-:rule_out_secondary_causes a gl:DecisionTask ;
+:rule_out_secondary_causes a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	

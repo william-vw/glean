@@ -1,5 +1,6 @@
 prefix log: <http://www.w3.org/2000/10/swap/log#>
 prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix list: <http://www.w3.org/2000/10/swap/list#>
 prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
 prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 base <http://niche.cs.dal.ca/ns/glean/base.owl#>
@@ -20,3 +21,43 @@ base <http://niche.cs.dal.ca/ns/glean/base.owl#>
 			{ ?sub state:in :Ready ; state:reason :readyFirstSubTask } .
 	
 } => { ?sub state:in :Ready } . # ready subtask
+
+
+# - if a composite task is active, and all its subtasks are done 
+# (i.e., at least one completed subtask, and all other subtasks are done (completed or discarded)), 
+# then complete the composite task
+
+{	?composite a :CompositeTask ;	
+		:subTask ?complSub .
+	# composite task has at least one completed subtask
+	?complSub state:in :Completed . 
+
+	# true if, for all subtasks of composite tasks, that subtask is done
+	# (i.e., completed or discarded)
+	( { ?composite :subTask ?sub } { ?sub state:in :Done } ) log:forAllIn _:x .
+
+	{ ?composite state:in :Active } # composite task in active state
+		e:becomes
+			{ ?composite state:in :Completed ; state:reason :completeCompositeWithAllCompletedSubTasks } .
+
+} => { ?composite state:in :Completed } . # complete composite task
+
+
+# - if a composite task is discarded, then discard all its not-done subtasks 
+
+{	?composite a :CompositeTask ;
+		state:in :Discarded ; # discarded composite task
+		:subTask ?sub .
+	
+	# subtask is not done yet (i.e., inactive/active)
+	?sub state:in :NotDone .
+	
+	?sub state:in ?atomState .
+	:NotDone state:atomStateList ?atomStates .
+	?atomState list:in ?atomStates .
+
+	{ ?sub state:in ?atomState }
+		e:becomes 
+			{ ?sub state:in :Discarded ; state:reason :discardSubTasksOfDiscardedComposite } .
+	
+} => { ?sub state:in :Discarded } . # discarded subtask
