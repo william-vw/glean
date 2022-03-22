@@ -56,8 +56,34 @@ base <http://niche.cs.dal.ca/ns/glean/base.owl#>
 	:NotDone state:atomStateList ?atomStates .
 	?atomState list:in ?atomStates .
 
+	# [] e:trace ( ?sub ?atomState ) .
+
 	{ ?sub state:in ?atomState }
 		e:becomes 
 			{ ?sub state:in :Discarded ; state:reason :discardSubTasksOfDiscardedComposite } .
 	
 } => { ?sub state:in :Discarded } . # discarded subtask
+
+
+# - if a composite task is not done, and all its subtasks are discarded, then discard the composite task
+
+{	?composite a :CompositeTask ;
+			:subTask ?oneSub . # at least one subtask
+	
+	?composite state:in :NotDone .
+	:NotDone state:atomStateList ?atomStates .
+	?atomState list:in ?atomStates .
+
+	# true if, for all subtasks of the composite task, that subtask is discarded
+	( { ?composite :subTask ?sub } { ?sub state:in :Discarded } ) log:forAllIn _:x .
+	
+	?composite state:in ?atomState .
+	[] e:trace ( ?composite ?atomState ) .
+
+	{ ?composite state:in ?atomState } # composite task in not-done sub-state
+		e:becomes
+			{ 	?composite state:in :Discarded ; 
+				state:reason :discardedCompositeWithAllDiscardedSubTasks 
+			} .
+	
+} => { ?composite state:in :Discarded } . # discard composite task
