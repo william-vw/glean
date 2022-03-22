@@ -78,7 +78,7 @@ base <http://niche.cs.dal.ca/ns/glean/base.owl#>
 	( { ?composite :subTask ?sub } { ?sub state:in :Discarded } ) log:forAllIn _:x .
 	
 	?composite state:in ?atomState .
-	[] e:trace ( ?composite ?atomState ) .
+	[] e:trace ( ?composite ?atomState ?atomStates ) .
 
 	{ ?composite state:in ?atomState } # composite task in not-done sub-state
 		e:becomes
