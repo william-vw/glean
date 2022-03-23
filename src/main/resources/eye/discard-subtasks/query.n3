@@ -9,5 +9,6 @@ prefix fhir: <http://hl7.org/fhir/>
 prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
 #{ ?x state:in ?y } => { ?x state:in ?y } .
-#{ ?x state:in ?y . ?y a state:AtomicState } => { ?x state:in ?y } .
-{ ?x state:in ?y . ?y a state:AtomicState . ?x state:reason ?r } => { ?x state:in ?y; state:reason ?r } .
+#{ ?x state:in ?y . ?x state:reason ?r } => { ?x state:in ?y; state:reason ?r } .
+{ ?x state:in ?y . ?y a state:AtomicState } => { ?x state:in ?y } .
+#{ ?x state:in ?y . ?y a state:AtomicState . ?x state:reason ?r } => { ?x state:in ?y; state:reason ?r } .
