@@ -10,6 +10,10 @@ PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
 
 #{ ?x ?p ?z } => { ?x ?p ?z } .
 
-{ 	:testa cond:conditionMet true
+#{ 	:testa cond:conditionMet true
+#	
+#} => { :test0 a :SUCCESS } .
+
+{ 	?x cond:conditionMet true
 	
-} => { :test0 a :SUCCESS } .
+} => { ?x cond:conditionMet true } .

@@ -8,6 +8,12 @@ prefix fhir: <http://hl7.org/fhir/>
 prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
 
+#{ ?x ?p ?z } => { ?x ?p ?z } .
+
+#{ 	:testa cond:conditionMet true
+#	
+#} => { :test0 a :SUCCESS } .
+
 { 	?x cond:conditionMet true
 	
 } => { ?x cond:conditionMet true } .

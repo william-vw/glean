@@ -1,13 +1,8 @@
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix log: <http://www.w3.org/2000/10/swap/log#>
 prefix list: <http://www.w3.org/2000/10/swap/list#>
-prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
 prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
-prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
-prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
-prefix fhir: <http://hl7.org/fhir/>
-prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
-PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
+prefix : <http://niche.cs.dal.ca/ns/condition/base.owl#>
 
 
 {	?x cond:premise ?clause .
@@ -21,8 +16,9 @@ PREFIX e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>
 	?disjunction!list:member cond:conditionMet true . 
 } .
 
-#{	?x cond:conditionMet true 	
-#} <= { 
-#	?x cond:allOf ?conjunction .
-#	( { ?clause list:in ?conjunction } { ?clause cond:conditionMet true } ) log:forAllIn <> . 
-#} .
+
+{	?x cond:conditionMet true 	
+} <= { 
+	?x cond:allOf ?conjunction .
+	( { ?conjunction list:member ?clause } { ?clause cond:conditionMet true } ) log:forAllIn _:x . 
+} .

@@ -15,17 +15,6 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 } => { ?e2 state:in :Ready } .
 
 
-# - simple test
-
-{ 	?e :done true .
-
-	{ ?e state:in :Active }
-		e:becomes
-			{ ?e state:in :Completed ; state:reason :completeDoneTask }
-
-} => { ?e state:in :Completed } .
-
-
 # - given a sequential relation, if all prior entities were discarded, then discard the following entity 
 # (propagate discarded state to all following entities)
 

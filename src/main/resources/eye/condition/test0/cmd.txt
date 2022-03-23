@@ -1,1 +1,0 @@
-eye --nope condition.n3 condition/test0/test.n3 --query condition/test0/query.n3
