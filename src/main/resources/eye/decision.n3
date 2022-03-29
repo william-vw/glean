@@ -24,19 +24,6 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 # so if a DecisionTask is discarded, then this discarded state will be propagated (next.n3)
 
 
-# - if a branch was activated, then ready its target task
-
-{	?branch a :DecisionBranch ;
-		state:in :Active ; # (this means its precondition was met!)
-		:branchTarget ?task .
-
-	{ ?task state:in :Inactive } 
-		e:becomes
-			{ ?task state:in :Ready ; state:reason :readyTaskOfActiveBranch }
-	
-} => { ?task state:in :Ready } .
-
-
 # - if a decision task has an active branch, then complete the decision task 
 
 {	?decision a :DecisionTask ;
@@ -48,6 +35,7 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 			{ ?decision state:in :Completed ; state:reason :completeDecisionTaskWithActiveBranch }
 	
 } => { ?decision state:in :Completed } . # complete decision task
+
 
 
 # - if at least one branch is active, then discard other branches
@@ -65,3 +53,17 @@ prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 			{ ?branch state:in :Discarded ; state:reason :discardRemainingBranchesInCaseOfActiveBranch }
 
 } => { ?branch state:in :Discarded } . # discard branch
+
+
+
+# - if a branch was activated, then ready its target task
+
+{	?branch a :DecisionBranch ;
+		state:in :Active ; # (this means its precondition was met!)
+		:branchTarget ?task .
+
+	{ ?task state:in :Inactive } 
+		e:becomes
+			{ ?task state:in :Ready ; state:reason :readyTaskOfActiveBranch }
+	
+} => { ?task state:in :Ready } .
