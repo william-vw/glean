@@ -1,0 +1,222 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+
+
+:check_routine_match_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <check_routine_match_report> ;
+	fhir:PlanDefinition.name "check_routine_match_report" ;
+	fhir:PlanDefinition.title "Some task1 report" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_check_routine_match
+	] ) .
+
+:action_check_routine_match a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_check_routine_match" ;
+	fhir:ActivityDefinition.title "Routine match?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_routine_match ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:check_need_irr_blood_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <check_need_irr_blood_report> ;
+	fhir:PlanDefinition.name "check_need_irr_blood_report" ;
+	fhir:PlanDefinition.title "Need irradiated blood?" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_need_irr_blood
+	] ) .
+
+:action_need_irr_blood a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_need_irr_blood" ;
+	fhir:ActivityDefinition.title "Need irradiated blood?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_irr_blood ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:check_female_childbearing_age_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <check_female_childbearing_age_report> ;
+	fhir:PlanDefinition.name "check_female_childbearing_age_report" ;
+	fhir:PlanDefinition.title "Female of childbearing age (< 45)?" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_check_male
+	] [
+		fhir:PlanDefinition.action.definitionUri :action_check_female
+	] [
+		fhir:PlanDefinition.action.definitionUri :action_check_age
+	] ) .
+
+:action_check_male a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_check_male" ;
+	fhir:ActivityDefinition.title "Male" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_male ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_female )
+	] .
+
+:action_check_female a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_check_female" ;
+	fhir:ActivityDefinition.title "Female" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_female ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_male )
+	] .
+	
+:action_check_age a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_check_age" ;
+	fhir:ActivityDefinition.title "Age?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_age ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "year" ;
+					rdfs:label "years"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 120 ] ;
+				rdfs:label "(1-120)"
+			]
+		]
+	] .
+	
+	
+:check_kell_status_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <check_kell_status_report> ;
+	fhir:PlanDefinition.name "check_kell_status_report" ;
+	fhir:PlanDefinition.title "Kell status?" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action (
+		[ fhir:PlanDefinition.action.definitionUri :action_kell_pos ]
+		[ fhir:PlanDefinition.action.definitionUri :action_kell_neg ]
+		[ fhir:PlanDefinition.action.definitionUri :action_kell_unknown ]
+	) .
+
+:action_kell_pos a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_kell_pos" ;
+	fhir:ActivityDefinition.title "Kell positive" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_kell_pos ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_kell_neg :code_kell_unknown )
+	] .
+
+:action_kell_neg a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_kell_neg" ;
+	fhir:ActivityDefinition.title "Kell negative" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_kell_neg ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_kell_pos :code_kell_unknown )
+	] .
+	
+:action_kell_unknown a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_kell_unknown" ;
+	fhir:ActivityDefinition.title "Kell unknown" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_kell_unknown ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_kell_pos :code_kell_neg )
+	] .
+	
+	
+:check_phenotype_avail_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <check_phenotype_avail_report> ;
+	fhir:PlanDefinition.name "check_phenotype_avail_report" ;
+	fhir:PlanDefinition.title "Phenotype available?" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_check_phenotype_avail
+	] ) .
+
+:action_check_phenotype_avail a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "check_phenotype_avail" ;
+	fhir:ActivityDefinition.title "Phenotype available?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_blood_phenotype_avail ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:check_need_phenotype_match_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <check_need_phenotype_match_report> ;
+	fhir:PlanDefinition.name "check_need_phenotype_match_report" ;
+	fhir:PlanDefinition.title "Need for phenotype match?" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action (
+		[ fhir:PlanDefinition.action.definitionUri :action_phenotype_unique_antibody ]
+		[ fhir:PlanDefinition.action.definitionUri :action_check_male ]
+		[ fhir:PlanDefinition.action.definitionUri :action_check_female ]
+		[ fhir:PlanDefinition.action.definitionUri :action_check_age ]
+		[ fhir:PlanDefinition.action.definitionUri :action_phenotype_chronic_transf ]
+		[ fhir:PlanDefinition.action.definitionUri :action_phenotype_sicke_cell ]
+	) .
+
+:action_phenotype_unique_antibody a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_phenotype_unique_antibody" ;
+	fhir:ActivityDefinition.title "Unique antibodies?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_unique_antibody ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+
+:action_phenotype_female_childbearing_age a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_phenotype_female_childbearing_age" ;
+	fhir:ActivityDefinition.title "Female of childbearing age (< 45)?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code ::code_female_childbearing_age ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+:action_phenotype_chronic_transf a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_phenotype_chronic_transf" ;
+	fhir:ActivityDefinition.title "Chronic transfusion case?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_chronic_transf ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+:action_phenotype_sicke_cell a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_phenotype_sickle_cell" ;
+	fhir:ActivityDefinition.title "Sickle cell disease?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_sickle_cell ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .

@@ -1,0 +1,166 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+
+:some_task1_report_bool a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <some_task1_report_bool> ;
+	fhir:PlanDefinition.name "some_task1_report_bool" ;
+	fhir:PlanDefinition.title "Some task1 report" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_some_task1_yesno
+	] ) .
+
+:action_some_task1_yesno a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_some_task1_yesno" ;
+	fhir:ActivityDefinition.title "Some action?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_some ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:some_task1_report_int a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <some_task1_report_int> ;
+	fhir:PlanDefinition.name "some_task1_report_int" ;
+	fhir:PlanDefinition.title "Some task1 report" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_some_task1_int
+	] ) .
+	
+:action_some_task1_int a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_some_task1_int" ;
+	fhir:ActivityDefinition.title "Some action?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_some ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code ".." ;
+					rdfs:label ".."
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 200 ] ;
+				rdfs:label "(1-200)"
+			]
+		]
+	] .
+	
+	
+:some_task2_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <some_task2_report> ;
+	fhir:PlanDefinition.name "some_task2_report" ;
+	fhir:PlanDefinition.title "Some task2 report" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action (
+		[ fhir:PlanDefinition.action.definitionUri :action_mutex1 ]
+		[ fhir:PlanDefinition.action.definitionUri :action_mutex2 ]
+		[ fhir:PlanDefinition.action.definitionUri :action_mutex3 ]
+	) .
+
+:action_mutex1 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_mutex1" ;
+	fhir:ActivityDefinition.title "Some action" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_mutex1 ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_mutex2 :code_mutex3 )
+	] .
+
+:action_mutex2 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_mutex2" ;
+	fhir:ActivityDefinition.title "Some action" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_mutex2 ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_mutex1 :code_mutex3 )
+	] .
+	
+:action_mutex3 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_mutex3" ;
+	fhir:ActivityDefinition.title "Some action" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_mutex3 ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_mutex1 :code_mutex2 )
+	] .
+	
+	
+	
+:some_task3_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <some_task3_report> ;
+	fhir:PlanDefinition.name "some_task3_report" ;
+	fhir:PlanDefinition.title "Some task3 report" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_some_task3_double1
+	] [
+		fhir:PlanDefinition.action.definitionUri :action_some_task3_double2
+	] ) .
+	
+	
+:action_some_task3_double1 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_some_task3_double1" ;
+	fhir:ActivityDefinition.title "Some action?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_some ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code ".." ;
+					rdfs:label ".."
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 100 ] ;
+				rdfs:label "(1-100)"
+			]
+		]
+	] .
+	
+:action_some_task3_double2 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_some_task3_double2" ;
+	fhir:ActivityDefinition.title "Some action" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_some ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code ".." ;
+					rdfs:label ".."
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 100 ] ;
+				rdfs:label "(1-100)"
+			]
+		]
+	] .

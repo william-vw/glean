@@ -33,8 +33,8 @@
 		fhir:ObservationDefinition.qualifiedInterval [
 			fhir:ObservationDefinition.qualifiedInterval.range [
 				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
-				fhir:Range.high [ fhir:Quantity.value 200 ] ;
-				rdfs:label "(1-200)"
+				fhir:Range.high [ fhir:Quantity.value 120 ] ;
+				rdfs:label "(1-120)"
 			]
 		]
 	] .

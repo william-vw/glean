@@ -1,0 +1,416 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
+prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#>
+prefix fhir: <http://hl7.org/fhir/>
+prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
+
+:Dyslipidemia_CKD a cig:MedicalWorkflow ;
+	state:in gl:Active ;
+	rdfs:label "RBC Matching" ;
+
+	cig:inputFile "/cig/btsf/input/rbc_match.n3" ;
+
+	gl:root true ;
+	gl:subTask :check_routine_match , :emergency_request , :match_abo_rhd , :match_antibody ,
+		:check_need_irr_blood , :match_irr_blood , :check_female_childbearing_age ,
+		:match_kell , :check_kell_status , :match_kell_neg , :check_phenotype_avail ,
+		:check_need_phenotype_match , :no_possible_phenotype_match ,
+		:do_phenotype_match , :no_need_phenotype_match , :check_multi_factor_match .
+	
+	
+:check_routine_match a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "Routine match?" ;
+	rdfs:comment """Does this constitute a routine match or an emergency (e.g., massive hemorrhage)?""" ;
+
+	cig:input :check_routine_match_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [ 
+			rdfs:label "emergency" ;
+			rdfs:comment """An RBC request for an emergency (e.g., hemorrhage)""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_routine_match ;
+						fhir:Observation.valueBoolean false 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :emergency_request
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "routine" ;
+			rdfs:comment """A non-emergency routine RBC request""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_routine_match ;
+						fhir:Observation.valueBoolean true 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :match_abo_rhd
+	] .
+	
+
+:emergency_request a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Emergency request" ;
+	rdfs:comment "This RBC request is for an emergency (e.g., hemorrhage) which is out of scope of this algorithm" .
+	
+
+:match_abo_rhd a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	gl:involvesAction false ;
+	
+	gl:next :match_antibody ;
+	
+	rdfs:label "Match ABO & RhD" ;
+	rdfs:comment """Match RBC units for ABO and RhD""" .
+	
+	
+:match_antibody a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	gl:involvesAction false ;
+	
+	gl:next :check_need_irr_blood ;
+	
+	rdfs:label "Match antibodies" ;
+	rdfs:comment """Match RBC units for antibodies""" .
+	
+	
+:check_need_irr_blood a a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "Need irradiated blood?" ;
+	rdfs:comment """Does the patient require irradiated blood?""" ;
+	
+	cig:input :check_need_irr_blood_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [ 
+			rdfs:label "irradiated blood" ;
+			rdfs:comment """The patient requires irradiated blood""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_irr_blood ;
+						fhir:Observation.valueBoolean true 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :match_irr_blood 
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment """The patient does not require irradiated blood""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_irr_blood ;
+						fhir:Observation.valueBoolean false 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :check_female_childbearing_age
+	] .
+	
+	
+:match_irr_blood a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	gl:involvesAction false ;
+	
+	gl:next :check_female_childbearing_age ;
+	
+	rdfs:label "Match irradiated blood" ;
+	rdfs:comment """Match irradiated RBC units""" .
+	
+	
+:check_female_childbearing_age a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "Female < 45?" ;
+	rdfs:comment """Is the patient a female of childbearing age (< 45)?""" ;
+	
+	cig:input :check_female_childbearing_age_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [ 
+			rdfs:label "yes" ;
+			rdfs:comment """Patient is a female of childbearing age (< 45)""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_age ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:lessThan 45 
+				} ]
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_female ; 
+						fhir:Observation.valueBoolean true .
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :match_kell 
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment """Patient is not a female of childbearing age (< 45)""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_age ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notLessThan 45 
+				} ]
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_female ; 
+						fhir:Observation.valueBoolean false .
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :check_phenotype_avail
+	] .
+	
+	
+:match_kell a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	gl:involvesAction false ;
+	
+	gl:next :check_kell_status ;
+	
+	rdfs:label "Match for Kell" ;
+	rdfs:comment """Match RBC units for Kell""" .
+	
+	
+:check_kell_status a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "Kell status?" ;
+	rdfs:comment """What is the patient's Kell status?""" ;
+	
+	cig:input :check_kell_status_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [ 
+			rdfs:label "+" ;
+			rdfs:comment """Patient is Kell positive""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_kell_pos ;
+						fhir:Observation.valueBoolean true
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :check_phenotype_avail
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "- or unknown" ;
+			rdfs:comment """Patient is Kell negative or unknown""" ;
+			
+			cond:anyOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_kell_neg ;
+						fhir:Observation.valueBoolean true
+				} ]
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_kell_unknown ;
+						fhir:Observation.valueBoolean true
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :match_kell_neg
+	] .
+	
+	
+:match_kell_neg a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	gl:involvesAction false ;
+	
+	gl:next :check_phenotype_avail ;
+	
+	rdfs:label "Match Kell -" ;
+	rdfs:comment """Match Kell - RBC units""" .
+	
+	
+:check_phenotype_avail a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "Phenotype available?" ;
+	rdfs:comment """Is the patient's phenotype available?""" ;
+	
+	cig:input :check_phenotype_avail_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [ 
+			rdfs:label "yes" ;
+			rdfs:comment """The patient's phenotype is available""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_blood_phenotype_avail ;
+						fhir:Observation.valueBoolean true 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :check_need_phenotype_match
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment """The patient's phenotype is not available""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_blood_phenotype_avail ;
+						fhir:Observation.valueBoolean false 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :no_possible_phenotype_match
+	] .
+		
+	
+:no_possible_phenotype_match a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No phenotype match" ;
+	rdfs:comment """Not possible to perform phenotype matching for this patient""" .
+	
+	
+:check_need_phenotype_match a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "Need for phenotype match?" ;
+	rdfs:comment """Consider the following factors for phenotype matching:
+		1) Unique antibodies?
+		2) Female of childbearing age (< 45)?
+		3) Chronic transfusion case?
+		4) Sickle cell disease?
+	The outcome of this task will be a weighted sum of the above factors. If this weighted sum lies above a certain threshold, there is a determined need for phenotype matching.""" ;
+	
+	cig:input :check_need_phenotype_match_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		
+		gl:precondition [ 
+			rdfs:label "phenotype match" ;
+			rdfs:comment """There is a determined need for phenotype matching.""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_unique_antibody ;
+						fhir:Observation.valueBoolean true 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :do_phenotype_match
+	
+	] , [
+		state:in gl:Inactive ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment """There is no determined need for phenotype matching.""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_unique_antibody ;
+						fhir:Observation.valueBoolean false 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :no_need_phenotype_match
+	] .
+	
+	
+
+:no_need_phenotype_match a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "No phenotype match" ;
+	rdfs:comment """There is no need to perform phenotype matching for this patient""" .
+	
+	
+:do_phenotype_match a gl:Task ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	gl:involvesAction false ;
+	
+	gl:next :check_multi_factor_match ;
+	
+	rdfs:label "Match phenotype" ;
+	rdfs:comment """Perform phenotype matching for this patient based on their antigens""" .
+	
+	
+:check_multi_factor_match a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "Multi-factor match" ;
+	rdfs:comment """Find RBC units depending on multiple factors:
+	1) Phenotype (antigen) match
+	2) Expiry times
+	3) Geographic location
+	The outcome of this task will be a weighted sum of the above factors for each RBC unit. An RBC unit will be chosen based on this weighted sum.""" ; .
