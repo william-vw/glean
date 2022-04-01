@@ -16,7 +16,7 @@ import wvw.glean.workflow.WorkflowModel;
 public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 	private Map<String, Node> nodeMap = new HashMap<>();
-	
+
 	public WorkflowD3TreePrinter() {
 	}
 
@@ -39,18 +39,24 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 	protected Node prepare(Resource wf) {
 		nodeMap.clear();
-		
+
 		return prepare(wf, null, 0, false);
 	}
 
 	protected Node prepare(Resource entity, Node parent, int depth, boolean composed) {
 		Resource task = getTask(entity);
 		String id = getId(task);
-		
+
 		Node node = nodeMap.get(id);
 		if (node == null) {
 			node = new Node(task);
 			nodeMap.put(id, node);
+		}
+
+		if (entity.hasProperty(kb.resource("gl:order"))) {
+			int order = entity.getPropertyResourceValue(kb.resource("gl:order")).asLiteral()
+					.getInt();
+			node.setOrder(order);
 		}
 
 		if (parent != null)
@@ -90,19 +96,28 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		if (curNode.getParents().size() > 1) {
 
 			// only print at lowest-down level
-			if (curNode.getMaxDepth() > curDepth) {
+			// (if this condition is met, means that we're not at lowest-down)
+			if (curDepth < curNode.getMaxDepth()) {
 
-				if (curNode.getMaxDepth() == (curDepth + 1))
+				if (curParent.getChildren().size() > 1) {
+					LOG.info("adding hidden child (1)");
 					str.append("{").append(printKeyValue("hidden", true)).append("}");
+				}
 
 				return false;
+
+			} else {
+				// we're at lowest level but node was already shown
+				if (curNode.isShown())
+					return false;
+
+				curNode.setShown(true);
+
+				if (curNode.getParents().size() > 1) {
+					LOG.info("adding hidden child (2)");
+					str.append("{").append(printKeyValue("hidden", true)).append("},");
+				}
 			}
-
-			// we're at lowest level but node was already shown
-			if (curNode.isShown())
-				return false;
-
-			curNode.setShown(true);
 		}
 
 		str.append("{");
@@ -170,9 +185,6 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		}
 
 		// currently, move all children with multiple parents to the right
-		// if child is not at lowest-down position, tends to 'pull' parent to the right
-		// if child is at lowest-down position, will be shifted to the right
-
 		sort(children);
 		// System.out.println("children: " + children);
 
@@ -234,8 +246,17 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 	}
 
 	private void sort(List<NodeLink> children) {
-		children.sort((c1, c2) -> Integer.valueOf(c1.getChild().getSortValue())
-				.compareTo(c2.getChild().getSortValue()));
+		children.sort((c1, c2) -> {
+			Node n1 = c1.getChild();
+			Node n2 = c2.getChild();
+
+			// assumes that if one child has an order,
+			// all the parent's children have an order
+			if (n1.hasOrder())
+				return Integer.valueOf(n1.getOrder()).compareTo(n2.getOrder());
+			else
+				return Integer.valueOf(n1.getSortValue()).compareTo(n2.getSortValue());
+		});
 	}
 
 	protected class Node {
@@ -244,6 +265,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		private List<NodeLink> parents = new ArrayList<>();
 		private List<NodeLink> children = new ArrayList<>();
 
+		private int order = -1;
 		private boolean shown = false;
 
 		public Node(Resource task) {
@@ -278,6 +300,18 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 		public boolean isShown() {
 			return shown;
+		}
+
+		public boolean hasOrder() {
+			return order != -1;
+		}
+
+		public int getOrder() {
+			return order;
+		}
+
+		public void setOrder(int order) {
+			this.order = order;
 		}
 
 		public void setShown(boolean shown) {

@@ -6,9 +6,9 @@ prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
 prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
 prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#>
 prefix fhir: <http://hl7.org/fhir/>
-prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
+prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 
-:Dyslipidemia_CKD a cig:MedicalWorkflow ;
+:RBC_Match a cig:MedicalWorkflow ;
 	state:in gl:Active ;
 	rdfs:label "RBC Matching" ;
 
@@ -32,23 +32,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	cig:input :check_routine_match_report ;
 	
 	gl:decisionBranch [
-		state:in gl:Inactive ;
-		
-		gl:precondition [ 
-			rdfs:label "emergency" ;
-			rdfs:comment """An RBC request for an emergency (e.g., hemorrhage)""" ;
-			
-			cond:allOf (
-				[ cond:premise { 
-					?obs fhir:Observation.code :code_routine_match ;
-						fhir:Observation.valueBoolean false 
-				} ]
-			)
-		] ;
-		
-		gl:branchTarget :emergency_request
-	
-	] , [
+		gl:order 0 ;
 		state:in gl:Inactive ;
 		
 		gl:precondition [
@@ -64,6 +48,24 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		] ;
 		
 		gl:branchTarget :match_abo_rhd
+	
+	] , [
+		gl:order 1 ;
+		state:in gl:Inactive ;
+		
+		gl:precondition [ 
+			rdfs:label "emergency" ;
+			rdfs:comment """An RBC request for an emergency (e.g., hemorrhage)""" ;
+			
+			cond:allOf (
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_routine_match ;
+						fhir:Observation.valueBoolean false 
+				} ]
+			)
+		] ;
+		
+		gl:branchTarget :emergency_request
 	] .
 	
 
@@ -97,7 +99,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	rdfs:comment """Match RBC units for antibodies""" .
 	
 	
-:check_need_irr_blood a a gl:DecisionTask ;
+:check_need_irr_blood a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 
