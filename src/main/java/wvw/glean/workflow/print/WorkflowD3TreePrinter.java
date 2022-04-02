@@ -88,33 +88,59 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		Resource task = curNode.getTask();
 		String curId = getId(task);
 
-		// parent task is *not* the lowest-down parent
-		// could skip this child but layout gets wonky
-		// try to bias layout by adding 'hidden' children
+		LOG.info("node: " + curNode + " - " + curDepth + " <> " + curNode.getMaxDepth());
 
-//		LOG.info("node: " + curNode + " - " + curDepth + " <> " + curNode.getMaxDepth());
+		// node has more than 1 parent but tree hierarchies are not meant for this
+		// so do some hacking here; add "hidden" children to fix layout
+
+		// - case 1:
+		// parent at depth-1, parent at depth-2 (possibly higher parents as well)
+		// 1) child will only be printed for deepest-down parent
+		// 2) add hidden child at the end for parent at depth-2 ("clears way" for its
+		// link; this will pull workflow to the left)
+		// 3) when printing child, and it has no siblings, first add hidden child to
+		// pull to right again
+		// higher-up parents will have curved edge & hope for the best
+
+		// - case 2:
+		// multiple parents at depth - 1
+		// 1) child will be printed for first (i.e., left-hand) parent;
+		// this will pull workflow to the left
+		// 2) when printing child, and it has no siblings, first add hidden child to
+		// pull to right again
+
 		if (curNode.getParents().size() > 1) {
 
-			// only print at lowest-down level
-			// (if this condition is met, means that we're not at lowest-down)
+			// this parent is not the lowest-down parent
 			if (curDepth < curNode.getMaxDepth()) {
 
-				if (curParent.getChildren().size() > 1) {
-					LOG.info("adding hidden child (1)");
+//				if (curParent.getChildren().size() > 1)
+
+				// second lowest-down parent:
+				// add hidden child to the right to make room for link
+				// (children with multiple parents will be the last child-node;
+				// see sort() method)
+
+				if (curDepth + 1 == curNode.getMaxDepth()) {
+//					LOG.info("adding hidden child (1)");
 					str.append("{").append(printKeyValue("hidden", true)).append("}");
 				}
 
+				// only print child-node at lowest-down level
 				return false;
 
+				// this parent is the lowest-down parent
 			} else {
-				// we're at lowest level but node was already shown
+				// node was already shown
 				if (curNode.isShown())
 					return false;
 
 				curNode.setShown(true);
 
-				if (curNode.getParents().size() > 1) {
-					LOG.info("adding hidden child (2)");
+				// child is not yet shown:
+				// if no siblings, first add hidden child to "pull" workflow back to the right
+				if (curParent.getChildren().size() == 1 && curNode.getParents().size() > 1) {
+//					LOG.info("adding hidden child (2)");
 					str.append("{").append(printKeyValue("hidden", true)).append("},");
 				}
 			}
@@ -184,9 +210,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			str.append("\"children\": [");
 		}
 
-		// currently, move all children with multiple parents to the right
 		sort(children);
-		// System.out.println("children: " + children);
 
 		boolean prior = false;
 		for (int i = 0; i < children.size(); i++) {
@@ -254,6 +278,8 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			// all the parent's children have an order
 			if (n1.hasOrder())
 				return Integer.valueOf(n1.getOrder()).compareTo(n2.getOrder());
+
+			// move all children with multiple parents to the right
 			else
 				return Integer.valueOf(n1.getSortValue()).compareTo(n2.getSortValue());
 		});
