@@ -194,7 +194,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 			rdfs:label "no" ;
 			rdfs:comment """Patient is not a female of childbearing age (< 45)""" ;
 			
-			cond:allOf (
+			cond:anyOf (
 				[ cond:premise { 
 					?obs fhir:Observation.code :code_age ; 
 						fhir:Observation.valueQuantity ?quantity . 
@@ -202,8 +202,8 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 						?value math:notLessThan 45 
 				} ]
 				[ cond:premise { 
-					?obs fhir:Observation.code :code_female ; 
-						fhir:Observation.valueBoolean false .
+					?obs fhir:Observation.code :code_male ; 
+						fhir:Observation.valueBoolean true .
 				} ]
 			)
 		] ;
@@ -360,7 +360,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 			cond:allOf (
 				[ cond:premise { 
 					?obs fhir:Observation.code :code_unique_antibody ;
-						fhir:Observation.valueBoolean true 
+						fhir:Observation.valueBoolean true .
+				} ]
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_female ;
+						fhir:Observation.valueBoolean true .
 				} ]
 			)
 		] ;
@@ -377,7 +381,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 			cond:allOf (
 				[ cond:premise { 
 					?obs fhir:Observation.code :code_unique_antibody ;
-						fhir:Observation.valueBoolean false 
+						fhir:Observation.valueBoolean true .
+				} ]
+				[ cond:premise { 
+					?obs fhir:Observation.code :code_male ;
+						fhir:Observation.valueBoolean true .
 				} ]
 			)
 		] ;

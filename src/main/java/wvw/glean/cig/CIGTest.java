@@ -2,8 +2,6 @@ package wvw.glean.cig;
 
 import java.util.List;
 
-import org.apache.jen3.reasoner.rulesys.impl.BindingStack;
-
 import wvw.glean.workflow.WorkflowModel.EntityState;
 import wvw.glean.workflow.WorkflowModel.InitOptions;
 import wvw.glean.workflow.WorkflowModel.LoadOptions;
@@ -12,30 +10,86 @@ import wvw.utils.rdf.NS;
 
 public class CIGTest {
 
-	private static String cigPath = "cig/lipid/ckd_dyslipidemia.n3";
+//	private static String cigNs = NS.ckd;
+//	private static String cigPath = "cig/lipid/ckd_dyslipidemia.n3";
+//	private static String workflow = "Dyslipidemia_CKD";
+
+//	private static String cigNs = NS.ckd;
 //	private static String cigPath = "cig/lipid/evaluate_lipid_profile.n3";
+//	private static String workflow = "Evaluate_Lipid_Profile";
+
+	private static String cigNs = NS.rbc;
+	private static String cigPath = "cig/btsf/rbc_match.n3";
+	private static String workflow = "RBC_Match";
 
 	public static void main(String[] args) throws Exception {
 		long start = System.currentTimeMillis();
 
-		CIGModel cig = (CIGModel) new CIGModel(NS.ckd)
-				.initialize(InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN) //InitOptions.LOGGING)
+		CIGModel cig = (CIGModel) new CIGModel(cigNs)
+				.initialize(InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN) // InitOptions.LOGGING)
 				.load(CIGModel.class, cigPath, LoadOptions.RECURSIVELY);
 
-		cig.transitAll("Dyslipidemia_CKD");
-//		cig.transitAll("Evaluate_Lipid_Profile");
+		cig.transitAll(workflow);
 
-		List<EntityState> states = followupLipidProfileCase(cig);
-//		evaluateLipidProfileCase(cig);
+//		List<EntityState> states = followupLipidProfileCase(cig);
+//		List<EntityState> states = evaluateLipidProfileCase(cig);
+
+		List<EntityState> states = rbcMatchCase1(cig);
 
 		long end = System.currentTimeMillis();
 
 		cig.printAllTransits(states, true);
 
 		Log.i("\ntime: " + (end - start));
-		
-		Log.i("# new graphs: " + BindingStack.nrNewGraphs);
-		Log.i("# new colls: " + BindingStack.nrNewColls);
+
+//		Log.i("# new graphs: " + BindingStack.nrNewGraphs);
+//		Log.i("# new colls: " + BindingStack.nrNewColls);
+	}
+
+	public static List<EntityState> rbcMatchCase1(CIGModel cig) throws Exception {
+		// > Follow-up Lipid Profile
+
+		// prior_lipid_profile
+		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+				+ "@prefix fhir: <http://hl7.org/fhir/>.\n"
+				+ "@prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>.\n"
+				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>.\n"
+				+ "_:df_0_0 <http://hl7.org/fhir/Observation.code> ns:code_routine_match;\n"
+				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.\n"
+				+ "ns:check_routine_match gl:hasInputData _:df_0_0.");
+
+		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+				+ "@prefix fhir: <http://hl7.org/fhir/>.\n"
+				+ "@prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>.\n"
+				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>.\n" + "\n"
+				+ "_:df_2_0 <http://hl7.org/fhir/Observation.code> ns:code_irr_blood ;\n"
+				+ "    <http://hl7.org/fhir/Observation.valueBoolean> false.\n"
+				+ "ns:check_need_irr_blood gl:hasInputData _:df_2_0.");
+
+		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+				+ "@prefix fhir: <http://hl7.org/fhir/>.\n"
+				+ "@prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>.\n"
+				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>.\n" + "\n"
+				+ "_:df_4_1 <http://hl7.org/fhir/Observation.code> ns:code_female;\n"
+//				+ "_:df_4_1 <http://hl7.org/fhir/Observation.code> ns:code_male;\n"
+				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.\n"
+				+ "_:df_4_2 <http://hl7.org/fhir/Observation.code> ns:code_age;\n"
+				+ "    <http://hl7.org/fhir/Observation.valueQuantity> _:df_4_3.\n"
+				+ "_:df_4_3 <http://hl7.org/fhir/Quantity.system> <http://unitsofmeasure.org>;\n"
+				+ "    <http://hl7.org/fhir/Quantity.code> \"year\";\n"
+//				+ "    <http://hl7.org/fhir/Quantity.value> 47.\n"
+				+ "    <http://hl7.org/fhir/Quantity.value> 41.\n"
+				+ "ns:check_female_childbearing_age gl:hasInputData _:df_4_1, _:df_4_2.");
+
+		return cig.transitAll();
+
+//		cig.printAllTransits(true);
+
+//		cig.getKb().printAll();
+//		cig.getKb().printDerivations();
 	}
 
 	public static List<EntityState> followupLipidProfileCase(CIGModel cig) throws Exception {
@@ -63,7 +117,7 @@ public class CIGTest {
 //		cig.getKb().printDerivations();
 	}
 
-	public static void evaluateLipidProfileCase(CIGModel cig) throws Exception {
+	public static List<EntityState> evaluateLipidProfileCase(CIGModel cig) throws Exception {
 		System.out.println("START");
 
 		// > Evaluate Lipid Profile
@@ -104,7 +158,9 @@ public class CIGTest {
 //				+ "    <http://hl7.org/fhir/Quantity.code> \"mmol/L\";\n"
 //				+ "    <http://hl7.org/fhir/Quantity.value> \"3.2\"^^xsd:double.\n");
 
-		cig.printAllTransits(true);
+		return cig.transitAll();
+
+//		cig.printAllTransits(true);
 
 //		cig.getKb().printAll();
 //		cig.getKb().printDerivations();

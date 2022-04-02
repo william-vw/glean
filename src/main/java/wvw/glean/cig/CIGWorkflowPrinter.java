@@ -57,8 +57,12 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		// - print workflow
 
 //		String name = "lipid/ckd_dyslipidemia";
+//		String ns = NS.ckd;
+//		printer.printWorkflow(name, ns);
+
 		String name = "btsf/rbc_match";
-		printer.printWorkflow(name);
+		String ns = NS.rbc;
+		printer.printWorkflow(name, ns);
 	}
 
 	private N3Model inputDef = null;
@@ -86,10 +90,10 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		System.out.println("html? " + html);
 	}
 
-	public void printWorkflow(String name) throws Exception {
+	public void printWorkflow(String name, String ns) throws Exception {
 		long start = System.currentTimeMillis();
 
-		WorkflowModel wf = new CIGModel(NS.ckd).initialize().load(getClass(), "cig/" + name + ".n3",
+		WorkflowModel wf = new CIGModel(ns).initialize().load(getClass(), "cig/" + name + ".n3",
 				LoadOptions.RECURSIVELY);
 
 //		wf.getKb().printAll();
