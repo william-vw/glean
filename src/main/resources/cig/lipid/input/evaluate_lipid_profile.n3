@@ -40,8 +40,6 @@
 		[ fhir:PlanDefinition.action.definitionUri :action_13-cis-retinioc_acid ]
 		[ fhir:PlanDefinition.action.definitionUri :action_anti_convulsant ]
 		[ fhir:PlanDefinition.action.definitionUri :action_highly_active_anti-retroviral_therapy ]
-		[ fhir:PlanDefinition.action.definitionUri :action_diuretics ]
-		[ fhir:PlanDefinition.action.definitionUri :action_beta_blockers ]
 		[ fhir:PlanDefinition.action.definitionUri :action_androgens ]
 		[ fhir:PlanDefinition.action.definitionUri :action_oral_contraceptives ]
 		[ fhir:PlanDefinition.action.definitionUri :action_corticosteroids ]
@@ -65,8 +63,6 @@
 			:code_13-cis-retinioc_acid
 			:code_anti_convulsant
 			:code_highly_active_anti-retroviral_therapy
-			:code_diuretics
-			:code_beta_blockers
 			:code_androgens
 			:code_oral_contraceptives
 			:code_corticosteroids
@@ -151,26 +147,6 @@
 	fhir:ActivityDefinition.title "Highly active anti-retroviral therapy?" ;
 	fhir:ActivityDefinition.observationResultRequirement [
 		fhir:ObservationDefinition.code :code_highly_active_anti-retroviral_therapy ;
-		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
-		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
-		fhir:ObservationDefinition.mutexWith ( :code_no_secondary_causes )
-	] .
-	
-:action_diuretics a fhir:ActivityDefinition ;
-	fhir:ActivityDefinition.name "action_diuretics" ;
-	fhir:ActivityDefinition.title "Diuretics?" ;
-	fhir:ActivityDefinition.observationResultRequirement [
-		fhir:ObservationDefinition.code :code_diuretics ;
-		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
-		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
-		fhir:ObservationDefinition.mutexWith ( :code_no_secondary_causes )
-	] .
-	
-:action_beta_blockers a fhir:ActivityDefinition ;
-	fhir:ActivityDefinition.name "action_beta_blockers" ;
-	fhir:ActivityDefinition.title "Beta blockers?" ;
-	fhir:ActivityDefinition.observationResultRequirement [
-		fhir:ObservationDefinition.code :code_beta_blockers ;
 		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
 		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
 		fhir:ObservationDefinition.mutexWith ( :code_no_secondary_causes )

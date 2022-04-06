@@ -58,15 +58,15 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// -- lipid
 		
-//		String name = "lipid/ckd_dyslipidemia";
-//		String ns = NS.ckd;
-//		printer.printWorkflow(name, ns);
+		String name = "lipid/ckd_dyslipidemia";
+		String ns = NS.ckd;
+		printer.printWorkflow(name, ns);
 
 		// -- rbc
 		
-		String name = "btsf/rbc_match";
-		String ns = NS.rbc;
-		printer.printWorkflow(name, ns);
+//		String name = "btsf/rbc_match";
+//		String ns = NS.rbc;
+//		printer.printWorkflow(name, ns);
 	}
 
 	private N3Model inputDef = null;

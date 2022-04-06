@@ -31,9 +31,9 @@
 	fhir:PlanDefinition.title "COPD observations" ;
 	fhir:PlanDefinition.status "active" ; 
 	fhir:PlanDefinition.action ( [
-		fhir:PlanDefinition.action.definitionUri :action_ldl_cholesterol
-	] [
 		fhir:PlanDefinition.action.definitionUri :action_fasting_triglycerides
+	] [
+		fhir:PlanDefinition.action.definitionUri :action_ldl_cholesterol
 	] ) .
 	
 	
@@ -51,7 +51,7 @@
 					rdfs:label "mmol/L"
     			]
     		] ;
-    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 2
 		] ;
 		fhir:ObservationDefinition.qualifiedInterval [
 			fhir:ObservationDefinition.qualifiedInterval.range [
@@ -76,7 +76,7 @@
 					rdfs:label "mmol/L"
     			]
     		] ;
-    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 2
 		] ;
 		fhir:ObservationDefinition.qualifiedInterval [
 			fhir:ObservationDefinition.qualifiedInterval.range [

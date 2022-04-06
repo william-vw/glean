@@ -84,6 +84,15 @@ public class CIGTest {
 				+ "    <http://hl7.org/fhir/Quantity.value> 41.\n"
 				+ "ns:check_female_childbearing_age gl:hasInputData _:df_4_1, _:df_4_2.");
 
+		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+				+ "@prefix fhir: <http://hl7.org/fhir/>.\n"
+				+ "@prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>.\n"
+				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>.\n" + "\n"
+				+ "_:df_5_0 <http://hl7.org/fhir/Observation.code> ns:code_kell_pos ;\n"
+				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.\n"
+				+ "ns:check_kell_status gl:hasInputData _:df_5_0.");
+
 		return cig.transitAll();
 
 //		cig.printAllTransits(true);

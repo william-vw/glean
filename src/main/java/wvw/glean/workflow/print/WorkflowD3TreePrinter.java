@@ -88,7 +88,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		Resource task = curNode.getTask();
 		String curId = getId(task);
 
-		LOG.info("node: " + curNode + " - " + curDepth + " <> " + curNode.getMaxDepth());
+//		LOG.info("node: " + curNode + " - " + curDepth + " <> " + curNode.getMaxDepth());
 
 		// node has more than 1 parent but tree hierarchies are not meant for this
 		// so do some hacking here; add "hidden" children to fix layout
