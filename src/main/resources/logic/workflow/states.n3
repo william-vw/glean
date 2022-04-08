@@ -23,7 +23,8 @@ prefix ckd: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
 {   ?cmpdState a state:CompoundState .
 
-    _:x e:findall (?atomState { ?cmpdState state:includes ?atomState} ?atomStates) .
+    (?atomState { ?cmpdState state:includes ?atomState} ?atomStates)
+    	log:collectAllIn <> .
     
 } => { ?cmpdState state:atomStateList ?atomStates } .
 

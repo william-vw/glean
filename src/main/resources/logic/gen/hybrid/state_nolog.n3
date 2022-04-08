@@ -1,0 +1,46 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix log: <http://www.w3.org/2000/10/swap/log#>
+prefix list: <http://www.w3.org/2000/10/swap/list#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix time: <http://www.w3.org/2000/10/swap/time#>
+prefix graph: <http://www.w3.org/2000/10/swap/graph#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix ex: <http://example.org#>
+prefix : <http://niche.cs.dal.ca/ns/state.owl#>
+
+
+# state transitions from *atomic* states
+
+{	?premise state:transit ?conclusion ;
+		log:includes { ?target state:in ?atomState . ?guard a state:Guard } .
+		
+	?atomState a state:AtomicState .
+	
+	( ?premise { ?guard a state:Guard } ) graph:difference ?retracts .
+	
+	( { ?guard a log:StableTruth } ?retracts ) log:conjunction ?llPremise .
+	
+} => { ?llPremise log:becomes ?conclusion } ; state:generator true .
+
+
+
+# state transitions from *compound* states
+
+{	?premise state:transit ?conclusion ;
+		log:includes { ?target state:in ?cmpdState . ?guard a state:Guard } .
+		
+	?cmpdState a state:CompoundState .
+	
+	(?premise { ?target state:in ?cmpdState . ?guard a state:Guard } ) 
+		graph:difference ?otherRetracts .
+	
+	?cmpdState state:atomStateList ?atomStateList .
+	
+	( { ?target state:in ?atomState . ?atomState list:in ?atomStateList } ?guard )
+		log:conjunction ?newGuard .
+		
+	( { ?newGuard a log:StableTruth } { ?target state:in ?atomState } ?otherRetracts ) log:conjunction
+		?llPremise . 
+	
+} => { ?llPremise log:becomes ?conclusion } ; state:generator true .

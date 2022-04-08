@@ -23,22 +23,22 @@ public class WorkflowTest {
 	private static String condTestFolder = root + "test/condition/";
 
 	public static void main(String[] args) throws Exception {
-		N3ModelSpec spec = N3ModelSpec.get(Types.N3_MEM_FP_INF);
+		N3ModelSpec spec = N3ModelSpec.get(Types.N3_MEM_HYBRID_INF);
 		spec.setFeedback(new N3Feedback(N3MistakeTypes.INFER_UNBOUND_GLOBALS, FeedbackTypes.WARN,
 				FeedbackActions.LOG));
 		spec.setFeedback(new N3Feedback(N3MistakeTypes.BUILTIN_WRONG_INPUT, FeedbackTypes.WARN,
 				FeedbackActions.LOG));
 		spec.setFeedback(new N3Feedback(N3MistakeTypes.BUILTIN_UNBOUND_VARS, FeedbackTypes.WARN,
 				FeedbackActions.LOG));
-		
+
 		// test condition satisfaction
 //		testCondition();
-		// (test re-derivation of conditional inferences) 
+		// (test re-derivation of conditional inferences)
 //		testRederive();
 
 		// test TNM constructs
 //		test_next(spec);
-		test_composite(spec);
+//		test_composite(spec);
 //		test_decision(spec);
 //		test_split(spec);
 //		test_cycle(spec);
@@ -57,7 +57,7 @@ public class WorkflowTest {
 	}
 
 	public static void testRederive() throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto().initialize(WorkflowModel.transitTest);
+		WorkflowModel m = new WorkflowModel_Auto().initialize(WorkflowModel.transitLog);
 
 		JenaKb kb = m.getKb();
 		kb.from(base, root + "test/test_rederive.n3");
@@ -79,23 +79,23 @@ public class WorkflowTest {
 	}
 
 	public static void test_next(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitTest)
+		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
 				.load(wfTestFolder + "test_next.n3");
 
 		JenaKb kb = m.getKb();
 
 		m.printAllTransits(true);
-//
-//		Log.i("\n>> adding profile that meets condition");
-//		kb.add(kb.resource(base + "will"), kb.resource(base + "hasHR"), 151);
-//		m.printAllTransits(true);
-		
+
+		Log.i("\n>> adding profile that meets condition");
+		kb.add(kb.resource(base + "will"), kb.resource(base + "hasHR"), 151);
+		m.printAllTransits(true);
+
 //		kb.printAll();
 //		kb.printDerivations();
 	}
 
 	public static void test_composite(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitTest)
+		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
 				.load(wfTestFolder + "test_composite.n3");
 		JenaKb kb = m.getKb();
 
@@ -115,13 +115,13 @@ public class WorkflowTest {
 		m.transitTo(kb.resource(base + "tE1"), kb.resource("gl:Discarded"));
 		m.transitTo(kb.resource(base + "tE2"), kb.resource("gl:Discarded"));
 		m.printAllTransits(true);
-		
+
 //		kb.printAll();
 //		kb.printDerivations();
 	}
 
 	public static void test_decision(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitTest)
+		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
 				.load(base, wfTestFolder + "test_decision.n3");
 //		JenaKb kb = m.getKb();
 
@@ -132,7 +132,7 @@ public class WorkflowTest {
 	}
 
 	public static void test_split(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitTest)
+		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
 				.load(base, wfTestFolder + "test_split.n3");
 		JenaKb kb = m.getKb();
 
@@ -172,7 +172,7 @@ public class WorkflowTest {
 	public static void test_cycle(N3ModelSpec spec) throws Exception {
 		long start = System.currentTimeMillis();
 
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitTest)
+		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
 				.load(base, wfTestFolder + "test_cycle.n3");
 		JenaKb kb = m.getKb();
 

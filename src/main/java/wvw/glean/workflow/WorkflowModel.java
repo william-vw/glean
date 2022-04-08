@@ -49,7 +49,10 @@ public abstract class WorkflowModel {
 	protected final static Logger LOG = Logger.getLogger(WorkflowModel.class.getName());
 
 	public static InitOptions[] transit = { InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN };
-	public static InitOptions[] transitTest = { InitOptions.DO_TRANSIT, InitOptions.LOGGING };
+	public static InitOptions[] transitLog = { InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN,
+			InitOptions.LOGGING };
+	public static InitOptions[] transitTest = { InitOptions.DO_TRANSIT };
+	protected static N3ModelSpec defaultSpec = N3ModelSpec.get(Types.N3_MEM_HYBRID_INF);
 
 //	protected static String root = "src/main/resources/";
 	protected static String root = "/";
@@ -74,7 +77,7 @@ public abstract class WorkflowModel {
 	}
 
 	public WorkflowModel(String base) {
-		this(base, N3ModelSpec.get(Types.N3_MEM_FP_INF));
+		this(base, defaultSpec);
 	}
 
 	public WorkflowModel(N3ModelSpec spec) {
@@ -102,6 +105,9 @@ public abstract class WorkflowModel {
 	}
 
 	public abstract WorkflowModel initialize(InitOptions... initOptions) throws WorkflowException;
+
+	public abstract WorkflowModel initialize(String genFolder, InitOptions... initOptions)
+			throws WorkflowException;
 
 	public WorkflowModel load(String dataPath, LoadOptions... loadOptions) throws IOException {
 		return load(base, dataPath, loadOptions);
@@ -602,9 +608,9 @@ public abstract class WorkflowModel {
 		@Override
 		public String toString() {
 			return label + " is " + (atomicState != null ? atomicState.getLocalName() : "unknown")
-					+ " (" + compoundStates.stream().map(c -> c.getLocalName())
-							.collect(Collectors.joining(", "))
-					+ ")";
+					+ (compoundStates.isEmpty() ? ""
+							: " (" + compoundStates.stream().map(c -> c.getLocalName())
+									.collect(Collectors.joining(", ")) + ")");
 		}
 	}
 }

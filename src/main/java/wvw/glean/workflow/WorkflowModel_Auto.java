@@ -26,6 +26,8 @@ public class WorkflowModel_Auto extends WorkflowModel {
 	public static String conditionFolder = root + WorkflowLogic.conditionFolder;
 	public static String workflowFolder = root + WorkflowLogic.workflowFolder;
 	public static String genFolder = root + WorkflowLogic.genFolder;
+	public static String genFolder_forward = root + WorkflowLogic.genFolder_forward;
+	public static String genFolder_hybrid = root + WorkflowLogic.genFolder_hybrid;
 	public static String ontologyPath = root + WorkflowLogic.ontologyPath;
 
 	public WorkflowModel_Auto() {
@@ -46,6 +48,13 @@ public class WorkflowModel_Auto extends WorkflowModel {
 
 	@Override
 	public WorkflowModel initialize(InitOptions... initOptions) throws WorkflowException {
+		return initialize(genFolder_hybrid, initOptions);
+	}
+
+	@Override
+	public WorkflowModel initialize(String genPath, InitOptions... initOptions)
+			throws WorkflowException {
+
 		try {
 			long start = System.currentTimeMillis();
 
@@ -69,6 +78,7 @@ public class WorkflowModel_Auto extends WorkflowModel {
 					kb.fromClsRes(getClass(), base, 
 						root + "logic/owl2rl.n3",
 						conditionFolder + "condition.n3",
+						workflowFolder + "states.n3",
 						workflowFolder + "next.n3",
 						workflowFolder + "condition.n3",
 						workflowFolder + "composite.n3",
@@ -77,7 +87,7 @@ public class WorkflowModel_Auto extends WorkflowModel {
 //						workflowFolder + "cycle.n3"
 					);
 					kb.fromClsRes(getClass(), base,
-						genFolder + "state" + (log ? "_log.n3" : "_nolog.n3")
+						genPath + "state" + (log ? "_log.n3" : "_nolog.n3")
 					);
 				}
 				// @formatter:on
