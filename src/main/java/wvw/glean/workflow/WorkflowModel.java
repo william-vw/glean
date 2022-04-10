@@ -42,6 +42,10 @@ public abstract class WorkflowModel {
 		DO_TRANSIT, LOAD_GEN, LOGGING
 	}
 
+	public enum ReasonTypes {
+		FORWARD, HYBRID
+	}
+
 	protected enum ResetCmds {
 		ALL, STOP, ONLY_STATES;
 	}
@@ -52,6 +56,8 @@ public abstract class WorkflowModel {
 	public static InitOptions[] transitLog = { InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN,
 			InitOptions.LOGGING };
 	public static InitOptions[] transitTest = { InitOptions.DO_TRANSIT };
+
+	public static ReasonTypes defaultReason = ReasonTypes.HYBRID;
 	protected static N3ModelSpec defaultSpec = N3ModelSpec.get(Types.N3_MEM_HYBRID_INF);
 
 //	protected static String root = "src/main/resources/";
@@ -104,9 +110,11 @@ public abstract class WorkflowModel {
 		return this;
 	}
 
-	public abstract WorkflowModel initialize(InitOptions... initOptions) throws WorkflowException;
+	public WorkflowModel initialize(InitOptions... initOptions) throws WorkflowException {
+		return initialize(defaultReason, initOptions);
+	}
 
-	public abstract WorkflowModel initialize(String genFolder, InitOptions... initOptions)
+	public abstract WorkflowModel initialize(ReasonTypes reasonType, InitOptions... initOptions)
 			throws WorkflowException;
 
 	public WorkflowModel load(String dataPath, LoadOptions... loadOptions) throws IOException {

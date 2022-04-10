@@ -10,6 +10,28 @@ prefix ex: <http://example.org#>
 prefix : <http://niche.cs.dal.ca/ns/state.owl#>
 
 
+{   ?cmpdState state:includes ?atomState .
+
+} => {
+    {   ?task state:in ?cmpdState .
+        
+    } <= {  ?task state:in ?atomState }
+} .
+
+# e.g., 
+#{   ?task state:in :Idle .
+#    
+#} <= {  ?task state:in :Inactive } .
+
+
+{   ?cmpdState a state:CompoundState .
+
+    (?atomState { ?cmpdState state:includes ?atomState} ?atomStates)
+    	log:collectAllIn <> .
+    
+} => { ?cmpdState state:atomStateList ?atomStates } .
+
+
 # state transitions from *atomic* states
 
 {	?premise state:transit ?conclusion ;

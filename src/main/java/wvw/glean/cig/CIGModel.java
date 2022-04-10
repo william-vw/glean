@@ -2,6 +2,8 @@ package wvw.glean.cig;
 
 import java.util.List;
 
+import org.apache.jen3.n3.N3ModelSpec;
+
 import wvw.glean.workflow.WorkflowModel_Auto;
 import wvw.utils.IOUtils;
 import wvw.utils.rdf.NS;
@@ -15,6 +17,13 @@ public class CIGModel extends WorkflowModel_Auto {
 
 	public CIGModel(String ns) {
 //		super(base);
+
+		this.ns = ns;
+		setup();
+	}
+
+	public CIGModel(String ns, N3ModelSpec spec) {
+		super(spec);
 
 		this.ns = ns;
 		setup();

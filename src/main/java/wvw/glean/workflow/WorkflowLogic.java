@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import wvw.glean.state.StateLogic;
 import wvw.glean.workflow.WorkflowModel.InitOptions;
+import wvw.glean.workflow.WorkflowModel.ReasonTypes;
 import wvw.glean.workflow.WorkflowModel.WorkflowException;
 
 public class WorkflowLogic extends StateLogic {
@@ -18,38 +19,32 @@ public class WorkflowLogic extends StateLogic {
 	public static final String conditionFolder = logicFolder + "condition/";
 	public static final String workflowFolder = logicFolder + "workflow/";
 	public static final String genFolder = logicFolder + "gen/";
-	public static final String genFolder_forward = genFolder + "forward/";
-	public static final String genFolder_hybrid = genFolder + "hybrid/";
 	public static final String ontologyPath = logicFolder + "glean.owl";
 
 	public static void main(String[] args) throws Exception {
 		// run this code each time state logic transitions are updated!
 
 		String outPath = "src/main/resources/" + workflowFolder;
-		String genPath = genFolder_hybrid;
 
-		regenerate(outPath, genPath);
+		for (ReasonTypes reasonType : ReasonTypes.values()) {
+			regenerate(outPath, reasonType, InitOptions.DO_TRANSIT);
+			regenerate(outPath, reasonType, InitOptions.DO_TRANSIT, InitOptions.LOGGING);
+		}
 	}
 
-	public static void regenerate(String outPath, String genPath) throws WorkflowException {
-		regenerate(outPath, genPath, InitOptions.DO_TRANSIT);
-		regenerate(outPath, genPath, InitOptions.DO_TRANSIT, InitOptions.LOGGING);
-	}
-
-	private static void regenerate(String outPath, String genPath, InitOptions... options)
+	public static void regenerate(String outPath, ReasonTypes reasonType, InitOptions... options)
 			throws WorkflowException {
 
 		try {
 			long start = System.currentTimeMillis();
 
-			WorkflowModel m = new WorkflowModel_Auto().initialize(genPath, options);
+			WorkflowModel m = new WorkflowModel_Auto().initialize(reasonType, options);
 
 			boolean logging = ArrayUtils.contains(options, InitOptions.LOGGING);
 			// rule generation code (genPath) already loaded by WorkflowModel
 			N3Model out = convertToLinearLogic(m.getKb().getModel(), null, logging);
 
-			String name = "gen" + (logging ? "_log" : "_nolog") + ".n3";
-			outPath += name;
+			outPath = WorkflowModel_Auto.pregenCodePath(outPath, reasonType, options);
 			out.write(new FileOutputStream(outPath));
 
 			long end = System.currentTimeMillis();

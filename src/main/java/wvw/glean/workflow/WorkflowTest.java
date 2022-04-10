@@ -11,6 +11,7 @@ import org.apache.jen3.n3.N3ModelSpec;
 import org.apache.jen3.n3.N3ModelSpec.Types;
 import org.apache.jen3.rdf.model.ModelFactory;
 
+import wvw.glean.workflow.WorkflowModel.ReasonTypes;
 import wvw.semweb.kb.jena.JenaKb;
 import wvw.utils.log.Log;
 
@@ -57,7 +58,8 @@ public class WorkflowTest {
 	}
 
 	public static void testRederive() throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto().initialize(WorkflowModel.transitLog);
+		WorkflowModel m = new WorkflowModel_Auto().initialize(ReasonTypes.HYBRID,
+				WorkflowModel.transitLog);
 
 		JenaKb kb = m.getKb();
 		kb.from(base, root + "test/test_rederive.n3");
@@ -79,7 +81,8 @@ public class WorkflowTest {
 	}
 
 	public static void test_next(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
+		WorkflowModel m = new WorkflowModel_Auto(spec)
+				.initialize(ReasonTypes.HYBRID, WorkflowModel.transitLog)
 				.load(wfTestFolder + "test_next.n3");
 
 		JenaKb kb = m.getKb();
@@ -95,7 +98,8 @@ public class WorkflowTest {
 	}
 
 	public static void test_composite(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
+		WorkflowModel m = new WorkflowModel_Auto(spec)
+				.initialize(ReasonTypes.HYBRID, WorkflowModel.transitLog)
 				.load(wfTestFolder + "test_composite.n3");
 		JenaKb kb = m.getKb();
 
@@ -121,7 +125,8 @@ public class WorkflowTest {
 	}
 
 	public static void test_decision(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
+		WorkflowModel m = new WorkflowModel_Auto(spec)
+				.initialize(ReasonTypes.HYBRID, WorkflowModel.transitLog)
 				.load(base, wfTestFolder + "test_decision.n3");
 //		JenaKb kb = m.getKb();
 
@@ -132,7 +137,8 @@ public class WorkflowTest {
 	}
 
 	public static void test_split(N3ModelSpec spec) throws Exception {
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
+		WorkflowModel m = new WorkflowModel_Auto(spec)
+				.initialize(ReasonTypes.HYBRID, WorkflowModel.transitLog)
 				.load(base, wfTestFolder + "test_split.n3");
 		JenaKb kb = m.getKb();
 
@@ -172,7 +178,8 @@ public class WorkflowTest {
 	public static void test_cycle(N3ModelSpec spec) throws Exception {
 		long start = System.currentTimeMillis();
 
-		WorkflowModel m = new WorkflowModel_Auto(spec).initialize(WorkflowModel.transitLog)
+		WorkflowModel m = new WorkflowModel_Auto(spec)
+				.initialize(ReasonTypes.HYBRID, WorkflowModel.transitLog)
 				.load(base, wfTestFolder + "test_cycle.n3");
 		JenaKb kb = m.getKb();
 

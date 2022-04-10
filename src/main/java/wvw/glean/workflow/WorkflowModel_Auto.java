@@ -26,8 +26,6 @@ public class WorkflowModel_Auto extends WorkflowModel {
 	public static String conditionFolder = root + WorkflowLogic.conditionFolder;
 	public static String workflowFolder = root + WorkflowLogic.workflowFolder;
 	public static String genFolder = root + WorkflowLogic.genFolder;
-	public static String genFolder_forward = root + WorkflowLogic.genFolder_forward;
-	public static String genFolder_hybrid = root + WorkflowLogic.genFolder_hybrid;
 	public static String ontologyPath = root + WorkflowLogic.ontologyPath;
 
 	public WorkflowModel_Auto() {
@@ -46,39 +44,52 @@ public class WorkflowModel_Auto extends WorkflowModel {
 		super(base, spec);
 	}
 
-	@Override
-	public WorkflowModel initialize(InitOptions... initOptions) throws WorkflowException {
-		return initialize(genFolder_hybrid, initOptions);
+	public static String pregenCodePath(ReasonTypes reasonType, InitOptions... initOptions) {
+		return pregenCodePath(workflowFolder, reasonType, initOptions);
+	}
+
+	public static String pregenCodePath(String folder, ReasonTypes reasonType,
+			InitOptions... initOptions) {
+
+		boolean log = ArrayUtils.contains(initOptions, InitOptions.LOGGING);
+
+		return folder + "pregen/" + reasonType.toString().toLowerCase() + "_"
+				+ (log ? "log" : "nolog") + ".n3";
+	}
+
+	private static String generatorCodePath(ReasonTypes reasonType, InitOptions... initOptions) {
+		boolean log = ArrayUtils.contains(initOptions, InitOptions.LOGGING);
+
+		return genFolder + reasonType.toString().toLowerCase() + "/" + "state"
+				+ (log ? "_log.n3" : "_nolog.n3");
 	}
 
 	@Override
-	public WorkflowModel initialize(String genPath, InitOptions... initOptions)
+	public WorkflowModel initialize(ReasonTypes reasonType, InitOptions... initOptions)
 			throws WorkflowException {
 
 		try {
 			long start = System.currentTimeMillis();
-
-			boolean log = ArrayUtils.contains(initOptions, InitOptions.LOGGING);
 
 			kb.fromClsRes(getClass(), base, ontologyPath);
 			for (InputStream ontology : addOntologies)
 				kb.from(base, ontology);
 
 			if (ArrayUtils.contains(initOptions, InitOptions.DO_TRANSIT)) {
-				// @formatter:off
+
 				if (ArrayUtils.contains(initOptions, InitOptions.LOAD_GEN)) {
-					String genFile = workflowFolder + "gen" + (log ? "_log" : "_nolog") + ".n3";
-					kb.fromClsRes(getClass(), base, genFile);
-					
-					LOG.info("(loading pre-generated file: " + genFile + ")");
+					String pregenPath = pregenCodePath(workflowFolder, reasonType, initOptions);
+					kb.fromClsRes(getClass(), base, pregenPath);
+
+					LOG.warn("(loading pre-generated file: " + pregenPath + ")");
 				}
-				
+
 				// re-generate linear-logic rules each time
 				else {
+					// @formatter:off
 					kb.fromClsRes(getClass(), base, 
 						root + "logic/owl2rl.n3",
 						conditionFolder + "condition.n3",
-						workflowFolder + "states.n3",
 						workflowFolder + "next.n3",
 						workflowFolder + "condition.n3",
 						workflowFolder + "composite.n3",
@@ -86,18 +97,18 @@ public class WorkflowModel_Auto extends WorkflowModel {
 //						workflowFolder + "split.n3",
 //						workflowFolder + "cycle.n3"
 					);
-					kb.fromClsRes(getClass(), base,
-						genPath + "state" + (log ? "_log.n3" : "_nolog.n3")
-					);
+					// @formatter:on
+
+					String generatorPath = generatorCodePath(reasonType, initOptions);
+					kb.fromClsRes(getClass(), base, generatorPath);
 				}
-				// @formatter:on
 
 			} else
 				kb.fromClsRes(getClass(), base, logicFolder + "owl2rl.n3");
 
 			long end = System.currentTimeMillis();
 
-			LOG.info("intialize workflow: " + (end - start) + "ms (options: "
+			LOG.warn("intialize workflow: " + (end - start) + "ms (options: " + reasonType + ", "
 					+ Arrays.toString(initOptions) + ")");
 
 		} catch (Exception e) {
