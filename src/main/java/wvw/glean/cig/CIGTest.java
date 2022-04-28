@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.jen3.n3.N3ModelSpec;
 import org.apache.jen3.n3.N3ModelSpec.Types;
+import org.apache.jen3.reasoner.rulesys.N3FBRuleInfGraph;
 
 import wvw.glean.workflow.WorkflowModel.EntityState;
 import wvw.glean.workflow.WorkflowModel.InitOptions;
@@ -55,7 +56,7 @@ public class CIGTest {
 
 //		Log.i("# new graphs: " + BindingStack.nrNewGraphs);
 //		Log.i("# new colls: " + BindingStack.nrNewColls);
-//		Log.i("# ctu calls: " + N3FBRuleInfGraph.ctuCnt);
+		Log.i("# ctu calls: " + N3FBRuleInfGraph.ctuCnt);
 	}
 
 	public static List<EntityState> evaluateLipidProfile(CIGModel cig) throws Exception {

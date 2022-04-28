@@ -53,7 +53,22 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
+		gl:precondition [ 
+			rdfs:label "no" ;
+			
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_statin_prescribed ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		
+		gl:branchTarget :no_statin_no_followup-2
+		
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [ 
 			rdfs:label "yes" ;
@@ -66,20 +81,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 		gl:branchTarget :fasting_serum_tgs_values-2
 		 
-	] , [
-		state:in gl:Inactive ;
-		
-		
-		gl:precondition [ 
-			rdfs:label "no" ;
-			
-			cond:allOf ( [ cond:premise 
-							{ ?obs fhir:Observation.code :code_statin_prescribed ;
-								fhir:Observation.valueBoolean false } 
-						] )
-		] ;
-		
-		gl:branchTarget :no_statin_no_followup-2
 	] .
 	
 	
@@ -100,7 +101,27 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
+		gl:precondition [
+			rdfs:label "<=5.65mmol/l" ;
+			rdfs:comment """<=5.65mmol/l (>500mg/dl)""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
+						fhir:Observation.valueQuantity ?quantity . 
+					  ?quantity fhir:Quantity.value ?value .
+					  ?value math:notGreaterThan 5.65
+					} 
+				] )
+		] ;
+		
+		gl:branchTarget :low_fasting_serum_no_followup-2
+		
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label ">5.65mmol/l" ;
@@ -118,25 +139,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		
 		gl:branchTarget :assess_malnutrition-2
 	
-	] , [
-		state:in gl:Inactive ;
-		
-		
-		gl:precondition [
-			rdfs:label "<=5.65mmol/l" ;
-			rdfs:comment """<=5.65mmol/l (>500mg/dl)""" ;
-			
-			cond:allOf ( 
-				[ cond:premise 
-					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
-						fhir:Observation.valueQuantity ?quantity . 
-					  ?quantity fhir:Quantity.value ?value .
-					  ?value math:notGreaterThan 5.65
-					} 
-				] )
-		] ;
-		
-		gl:branchTarget :low_fasting_serum_no_followup-2
 	] .
 	
 	
@@ -157,7 +159,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
-		
+		gl:order 0 ;
 		
 		gl:precondition [
 			rdfs:label "yes" ;
@@ -173,7 +175,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [
 		state:in gl:Inactive ;
-		
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label "no" ;
@@ -225,7 +227,27 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
+		gl:precondition [
+			rdfs:label "<=11.3mmol/l" ;
+			rdfs:comment """<=11.3mmol/l (<=1000mg/dl)""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
+						fhir:Observation.valueQuantity ?quantity . 
+					  ?quantity fhir:Quantity.value ?value .
+					  ?value math:notGreaterThan 11.3
+					} 
+				] )
+		] ;
+		
+		gl:branchTarget :low_fasting_serum_no_followup2-2
+		
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label ">11.3mmol/l" ;
@@ -243,25 +265,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		
 		gl:branchTarget :avoid_nicotinic_acid-2
 	
-	] , [
-		state:in gl:Inactive ;
-		
-		
-		gl:precondition [
-			rdfs:label "<=11.3mmol/l" ;
-			rdfs:comment """<=11.3mmol/l (<=1000mg/dl)""" ;
-			
-			cond:allOf ( 
-				[ cond:premise 
-					{ ?obs fhir:Observation.code :code_fasting_serum_tg ; 
-						fhir:Observation.valueQuantity ?quantity . 
-					  ?quantity fhir:Quantity.value ?value .
-					  ?value math:notGreaterThan 11.3
-					} 
-				] )
-		] ;
-		
-		gl:branchTarget :low_fasting_serum_no_followup2-2
 	] .
 	
 :low_fasting_serum_no_followup2-2 a gl:EndPoint ;
@@ -273,7 +276,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 :avoid_nicotinic_acid-2 a gl:Task ;
 	state:in gl:Inactive ;
-	gl:conditional false ; 
+	gl:conditional false ;
 	gl:involvesAction false ;
 	
 	gl:next :assess_prevent_pancreatitis-2 ;
@@ -293,7 +296,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
-		
+		gl:order 0 ;
 		
 		gl:precondition [
 			rdfs:label "yes" ;
@@ -309,7 +312,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [
 		state:in gl:Inactive ;
-		
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label "no" ;

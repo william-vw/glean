@@ -37,7 +37,23 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
+		gl:precondition [ 
+			rdfs:label "normal" ;
+			rdfs:comment "No abnormal lipid profile." ;
+			
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		
+		gl:branchTarget :no_dyslipidemia
+		
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [ 
 			rdfs:label "abnormal" ;
@@ -51,21 +67,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 		gl:branchTarget :rule_out_secondary_causes
 		 
-	] , [
-		state:in gl:Inactive ;
-		
-		
-		gl:precondition [ 
-			rdfs:label "normal" ;
-			rdfs:comment "No abnormal lipid profile." ;
-			
-			cond:allOf ( [ cond:premise 
-							{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
-								fhir:Observation.valueBoolean false } 
-						] )
-		] ;
-		
-		gl:branchTarget :no_dyslipidemia
 	] .
 	
 	
@@ -96,6 +97,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
 		gl:precondition [
 			rdfs:label "secondary causes" ;
@@ -122,6 +124,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		
 	] , [
 		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label "no" ;

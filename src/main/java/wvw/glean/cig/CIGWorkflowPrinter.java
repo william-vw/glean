@@ -40,9 +40,6 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 	private final static Logger LOG = Logger.getLogger(CIGWorkflowPrinter.class.getName());
 
-	private Map<Resource, JenaKb> inputDatas = new HashMap<>();
-	private Map<Resource, String> inputHtml = new HashMap<>();
-
 	private UiGen uiGen = new UiGen();
 
 	public static void main(String[] args) throws Exception {
@@ -57,20 +54,24 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		// - print workflow
 
 		// -- lipid
-		
+
 		String name = "lipid/ckd_dyslipidemia";
 		String ns = NS.ckd;
 		printer.printWorkflow(name, ns);
 
 		// -- rbc
-		
+
 //		String name = "btsf/rbc_match";
 //		String ns = NS.rbc;
 //		printer.printWorkflow(name, ns);
 	}
 
 	private N3Model inputDef = null;
+
+	private File htmlDir = Paths.get("src/main/resources/out/html").toFile();
 	private File tmpDir = Paths.get("src/main/resources/out/tmp").toFile();
+
+	private Map<Resource, JenaKb> inputDatas = new HashMap<>();
 
 	public CIGWorkflowPrinter() throws IOException {
 		File defFile = Paths.get("src/main/resources/cig/input/definitions.n3").toFile();
@@ -127,47 +128,87 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 	// (returns whether json was updated by this hook)
 	public Boolean apply(Resource t, JenaKb kb, WorkflowJsonPrinter printer) {
+		// did we add some stuff to the json?
+		boolean modified = false;
+
 		if (!t.isURI())
 			return false;
 
-		Resource input = t.getPropertyResourceValue(kb.resource("cig:input"));
-		if (input != null) {
-			String html = null;
-
-			// already encountered this particular input
-			// (e.g., in case of multiple occurrences of same workflow)
-			if (inputHtml.containsKey(input))
-				html = inputHtml.get(input);
-			else {
-				html = generateHtml(t, kb, input);
-				inputHtml.put(input, html);
-			}
+		Resource inputRes = t.getPropertyResourceValue(kb.resource("cig:input"));
+		if (inputRes != null) {
+			String html = generateHtml(t, kb, inputRes);
 
 			if (html != null) {
-				printer.appendKeyString("html", printer.txtToJson(html));
-				// added some stuff to the json
-				return true;
+				printer.appendKeyString("input", printer.txtToJson(html));
+
+				modified = true;
 			}
 		}
 
-		return false;
+		Resource htmlRes = t.getPropertyResourceValue(kb.resource("cig:insert"));
+		if (htmlRes != null) {
+			String html = loadFrom(htmlRes);
+
+			if (html != null) {
+				printer.appendKeyString("insert", printer.txtToJson(html));
+
+				modified = true;
+			}
+		}
+
+		return modified;
 	}
 
-	private String generateHtml(Resource t, JenaKb kb, Resource input) {
-		Resource inputFile = findClosestInputData(t, kb);
-		if (inputFile == null) {
-			LOG.error("cannot find closest inputFile for input: " + input);
+	private String loadFrom(Resource htmlRes) {
+		String htmlPath = htmlRes.asLiteral().getString();
+
+		File htmlFile = Paths.get("src/main/resources" + htmlPath).toFile();
+		try {
+			return IOUtils.readFromFile(htmlFile);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private String generateHtml(Resource t, JenaKb kb, Resource inputElRes) {
+		Resource inputFileRes = findClosestInputData(t, kb);
+		if (inputFileRes == null) {
+			LOG.error("cannot find closest inputFile for input: " + inputElRes);
 			return null;
 		}
 
-		if (!inputDatas.containsKey(inputFile)) {
-			String inPath = inputFile.asLiteral().getString();
+		// - check whether HTML for this element had already been generated before;
+		// if so, simply load & return that
 
+		String inPath = inputFileRes.asLiteral().getString();
+		File inputFile = Paths.get("src/main/resources" + inPath).toFile();
+		File htmlFile = new File(htmlDir, inputElRes.getLocalName() + ".html");
+
+		// input-file was not edited after html was previously generated
+		// so, simply return previously generated html
+
+		if (inputFile.lastModified() <= htmlFile.lastModified())
+			try {
+				String html = IOUtils.readFromFile(htmlFile);
+				LOG.info("loaded html file: " + htmlFile.getPath());
+
+				return html;
+
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+
+		// - check whether this input-data file had already been loaded
+		// (will typically contain many report-needs for input resources)
+
+		if (!inputDatas.containsKey(inputFileRes)) {
 			try {
 				JenaKb inputData = loadInputData(inPath);
-				inputDatas.put(inputFile, inputData);
-
 				LOG.info("loaded input file: " + inPath);
+
+				inputDatas.put(inputFileRes, inputData);
 
 			} catch (IOException e) {
 				LOG.error("cannot load inputFile: " + inPath, e);
@@ -175,12 +216,12 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 			}
 		}
 
-		JenaKb inputData = inputDatas.get(inputFile);
+		JenaKb inputData = inputDatas.get(inputFileRes);
 
-		LOG.info(t.getLocalName() + ": input = " + input.getLocalName() + " ("
-				+ inputFile.asLiteral().getValue() + ")");
+		LOG.info(t.getLocalName() + ": input = " + inputElRes.getLocalName() + " ("
+				+ inputFileRes.asLiteral().getValue() + ")");
 
-		N3Model reportNeeds = getReportNeeds(input, inputData);
+		N3Model reportNeeds = getReportNeeds(inputElRes, inputData);
 //			reportNeeds.write(System.out);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -191,6 +232,9 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 			String html = new String(out.toByteArray()).trim();
 //			System.out.println(html);
 			html = Pattern.compile(">\\s+<", Pattern.DOTALL).matcher(html).replaceAll("><");
+
+			// store html for later re-use
+			IOUtils.writeToFile(html, htmlFile);
 
 			return html;
 

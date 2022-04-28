@@ -32,6 +32,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
 		gl:precondition [
 			rdfs:label "yes" ;
@@ -45,6 +46,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [ 
 		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label "no" ;
@@ -77,6 +79,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
 		gl:precondition [
 			rdfs:label "receiving statins" ;
@@ -90,6 +93,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [
 		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label "no statins" ;
@@ -122,6 +126,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
 		gl:precondition [
 			rdfs:label "yes" ;
@@ -135,6 +140,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [
 		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label "no" ;
@@ -153,7 +159,8 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	gl:conditional false ; 
 	
 	rdfs:label "Followup lipid profile" ;
-	rdfs:comment "Follow-up measurement of the lipid profile is suggested." .
+	rdfs:comment """Some patients may prefer to know their levels: therefore, the need for follow-up can be assessed on a per-patient basis. 
+	However, there is no evidence to followup lipid profile.""" .
 
 
 :no_reassess_no_followup-1 a gl:EndPoint ;

@@ -38,6 +38,23 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "prior lipid profile" ;
+			rdfs:comment """Established CKD with previous measurement of lipid profile.""" ;
+			
+			cond:allOf (
+				[ cond:premise { ?obs fhir:Observation.code :code_lipid_profile ;
+						fhir:Observation.valueBoolean true } ]
+			)
+		] ;
+		
+		gl:branchTarget :Dyslipidemia_Treatment-2
+		
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [ 
 			rdfs:label "no profile" ;
@@ -51,20 +68,6 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 		
 		gl:branchTarget :Evaluate_Lipid_Profile 
 	
-	] , [
-		state:in gl:Inactive ;
-		
-		gl:precondition [
-			rdfs:label "prior lipid profile" ;
-			rdfs:comment """Established CKD with previous measurement of lipid profile.""" ;
-			
-			cond:allOf (
-				[ cond:premise { ?obs fhir:Observation.code :code_lipid_profile ;
-						fhir:Observation.valueBoolean true } ]
-			)
-		] ;
-		
-		gl:branchTarget :Dyslipidemia_Treatment-2
 	] .
 
 
@@ -100,6 +103,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
+		gl:order 0 ;
 		
 		gl:precondition [
 			rdfs:label "severe" ;
@@ -125,6 +129,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 	
 	] , [ 
 		state:in gl:Inactive ;
+		gl:order 1 ;
 		
 		gl:precondition [
 			rdfs:label "not severe" ;
