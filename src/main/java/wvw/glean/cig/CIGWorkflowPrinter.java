@@ -139,7 +139,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 			String html = generateHtml(t, kb, inputRes);
 
 			if (html != null) {
-				printer.appendKeyString("input", printer.txtToJson(html));
+				printer.appendKeyString("inputForm", printer.txtToJson(html));
 
 				modified = true;
 			}

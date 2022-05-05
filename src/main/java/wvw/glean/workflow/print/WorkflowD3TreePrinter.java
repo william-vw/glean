@@ -9,9 +9,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.jen3.rdf.model.Resource;
+import org.apache.jen3.vocabulary.RDF;
 import org.apache.jen3.vocabulary.RDFS;
+import org.apache.jena.atlas.logging.Log;
 
 import wvw.glean.workflow.WorkflowModel;
+import wvw.utils.rdf.NS;
 
 public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
@@ -40,10 +43,12 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 	protected Node prepare(Resource wf) {
 		nodeMap.clear();
 
-		return prepare(wf, null, 0, false);
+		return prepare(wf, null, wf, 0, false);
 	}
 
-	protected Node prepare(Resource entity, Node parent, int depth, boolean composed) {
+	protected Node prepare(Resource entity, Node parent, Resource workflow, int depth,
+			boolean composed) {
+
 		Resource task = getTask(entity);
 		String id = getId(task);
 
@@ -52,6 +57,9 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			node = new Node(task);
 			nodeMap.put(id, node);
 		}
+
+		if (!task.equals(workflow))
+			node.setWorkflow(workflow);
 
 		if (entity.hasProperty(kb.resource("gl:order"))) {
 			int order = entity.getPropertyResourceValue(kb.resource("gl:order")).asLiteral()
@@ -62,16 +70,22 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		if (parent != null)
 			node.addParent(entity, parent, depth, composed);
 
+		// use for composed tasks (getComposed)
+		Resource curWorkflow = workflow;
+		if (task.hasProperty(RDF.type, kb.resource("gl:Workflow")))
+			curWorkflow = task;
+
 		Iterator<Resource> it = getComposed(task).iterator();
 		while (it.hasNext()) {
 			Resource sub = it.next();
-			prepare(sub, node, depth + 1, true);
+			prepare(sub, node, curWorkflow, depth + 1, true);
 		}
 
+		// (next tasks will still be under prior workflow)
 		it = getNext(task).iterator();
 		while (it.hasNext()) {
 			Resource next = it.next();
-			prepare(next, node, depth + 1, false);
+			prepare(next, node, workflow, depth + 1, false);
 		}
 
 		return node;
@@ -158,7 +172,12 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 		str.append(printKeyString("name", label, true));
 
+		// whether the parent JSON element is its parent composite element,
+		// or its prior element (i.e., sequential relation)
 		str.append(printKeyValue("composed", link.isComposed(), true));
+
+		if (curNode.hasWorkflow())
+			str.append(printKeyString("in_workflow", getId(curNode.getWorkflow()), true));
 
 		// we're at lowest-down position for this node
 		// and the node has multiple parents
@@ -287,6 +306,8 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 	protected class Node {
 
+		private Resource workflow;
+
 		private Resource task;
 		private List<NodeLink> parents = new ArrayList<>();
 		private List<NodeLink> children = new ArrayList<>();
@@ -306,6 +327,18 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 				parents.add(l);
 				parent.addChild(l);
 			}
+		}
+
+		public boolean hasWorkflow() {
+			return workflow != null;
+		}
+
+		public Resource getWorkflow() {
+			return workflow;
+		}
+
+		public void setWorkflow(Resource workflow) {
+			this.workflow = workflow;
 		}
 
 		private void addChild(NodeLink l) {

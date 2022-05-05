@@ -243,7 +243,7 @@
 	
 :action_likelihood_non_fatal_mi a fhir:ActivityDefinition ;
 	fhir:ActivityDefinition.name "action_likelihood_non_fatal_mi" ;
-	fhir:ActivityDefinition.title "Likelihood of non-fatal MI (<a href=\"https://www.mdcalc.com/framingham-risk-score-hard-coronary-heart-disease#creator-insights\" target=\"_blank\">calculate</a>)" ;
+	fhir:ActivityDefinition.title "Likelihood of non-fatal MI (<a href=\"https://www.mdcalc.com/framingham-risk-score-hard-coronary-heart-disease\" target=\"_blank\">calculate</a>)" ;
 	fhir:ActivityDefinition.observationResultRequirement [
 		fhir:ObservationDefinition.code :code_likelihood_non_fatal_mi ;
 		# fhir:ObservationDefinition.category .. ;
