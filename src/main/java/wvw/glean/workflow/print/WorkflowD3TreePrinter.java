@@ -11,10 +11,8 @@ import java.util.stream.Collectors;
 import org.apache.jen3.rdf.model.Resource;
 import org.apache.jen3.vocabulary.RDF;
 import org.apache.jen3.vocabulary.RDFS;
-import org.apache.jena.atlas.logging.Log;
 
 import wvw.glean.workflow.WorkflowModel;
-import wvw.utils.rdf.NS;
 
 public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 

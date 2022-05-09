@@ -166,34 +166,10 @@
         <http://niche.cs.dal.ca/ui_tpl.n3#generated>
             ?output2 .} .
 
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_no_cv_risk>
+<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_ldl_cholesterol>
     <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_no_cv_risk_factors'></span><input type='checkbox' id='code_no_cv_risk_factors' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_prior_mi,code_prior_coronary_revascularization,code_prior_ischemic_stroke,code_prior_transient_ischemic_attack,code_diabetes,code_estimated_10-year_incidence_coronary_death,code_likelihood_non_fatal_mi' mandatory='false' /> <label for='code_no_cv_risk_factors'>No CV risk factors</label></td></tr>" .
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_ldl_cholesterol'></span><div property='http://hl7.org/fhir/Observation.valueQuantity' typeof=''><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='http://unitsofmeasure.org'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>mmol/L</span>LDL cholesterol <input type='number' id='code_ldl_cholesterol' code='code_ldl_cholesterol' min='1' max='100' step='0.01' size='2' property='http://hl7.org/fhir/Quantity.value' /> (1-100)</div></td></tr>" .
 
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_likelihood_non_fatal_mi>
+<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_fasting_triglycerides>
     <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_likelihood_non_fatal_mi'></span><div property='http://hl7.org/fhir/Observation.valueQuantity' typeof=''><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='http://unitsofmeasure.org'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>%</span>Likelihood of non-fatal MI (<a href=\"https://www.mdcalc.com/framingham-risk-score-hard-coronary-heart-disease\" target=\"_blank\">calculate</a>) <input type='number' id='code_likelihood_non_fatal_mi' min='1' max='100' step='1' size='2' property='http://hl7.org/fhir/Quantity.value' /> (1-100)</div></td></tr>" .
-
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_estimated_10-year_incidence_coronary_death>
-    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_estimated_10-year_incidence_coronary_death'></span><input type='checkbox' id='code_estimated_10-year_incidence_coronary_death' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_no_cv_risk_factors' mandatory='false' /> <label for='code_estimated_10-year_incidence_coronary_death'>Estimated 10-year incidence of coronary death?</label></td></tr>" .
-
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_prior_transient_ischemic_attack>
-    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_prior_transient_ischemic_attack'></span><input type='checkbox' id='code_prior_transient_ischemic_attack' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_no_cv_risk_factors' mandatory='false' /> <label for='code_prior_transient_ischemic_attack'>Prior transient ischemic attack?</label></td></tr>" .
-
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_diabetes>
-    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_diabetes'></span><input type='checkbox' id='code_diabetes' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_no_cv_risk_factors' mandatory='false' /> <label for='code_diabetes'>Diabetes?</label></td></tr>" .
-
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_prior_mi>
-    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_prior_mi'></span><input type='checkbox' id='code_prior_mi' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_no_cv_risk_factors' mandatory='false' /> <label for='code_prior_mi'>Prior MI?</label></td></tr>" .
-
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_prior_ischemic_stroke>
-    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_prior_ischemic_stroke'></span><input type='checkbox' id='code_prior_ischemic_stroke' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_no_cv_risk_factors' mandatory='false' /> <label for='code_prior_ischemic_stroke'>Prior ischemic stroke?</label></td></tr>" .
-
-<http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#action_prior_coronary_revascularization>
-    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_prior_coronary_revascularization'></span><input type='checkbox' id='code_prior_coronary_revascularization' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_no_cv_risk_factors' mandatory='false' /> <label for='code_prior_coronary_revascularization'>Prior Coronary Revascularization?</label></td></tr>" .
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_fasting_triglycerides'></span><div property='http://hl7.org/fhir/Observation.valueQuantity' typeof=''><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='http://unitsofmeasure.org'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>mmol/L</span>Fasting triglycerides <input type='number' id='code_fasting_triglycerides' code='code_fasting_triglycerides' min='1' max='100' step='0.01' size='2' property='http://hl7.org/fhir/Quantity.value' /> (1-100)</div></td></tr>" .
