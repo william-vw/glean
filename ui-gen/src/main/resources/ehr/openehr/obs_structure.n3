@@ -1,0 +1,78 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix oe: <https://openehr.org#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+# METHOD 1
+
+_:x tpl:domainNamespace oe: .
+
+_:b0 a tpl:UiElement ; tpl:level 0 ;
+	tpl:elements ( :ui-int_input :ui-bool_input :ui-quant_input ) .
+
+
+:ui-int_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
+	tpl:inProperty oe:content ;
+	tpl:elements ( :ui-int_input1 :ui-event_int ) .
+
+:ui-int_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	oe:nodeId :id .
+
+:ui-event_int a tpl:UiElement ; tpl:structure true ; tpl:level 2 ;
+	tpl:inProperty oe:events ;
+	tpl:elements ( :ui-val_int ) .
+
+:ui-val_int a tpl:UiElement ; tpl:structure true ; tpl:level 3 ;
+	tpl:inProperty oe:value ;
+	tpl:elements ( :ui-val_int1 ) .
+
+:ui-val_int1 a tpl:UiElement ; tpl:inputType xsd:numeric ; 
+	oe:dv_ordinal :v .
+		
+	
+:ui-bool_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
+	tpl:inProperty oe:content ;
+	tpl:elements ( :ui-bool_input1 :ui-event_bool ) .
+
+:ui-bool_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	oe:nodeId :id .
+
+:ui-event_bool a tpl:UiElement ; tpl:structure true ; tpl:level 2 ;
+	tpl:inProperty oe:events ;
+	tpl:elements ( :ui-val_bool ) .
+
+:ui-val_bool a tpl:UiElement ; tpl:structure true ; tpl:level 3 ;
+	tpl:inProperty oe:value ;
+	tpl:elements ( :ui-val_bool1 ) .
+
+:ui-val_bool1 a tpl:UiElement ; tpl:inputType xsd:boolean ; 
+	oe:dv_boolean :v .
+	
+	
+:ui-quant_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ;
+	tpl:inProperty oe:content ;
+	tpl:elements ( :ui-quant_input1 :ui-event_quant ) .
+	
+:ui-quant_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	oe:nodeId :id .
+
+:ui-event_quant a tpl:UiElement ; tpl:structure true ; tpl:level 2 ;
+	tpl:inProperty oe:events ;
+	tpl:elements ( :ui-val_quant ) .
+
+:ui-val_quant a tpl:UiElement ; tpl:structure true ; tpl:level 3 ;
+	tpl:inProperty oe:value ;
+	tpl:elements ( :ui-val_quant1 :ui-val_quant2 ) .
+
+:ui-val_quant1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:string ;
+	oe:units :s .
+:ui-val_quant2 a tpl:UiElement ; tpl:inputType xsd:numeric ; 
+	oe:magnitude :v .

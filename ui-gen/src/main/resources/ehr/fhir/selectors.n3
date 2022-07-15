@@ -1,0 +1,90 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+:select-observation_code a tpl:Selector ; 
+	rdf:value {	
+		?action a fhir:ActivityDefinition ;
+			fhir:ActivityDefinition.observationResultRequirement ?req ;
+			fhir:ActivityDefinition.title ?label .
+		?req fhir:ObservationDefinition.code ?code .
+		(?code ".*?#(.*)") string:scrape ?code_ln .
+	} .
+
+:select-datatype_data a tpl:Selector ;
+	rdf:value {
+		?req fhir:ObservationDefinition.permittedDataType ?range .
+	} .
+
+:select-qualified_data a tpl:Selector ;
+	rdf:value {
+		?req fhir:ObservationDefinition.qualifiedInterval ?interval .
+		?interval fhir:ObservationDefinition.qualifiedInterval.range ?range .
+		
+		?req fhir:ObservationDefinition.quantitativeDetails ?quant .
+		?quant fhir:ObservationDefinition.quantitativeDetails.unit ?unit .
+		?unit fhir:CodeableConcept.coding ?coding .	
+		?coding fhir:Coding.system ?codeSystem ; 
+			fhir:Coding.code ?unitCode ;
+			rdfs:label ?unitLabel .
+		
+		?quant fhir:ObservationDefinition.quantitativeDetails.decimalPrecision ?prec .
+	} .
+
+:select-present_data a tpl:Selector ;
+	rdf:value {
+		?req fhir:ObservationDefinition.permittedDataType :dt_boolean ;
+			fhir:ObservationDefinition.category in:category_present ;
+			fhir:ObservationDefinition.mutexWith ?mutex .
+		( ?mutex "," ) string:join ?mutex_str .
+		( ?mutex_str "http://.*?#(.*?)" "$1" ) string:replace ?mutex_ln .
+	} .
+
+:select-yes_no_data a tpl:Selector ;
+	rdf:value {
+		?req fhir:ObservationDefinition.permittedDataType :dt_boolean ;
+			fhir:ObservationDefinition.category in:category_yes_no .
+	} .
+
+
+:select-range_data a tpl:Selector ;
+	rdf:value {
+		?range!fhir:Range.low fhir:Quantity.value ?min .
+		?range!fhir:Range.high fhir:Quantity.value ?max .
+		?range rdfs:label ?rangeLabel . 
+	} .
+
+:select-num_size a tpl:Selector ;
+	rdf:value {
+		(?max 10) math:logarithm ?log .
+		?log math:floor ?size .
+	} .
+
+:select-int_range_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_code , :select-datatype_data , :select-range_data , :select-num_size ,
+	[ rdf:value { 
+		?req fhir:ObservationDefinition.permittedDataType :dt_integer 
+	} ] .
+	
+:select-present_range_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_code , :select-present_data .
+
+:select-yes_no_range_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_code , :select-yes_no_data .
+	
+:select-qualified_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_code , :select-qualified_data , :select-range_data , :select-num_size ,
+	[ rdf:value { 
+		(10 ?prec) math:exponentiation ?divisor .
+		(1 ?divisor) math:quotient ?step .
+	} ] .

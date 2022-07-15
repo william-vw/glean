@@ -1,0 +1,49 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+# @base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+:hidden_uri_input rdf:value """<span style='display: none' property='_property_' resource='_code_'></span>""" .
+:hidden_str_input rdf:value """<span style='display: none' property='_property_'>_code_</span>""" .
+:numeric_input rdf:value """_prefix-label_ <input type='number' id='_id_' min='_min_' max='_max_' step='_step_' size='_size_' property='_property_' /> _suffix-label_""" .
+:present_input rdf:value """<input type='checkbox' id='_id_' property='_property_' mutex-with='_mutex_' yes-no='false' /> <label for='_id_'>_label_</label>""".
+#:yes_no_input rdf:value """<input type='checkbox' id='_id_' property='_property_' yes-no='true' /> <label for='_id_'>_label_</label>""".
+:yes_no_input rdf:value """<div id='_id_' property='_property_'>_label_: <input type='radio' name='_id_' id='_id_-yes' value='yes' /><label for='_id_-yes'>yes</label>&nbsp;&nbsp;<input type='radio' name='_id_' id='_id_-no' value='no' /><label for='_id_-no'>no</label></div>""".
+
+:lvl_1_struct rdf:value """<tr><td property='_property_' typeof=''>%s</td></tr>""" ; tpl:separator "" .
+:lvl_n_struct rdf:value """<div property='_property_' typeof=''>%s</div>""" ; tpl:separator "" .
+
+{	?el a tpl:UiElement ; tpl:level 1
+} => {	?el tpl:lvl_struct :lvl_1_struct } .
+
+{	?el a tpl:UiElement ; tpl:level ?lvl . ?lvl math:greaterThan 1 .
+} => {	?el tpl:lvl_struct :lvl_n_struct } .
+
+
+:container_struct_param rdf:value """<html>
+<head>%s</head>
+<body>
+	<form action="" method="POST" onsubmit="submitInputData(this); return false">
+		<table>
+			%s
+			<tr>
+				<td><input type='submit' value='submit'></input></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>""" ;
+	tpl:separator "" .
+
+
+{ 	<file:///Users/wvw/git/cig/ui_gen/src/main/resources/ui/html_rdfa/self_contained/header.html> log:content ?header .
+
+	:container_struct_param rdf:value ?code ; tpl:separator ?sep .
+	( ?code ?header "%s" ) string:format ?code2 .
+
+} => { :container_struct rdf:value ?code2 ; tpl:separator ?sep } . 
+

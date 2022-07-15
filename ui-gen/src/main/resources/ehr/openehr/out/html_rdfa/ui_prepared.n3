@@ -1,0 +1,216 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_bool>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div property='https://openehr.org#value' typeof=''>_label0_ <input type='checkbox' id='_id0_' property='https://openehr.org#dv_boolean' /></div>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-event_quant>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''><span style='display: none' property='https://openehr.org#units'>_code00_</span>_prefix-label01_ <input type='number' id='_id01_' min='_min01_' max='_max01_' step='_step01_' property='https://openehr.org#magnitude' /> _suffix-label01_</div></div>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='https://openehr.org#nodeId' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='_code0_'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>_label100_ <input type='checkbox' id='_id100_' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div property='https://openehr.org#value' typeof=''><span style='display: none' property='https://openehr.org#units'>_code0_</span>_prefix-label1_ <input type='number' id='_id1_' min='_min1_' max='_max1_' step='_step1_' property='https://openehr.org#magnitude' /> _suffix-label1_</div>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_int1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "_prefix-label_ <input type='number' id='_id_' min='_min_' max='_max_' step='_step_' property='https://openehr.org#dv_ordinal' /> _suffix-label_" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-event_int>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>_prefix-label00_ <input type='number' id='_id00_' min='_min00_' max='_max00_' step='_step00_' property='https://openehr.org#dv_ordinal' /> _suffix-label00_</div></div>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "_prefix-label_ <input type='number' id='_id_' min='_min_' max='_max_' step='_step_' property='https://openehr.org#magnitude' /> _suffix-label_" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_int>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div property='https://openehr.org#value' typeof=''>_prefix-label0_ <input type='number' id='_id0_' min='_min0_' max='_max0_' step='_step0_' property='https://openehr.org#dv_ordinal' /> _suffix-label0_</div>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='https://openehr.org#units'>_code_</span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='https://openehr.org#nodeId' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-event_bool>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>_label00_ <input type='checkbox' id='_id00_' property='https://openehr.org#dv_boolean' /></div></div>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='_code0_'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>_prefix-label100_ <input type='number' id='_id100_' min='_min100_' max='_max100_' step='_step100_' property='https://openehr.org#dv_ordinal' /> _suffix-label100_</div></div></td></tr>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='https://openehr.org#nodeId' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_bool1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "_label_ <input type='checkbox' id='_id_' property='https://openehr.org#dv_boolean' />" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#container_struct>
+    <http://niche.cs.dal.ca/ui_tpl.n3#separator>
+        "" ;
+    rdf:value """<html>
+<head><meta charset=\"utf-8\" />
+<style>
+#results { display: none }
+</style>
+
+<script src=\"https://code.jquery.com/jquery-3.6.0.min.js\"
+	integrity=\"sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=\"
+	crossorigin=\"anonymous\">
+        </script>
+<script src=\"lib/N3.dist.js\"></script>
+<script src=\"lib/rdfa.dist.js\"></script>
+<script>
+	function localName(node) {
+		return node.id.substring(node.id.indexOf(\"#\") + 1);
+	}
+
+    const { DataFactory } = N3;
+    const { namedNode, blankNode, literal, defaultGraph, quad } = DataFactory;
+    
+    const prefixes = {
+         xsd: 'http://www.w3.org/2001/XMLSchema#',
+         rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#', 
+         ns: 'http://niche.cs.dal.ca/ns/cig/input/fhir.owl#'
+     };
+    
+	function insertUserData() {
+		$(\"input\").each((idx, input) => {
+			input = $(input);
+			var id = input.attr(\"id\");
+			var prp = input.attr(\"property\");
+			
+			// console.log(id, \": \", prp);
+			
+			var value = \"\";	
+			switch (input.attr('type')) {
+		
+			case 'number':
+				value = input.val() * 1;
+				break;
+			
+			case 'checkbox':
+				value = input.is(':checked');
+				break;
+			}
+			
+			var codeStmt = store.getQuads(null, null, prefixes.ns + id)[0];			
+			if (!codeStmt)
+				return;
+			
+			// console.log(prp, \" = \", value);
+			
+			var start = codeStmt._subject;
+			var subject = find(start, prp);
+			
+			var valueStmt = store.getQuads(subject, prp, null)[0];
+			store.removeQuad(valueStmt);
+			store.addQuad(subject, prp, literal(value));
+		});
+        
+        sendDiary();
+    }
+	
+	function find(subject, targetPrp) {
+		var stmts = store.getQuads(subject, null, null);
+		for (var i = 0; i < stmts.length; i++) {
+			var stmt = stmts[i];
+			if (stmt._predicate.id == targetPrp)
+				return stmt._subject;
+			else {
+				var found = find(stmt._object, targetPrp);
+				if (found)
+					return found;
+			}
+		}
+	}
+    
+    function processDiary() {
+        store = new N3.Store({ prefixes: prefixes });
+
+        rdfaParser = new rdfa.RdfaParser({ contentType: 'text/html' })
+          .on('data', (quad, etc) => store.addQuad(quad))
+          .on('error', console.error)
+          .on('end', insertUserData);
+    	
+        //$('#curDateTime').attr('content', new Date().toISOString());
+        
+        rdfaParser.write($(\"body\").html());
+        rdfaParser.end();
+    }
+    
+    function sendDiary() {
+    	const writer = new N3.Writer({ prefixes: prefixes });
+    	store.forEach(stmt => writer.addQuad(stmt));
+    	
+    	writer.end((error, result) => {
+        	console.log(\"sending diary\");
+        	console.log(result);
+        	
+//         	$.ajax({ 
+//         		url: \"http://localhost:8080/cds_service/diary/\",
+//         		type: \"post\",
+//         		data: result,
+//         		dataType: \"text\",
+//        			error: (xhr, status, error) => {
+// 					console.log(\"error\", xhr.responseText);
+//  				},
+//  				success: processResults
+//         	});
+		});
+    } 
+</script></head>
+<body>
+	<form action=\"\" method=\"POST\" onsubmit=\"processDiary(); return false\">
+		<table>
+			%s
+			<tr>
+				<td><input type='submit' value='submit'></input></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='_code0_'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''><span style='display: none' property='https://openehr.org#units'>_code100_</span>_prefix-label101_ <input type='number' id='_id101_' min='_min101_' max='_max101_' step='_step101_' property='https://openehr.org#magnitude' /> _suffix-label101_</div></div></td></tr>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .

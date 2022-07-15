@@ -1,0 +1,155 @@
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix string:    <http://www.w3.org/2000/10/swap/string#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+
+{
+    ?attr
+        <https://openehr.org#C_DV_ORDINAL>
+            ?ordinalValues .
+    ( ?ordinalNr {
+    ?ordinalValue
+        list:in ?ordinalValues .
+    ?ordinalValue
+        <https://openehr.org#value>
+            ?ordinalNr .} ?ordinalNrs )  log:collectAllIn _:b1 .
+    ?ordinalNrs
+        math:min ?min .
+    ?ordinalNrs
+        math:max ?max .
+    ( "(" ?min " - " ?max ")" )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?rangeLabel .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_prefix-label100_" "_id100_" "_min100_" "_max100_" "_step100_" "_suffix-label100_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?label ?id ?min ?max "1"^^xsd:int ?rangeLabel ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+
+{
+    ?attr
+        <https://openehr.org#object>
+            ?obj .
+    ?obj  rdf:type <https://openehr.org#C_DV_COUNT> .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_prefix-label100_" "_id100_" "_min100_" "_max100_" "_step100_" "_suffix-label100_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?label ?id "" "" "1"^^xsd:int "" ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+
+{
+    ?attr
+        <https://openehr.org#object>
+            ?obj .
+    ?obj  rdf:type <https://openehr.org#C_DV_BOOLEAN> .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_label100_" "_id100_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?label ?id ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+
+{
+    ( "10"^^xsd:int ?prec )  math:exponentiation ?divisor .
+    ( "1"^^xsd:int ?divisor )  math:quotient ?step .
+    ?range
+        <https://openehr.org#lower>
+            ?min .
+    ?range
+        <https://openehr.org#lowerIncluded>
+            "true"^^xsd:boolean .
+    ?range
+        <https://openehr.org#upper>
+            ?max .
+    ?range
+        <https://openehr.org#upperIncluded>
+            "true"^^xsd:boolean .
+    ( "(" ?min " - " ?max ")" )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?rangeLabel .
+    ?attr
+        <https://openehr.org#C_DV_QUANTITY>
+            ?dvqs .
+    ?dvq  list:in ?dvqs .
+    ?dvq  <https://openehr.org#units>
+            ?unit .
+    ?dvq  <https://openehr.org#precision>
+            ?prec .
+    ?dvq  <https://openehr.org#magnitude>
+            ?range .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_code100_" "_prefix-label101_" "_id101_" "_min101_" "_max101_" "_step101_" "_suffix-label101_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?unit ?label ?id ?min ?max ?step ?rangeLabel ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+            
+            
+{	?el tpl:generated ?gen .
+
+	?container ?property ?el .
+	?property!log:uri string:notMatches tpl:!log:uri .
+
+} => { ?container tpl:generated ?gen } .

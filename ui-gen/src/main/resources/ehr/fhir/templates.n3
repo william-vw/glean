@@ -1,0 +1,66 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+:tpl-int_range_field a tpl:UiTemplate ; 
+	tpl:select :select-int_range_field ;
+	tpl:generate [
+		tpl:ui :ui-int_input ;
+		tpl:placeholders ( '_code0_' '_prefix-label1_' '_id1_' '_min1_' '_max1_' '_step1_' '_suffix-label1_' ) ;
+		tpl:values ( ?code ?label ?code_ln ?min ?max 1 ?rangeLabel ) ;
+		tpl:target ?action
+	 ] .
+	 
+:tpl-present_range_field a tpl:UiTemplate ; 
+	tpl:select :select-present_range_field ;
+	tpl:generate [
+		tpl:ui :ui-present_input ;
+		tpl:placeholders ( '_code0_' '_label1_' '_id1_' '_mutex1_' ) ;
+		tpl:values ( ?code ?label ?code_ln ?mutex_ln ) ;
+		tpl:target ?action
+	 ] .
+	 
+:tpl-yes_no_range_field a tpl:UiTemplate ; 
+	tpl:select :select-yes_no_range_field ;
+	tpl:generate [
+		tpl:ui :ui-yes_no_input ;
+		tpl:placeholders ( '_code0_' '_label1_' '_id1_' ) ;
+		tpl:values ( ?code ?label ?code_ln ) ;
+		tpl:target ?action
+	 ] .
+	 
+:tpl-boolean_range_mutex_field a tpl:UiTemplate ; 
+	tpl:select :select-bool_range_mutex_field ;
+	tpl:generate [
+		tpl:ui :ui-bool_input ;
+		tpl:placeholders ( '_code0_' '_label1_' '_id1_' ) ;
+		tpl:values ( ?code ?label ?code_ln ) ;
+		tpl:target ?action
+	 ] .
+	 
+:tpl-quant_range_field a tpl:UiTemplate ; 
+	tpl:select :select-qualified_field ;
+	tpl:generate [
+		tpl:ui :ui-quant_input ;
+		tpl:placeholders ( '_code0_' '_code10_' '_code11_' '_prefix-label12_' '_id12_' '_min12_' '_max12_' '_step12_' '_size12_' '_suffix-label12_' ) ;
+		tpl:values ( ?code ?codeSystem ?unitCode ?label ?code_ln ?min ?max ?step ?size ?rangeLabel ) ;
+		tpl:target ?action
+	 ] .
+	 
+:tpl-report a tpl:UiTemplate ; 
+	tpl:container [
+		tpl:select [ rdf:value { 
+			?plan a fhir:PlanDefinition ; fhir:PlanDefinition.action ?actions .
+			[ fhir:PlanDefinition.action.definitionUri ?action ] list:in ?actions . 
+		} ] ;
+		tpl:target ?plan
+	] .

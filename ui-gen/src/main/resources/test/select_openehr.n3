@@ -1,0 +1,94 @@
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+{	?attr
+                <https://openehr.org#C_DV_ORDINAL>
+                    ?values .
+            ( ?nr {
+    ?value
+        list:in ?values .
+    ?value
+        <https://openehr.org#value>
+            ?nr .} ?nrs )  log:collectAllIn _:b1 .
+            ?nrs  math:min ?min .
+            ?nrs  math:max ?max .
+            ?obs  <https://openehr.org#attribute>
+                    ?attr .
+            ?obs  <https://openehr.org#nodeId>
+                    ?id .
+            ?obs  rdfs:label ?label .
+            ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+                    ?code .          
+
+} => { [ a :ordinal ; :min ?min ; :max ?max ; :label ?label ; :code ?code ] } .
+
+
+{
+    ?attr
+        <https://openehr.org#object>
+            ?obj .
+    ?obj  rdf:type <https://openehr.org#C_DV_COUNT> .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .        
+
+} => { [ a :count ; :label ?label ] } .
+
+
+{	?attr
+    	<https://openehr.org#object>
+        	?obj .
+    ?obj  rdf:type <https://openehr.org#C_DV_BOOLEAN> .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label 
+
+} => { [ a :bool ; :label ?label ] } . 
+
+
+{
+    ( "10"^^xsd:int ?prec )  math:exponentiation ?divisor .
+    ( "1"^^xsd:int ?divisor )  math:quotient ?step .
+    ?range
+        <https://openehr.org#lower>
+            ?min .
+    #?range
+    #    <https://openehr.org#lowerIncluded>
+    #        "true"^^xsd:boolean .
+    ?range
+        <https://openehr.org#upper>
+            ?max .
+    #?range
+    #    <https://openehr.org#upperIncluded>
+    #        "true"^^xsd:boolean .
+    ( ?min " - " ?max )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?rangeLabel .
+    ?attr
+        <https://openehr.org#C_DV_QUANTITY>
+            ?dvqs .
+    ?dvq  list:in ?dvqs .
+    ?dvq  <https://openehr.org#units>
+            ?unit .
+    ?dvq  <https://openehr.org#precision>
+            ?prec .
+    ?dvq  <https://openehr.org#magnitude>
+            ?range .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .        
+
+} => { [ a :quant ; :label ?label ; :min ?min ; :max ?max ; :label2 ?rangeLabel ] } .
+

@@ -1,0 +1,104 @@
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://niche.cs.dal.ca/copd.n3#> .
+
+@base <http://niche.cs.dal.ca/copd.n3> .
+
+
+:patient0 a fhir:Patient ;
+	fhir:Patient.identifier "patient0" ;
+	fhir:Patient.name "will i am" ;
+	fhir:Patient.gender "248153007" ; # male
+	fhir:Patient.birthDate "1963-01-01" .
+
+:patient0_req0 a fhir:ServiceRequest ;
+	fhir:ServiceRequest.instantiatesCanonical :copd_diary_observations .	
+
+:patient0_req0_cough a fhir:ServiceRequest ;
+	fhir:ServiceRequest.instantiatesCanonical :diagnose_cough_wheezing_stridor .
+
+:patient0_req0_cyanosis a fhir:ServiceRequest ;
+	fhir:ServiceRequest.instantiatesCanonical :diagnose_cyanosis .
+	
+:patient0_req0_swollen_ankles a fhir:ServiceRequest ;
+	fhir:ServiceRequest.instantiatesCanonical :diagnose_swollen_ankles .
+	
+:patient0_req0_hr a fhir:ServiceRequest ;
+	fhir:ServiceRequest.instantiatesCanonical :diagnose_heart_rate .
+
+:patient0_req0_rr a fhir:ServiceRequest ;
+	fhir:ServiceRequest.instantiatesCanonical :diagnose_respiratory_rate .
+
+:patient0_req0_o2_sat a fhir:ServiceRequest ;
+	fhir:ServiceRequest.instantiatesCanonical :diagnose_o2_saturation .
+
+:patient0_req0_report a fhir:DiagnosticReport ;
+	fhir:DiagnosticReport.status "final" ;
+	fhir:DiagnosticReport.basedOn [ fhir:Reference.reference :patient0_req0 ] ;
+	fhir:Observation.effectiveDateTime "2021-06-01T12:12"^^xsd:dateTime ;
+	fhir:DiagnosticReport.subject [ fhir:Reference.reference :patient0 ] ;
+	fhir:DiagnosticReport.code :code_assessment , :code_patient_diary_entry ;
+	fhir:DiagnosticReport.result 
+		[ fhir:index 0 ; fhir:Reference.reference :patient0_req0_report_cough ] ,
+		[ fhir:index 1 ; fhir:Reference.reference :patient0_req0_report_hr ] ,
+		[ fhir:index 2 ; fhir:Reference.reference :patient0_req0_report_rr ] .
+
+:patient0_req0_report_cough a fhir:Observation ;
+	fhir:Observation.status "final" ;
+	fhir:Observation.basedOn [ fhir:Reference.reference :patient0_req0_cough ] ;
+	fhir:Observation.effectiveDateTime "2021-06-01T12:12"^^xsd:dateTime ;
+	fhir:Observation.subject [ fhir:Reference.reference :patient0 ] ;
+	fhir:Observation.code :code_cough ;
+	fhir:Observation.valueInteger 7 .
+
+:patient0_req0_report_cyanosis a fhir:Observation ;
+	fhir:Observation.status "final" ;
+	fhir:Observation.basedOn [ fhir:Reference.reference :patient0_req0_cyanosis ] ;
+	fhir:Observation.effectiveDateTime "2021-06-01T12:12"^^xsd:dateTime ;
+	fhir:Observation.subject [ fhir:Reference.reference :patient0 ] ;
+	fhir:Observation.code :code_cyanosis ;
+	fhir:Observation.valueBoolean true .
+	
+:patient0_req0_report_swollen_ankles a fhir:Observation ;
+	fhir:Observation.status "final" ;
+	fhir:Observation.basedOn [ fhir:Reference.reference :patient0_req0_swollen_ankles ] ;
+	fhir:Observation.effectiveDateTime "2021-06-01T12:12"^^xsd:dateTime ;
+	fhir:Observation.subject [ fhir:Reference.reference :patient0 ] ;
+	fhir:Observation.code :code_swollen_ankle ;
+	fhir:Observation.valueBoolean true .
+
+:patient0_req0_report_hr a fhir:Observation ;	
+	fhir:Observation.status "final" ;
+	fhir:Observation.basedOn [ fhir:Reference.reference :patient0_req0_hr ] ;
+	fhir:Observation.effectiveDateTime "2021-06-01T12:12"^^xsd:dateTime ;
+	fhir:Observation.code :code_hr ;
+	fhir:Observation.subject [ fhir:Reference.reference :patient0 ] ;
+	fhir:Observation.valueQuantity [
+		fhir:Observation.valueQuantity.value 89 ;
+		fhir:Observation.valueQuantity.system <http://unitsofmeasure.org> ;
+		fhir:Observation.valueQuantity.code "/min"
+	] .
+
+:patient0_req0_report_rr a fhir:Observation ;	
+	fhir:Observation.status "final" ;
+	fhir:Observation.basedOn [ fhir:Reference.reference :patient0_req0_rr ] ;
+	fhir:Observation.effectiveDateTime "2021-06-01T12:12"^^xsd:dateTime ;
+	fhir:Observation.code :code_rr ;
+	fhir:Observation.subject [ fhir:Reference.reference :patient0 ] ;
+	fhir:Observation.valueQuantity [
+		fhir:Observation.valueQuantity.value 35 ;
+		fhir:Observation.valueQuantity.system <http://unitsofmeasure.org> ;
+		fhir:Observation.valueQuantity.code "/min"
+	] .
+	
+:patient0_req0_report_o2_sat a fhir:Observation ;
+	fhir:Observation.status "final" ;
+	fhir:Observation.basedOn [ fhir:Reference.reference :patient0_req0_o2_sat ] ;
+	fhir:Observation.effectiveDateTime "2021-06-01T12:12"^^xsd:dateTime ;
+	fhir:Observation.code :code_o2_sat ;
+	fhir:Observation.subject [ fhir:Reference.reference :patient0 ] ;
+	fhir:Observation.valueQuantity [
+		fhir:Observation.valueQuantity.value 85 ;
+		fhir:Observation.valueQuantity.system <http://unitsofmeasure.org> ;
+		fhir:Observation.valueQuantity.code "%"
+	] .

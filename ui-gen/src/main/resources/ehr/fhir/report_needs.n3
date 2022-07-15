@@ -1,0 +1,531 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+# data types
+
+:1_5_scale a fhir:Range ;
+	fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+	fhir:Range.high [ fhir:Quantity.value 5 ] ;
+	rdfs:label "(1-5, 1 is least, 3 is same, 5 is worst)" .
+
+:1_10_scale a fhir:Range ;
+	fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+	fhir:Range.high [ fhir:Quantity.value 10 ] ;
+	rdfs:label "(1-10, 1 is least, 5 is same, 10 is worst)" .
+
+:0_100_scale a fhir:Range ;
+	fhir:Range.low  [ fhir:Quantity.value 0 ] ;
+	fhir:Range.high [ fhir:Quantity.value 100 ] ;
+	rdfs:label "(1-100)" .
+
+:dt_boolean 
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://hl7.org/fhir/permitted-data-type> ;
+		fhir:Coding.code "boolean"
+	] .
+
+:dt_integer
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://hl7.org/fhir/permitted-data-type> ;
+		fhir:Coding.code "integer"
+	] .
+	
+:dt_decimal 
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://hl7.org/fhir/permitted-data-type> ;
+		fhir:Coding.code "decimal" # not in http://hl7.org/fhir/R4/valueset-permitted-data-type.html ??
+	] .
+	
+	
+# severities
+	
+:severity_mild
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "mild"
+	] .	
+
+:severity_moderate
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "moderate"
+	] .
+	
+:severity_severe
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "severe"
+	] .
+	
+
+# categories
+
+:borg_scale
+	fhir:CodeableConcept.Coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "263487004" # Borg scale (assessment scale)
+	] .
+
+:category_survey
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://terminology.hl7.org/CodeSystem/observation-category> ;
+		fhir:Coding.code "survey"
+	] .
+	
+:category_activity
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://terminology.hl7.org/CodeSystem/observation-category> ;
+		fhir:Coding.code "activity"
+	] .
+	
+:category_vital_signs
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://terminology.hl7.org/CodeSystem/observation-category> ;
+		fhir:Coding.code "vital-signs"
+	] .
+	
+:category_cmp_symptom_to_usual
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "cmp-symptom-to-usual"
+    ] .
+
+:category_rate_sympom
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "rate-symptom"
+    ] .
+
+:category_symptom_present
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "symptom-present"
+    ] .
+    
+:category_sensor_data
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "sensor-data"
+    ] .
+    
+
+# codes
+    
+:code_appetite
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "289161009" # Finding of appetite (finding)
+    ] .
+
+:code_sleep
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "95607-8" # Sleep quality - 1-5 numeric rating [Score] 24 hour
+    ] .    
+    
+:code_cough
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "49727002" # Cough (finding) (closest in LOINC was "Cough duration")
+    ] .
+
+:code_stridor
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "70407001" # Stridor (finding)
+    ] .
+    
+:code_wheezing
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "56018004" # Wheezing (finding)
+    ] .    
+
+:code_phlem_amount
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "38200-2" # Volume of Sputum
+    ] .
+
+:code_phlem_color
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "86243-3" # Color of Sputum
+    ] .
+    
+:code_phlem_blood
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "301290008" # Frank blood in sputum (finding)
+    ] .
+
+:code_activity_exertion
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "82289-0" # Rating of perceived exertion [Score]
+	] .
+	
+:code_use_inhaler
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "704098003" # Uses inhaler device (finding)
+    ] .
+
+:code_chest_pain
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "58259-3" # Chest pain
+	] .
+	
+:code_cyanosis
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "3415004" # Cyanosis (finding)
+	] .
+
+:code_confusion
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "42849-0" # Confusion [CCC]
+	] .	
+
+:code_excessive_drowsiness
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "372947007" # Excessive somnolence (finding)
+	] .
+	
+:code_swollen_joint
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "88984-0" # Swollen joint
+    ] .
+    
+:code_swollen_ankle
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "267039000" # Swollen ankle (finding)
+    ] .
+    
+:code_activity_level
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "80493-0" # Activity level [Acceleration]
+	] .
+	
+:code_hr
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "8867-4" # Heart rate
+    ] .
+    
+:code_rr
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "9279-1" # Respiratory rate
+    ] .
+    
+:code_o2_sat
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "20564-1" # Oxygen saturation in Blood
+    ] .
+    
+:code_low_o2_sat
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "449171008" # Low oxygen saturation
+    ] .
+    
+:code_body_temp
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://loinc.org> ;
+		fhir:Coding.code "8310-5" # Body temperature
+    ] .
+    
+:code_assessment
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "386053000" # Assessment
+	] .
+	
+:code_patient_diary_entry
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "patient-diary-entry"
+	] .
+
+
+# activity definitions
+
+:diagnose_appetite a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_appetite" ;
+	fhir:ActivityDefinition.title "Do you have less, the same or more appetite than usual?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_appetite ;
+		fhir:ObservationDefinition.category :category_survey , :category_cmp_symptom_to_usual ;
+		fhir:ObservationDefinition.permittedDataType :dt_integer, :1_5_scale
+	] .
+	
+:diagnose_sleep a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_sleep" ;
+	fhir:ActivityDefinition.title "Is your quality of sleep less, the same or higher than usual?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_sleep ;
+		fhir:ObservationDefinition.category :category_survey , :category_cmp_symptom_to_usual ;
+		fhir:ObservationDefinition.permittedDataType :dt_integer, :1_5_scale
+	] .
+
+:diagnose_cough_wheezing_stridor a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_cough_wheezing_stridor" ;
+	fhir:ActivityDefinition.title "Is your cough, wheezing or stridor less, the same or worse than usual?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_cough ; # :code_wheezing , :code_stridor
+		fhir:ObservationDefinition.category :category_survey , :category_cmp_symptom_to_usual ;
+		fhir:ObservationDefinition.permittedDataType :dt_integer, :1_10_scale
+	] .
+	
+:diagnose_phlem_amount a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_phlem_amount" ;
+	fhir:ActivityDefinition.title "Is your amount of phlem, sputum or mucus, less, the same or worse than usual?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_phlem_amount ;
+		fhir:ObservationDefinition.category :category_survey , :category_cmp_symptom_to_usual ;
+		fhir:ObservationDefinition.permittedDataType :dt_integer, :1_10_scale
+	] .
+	
+:diagnose_phlem_color a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_phlem_color" ;
+	fhir:ActivityDefinition.title "Is the color of phlem, sputum or mucus green, yellow or rust-colored, and is this different from usual?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_phlem_color ;
+		fhir:ObservationDefinition.category :category_survey , :category_symptom_present ;
+		fhir:ObservationDefinition.permittedDataType :dt_boolean
+	] .
+
+:diagnose_phlem_blood a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_phlem_blood" ;
+	fhir:ActivityDefinition.title "Is there significant blood in the phlem, sputum or mucus, beyond flecks or streaks?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_phlem_blood ;
+		fhir:ObservationDefinition.category :category_survey , :category_symptom_present ;
+		fhir:ObservationDefinition.permittedDataType :dt_boolean
+	] .
+
+:diagnose_activity_exertion a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_activity_exertion" ;
+	fhir:ActivityDefinition.title "Please rate your exertion level when performing activities." ;
+	fhir:ActivityDefinition.observationResultRequirement [ 
+		fhir:ObservationDefinition.code :code_activity_exertion ;
+		fhir:ObservationDefinition.category :category_survey , :category_rate_symptom ;
+		fhir:ObservationDefinition.permittedDataType :dt_integer, :borg_scale, :1_10_scale
+	] .
+
+:diagnose_use_inhaler_often a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_use_inhaler_often" ;
+	fhir:ActivityDefinition.title "Have you used your inhaler more often than usual?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_use_inhaler ;
+		fhir:ObservationDefinition.category :category_survey , :category_symptom_present ;
+		fhir:ObservationDefinition.permittedDataType :dt_boolean
+	] .
+
+:diagnose_activity_level a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_activity_level" ;
+	fhir:ActivityDefinition.title "Your level of activity as recorded by your smartwatch throughout the day." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_activity_level ;
+		fhir:ObservationDefinition.category :category_activity , :category_sensor_data ;
+		fhir:ObservationDefinition.permittedDataType :dt_integer , 
+			[ a fhir:Range ;
+				fhir:Range.low  [ fhir:Quantity.value "" ] ;
+				fhir:Range.high [ fhir:Quantity.value "" ] ;
+				rdfs:label "" 
+			]
+	] .
+	
+:diagnose_chest_pain a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_chest_pain" ;
+	fhir:ActivityDefinition.title "Please indicate whether you have chest pain." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_chest_pain ;
+		fhir:ObservationDefinition.category :category_survey , :category_symptom_present ;
+		fhir:ObservationDefinition.permittedDataType :dt_boolean
+	] .
+	
+:diagnose_cyanosis a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_cyanosis" ;
+	fhir:ActivityDefinition.title "Please indicate whether you have cyanosis (blue/grey coloration around lips, fingernails)." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_cyanosis ;
+		fhir:ObservationDefinition.category :category_survey , :category_symptom_present ;
+		fhir:ObservationDefinition.permittedDataType :dt_boolean
+	] .
+	
+:diagnose_confusion_excessive_drowsiness a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_confusion_excessive_drowsiness" ;
+	fhir:ActivityDefinition.title "Please indicate whether you are feeling confused or have excessive drowsiness." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_confusion ; # :code_excessive_drowsiness
+		fhir:ObservationDefinition.category :category_survey , :category_symptom_present ;
+		fhir:ObservationDefinition.permittedDataType :dt_boolean
+	] .
+
+:diagnose_swollen_ankles a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_swollen_ankles" ;
+	fhir:ActivityDefinition.title "Please indicate whether your ankles are swollen." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		# technically the broader concept from LOINC should be included as well
+		fhir:ObservationDefinition.code :code_swollen_ankle ; # :code_swollen_joint
+		fhir:ObservationDefinition.category :category_survey , :category_symptom_present ;
+		fhir:ObservationDefinition.permittedDataType :dt_boolean
+	] .
+
+:diagnose_heart_rate a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_heart_rate" ;
+	fhir:ActivityDefinition.title "Your objectively measured heart rate." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_hr ;
+		fhir:ObservationDefinition.category :category_vital_signs , :category_sensor_data ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "{beats}/min" ; # heart beats per minute
+					rdfs:label "beats/min"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 400 ] ;
+				rdfs:label "(1-400)"
+			]
+		]
+	] .
+	
+:diagnose_respiratory_rate a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_respiratory_rate" ;
+	fhir:ActivityDefinition.title "Your objectively measured respiratory rate." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_rr ;
+		fhir:ObservationDefinition.category :category_vital_signs , :category_sensor_data ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "{Breaths}/min" ; # Breaths / minute
+					rdfs:label "breaths/min"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 200 ] ;
+				rdfs:label "(1-200)"
+			]
+		]
+	] .
+
+:diagnose_o2_saturation a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_o2_saturation" ;
+	fhir:ActivityDefinition.title "Your objectively measured O2 saturation." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_o2_sat ;
+		fhir:ObservationDefinition.category :category_vital_signs , :category_sensor_data ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "%" ; # Percent
+					rdfs:label "%"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 1
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range :0_100_scale
+		]
+	] .
+
+:diagnose_body_temp a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "diagnose_body_temp" ;
+	fhir:ActivityDefinition.title "Your objectively measured body temperature." ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_body_temp ;
+		fhir:ObservationDefinition.category :category_vital_signs , :category_sensor_data ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "Cel" ; # DegreesCelsius
+					rdfs:label "C"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 1
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range :0_100_scale
+		]
+	] .
+
+# plan definition
+
+:diary_observations a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.useContext [
+		fhir:index 0 ;	
+		fhir:UsageContext.code "venue" ;
+		fhir:UsageContext.valueCodeableConcept [
+			fhir:CodeableConcept.Coding [
+				fhir:Coding.system <http://www.snomed.org> ;
+				fhir:Coding.code "264362003" ; # Home (environment)
+			] ;
+			fhir:CodeableConcept.text "Home (environment)"
+		]
+	] ;
+	# technically this needs to be a set of ..action statements
+	# (with associated fhir:index'es to indicate their ordering)
+	# this better suits N3 paradigm
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :diagnose_cough_wheezing_stridor
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_phlem_amount
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_phlem_color
+	]  [
+		fhir:PlanDefinition.action.definitionUri :diagnose_phlem_blood
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_activity_exertion
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_use_inhaler_often
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_chest_pain
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_cyanosis
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_confusion_excessive_drowsiness
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_swollen_ankles
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_respiratory_rate
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_heart_rate
+	] [
+		fhir:PlanDefinition.action.definitionUri :diagnose_activity_level
+	] [ 
+		fhir:PlanDefinition.action.definitionUri :diagnose_o2_saturation
+	] [ 
+		fhir:PlanDefinition.action.definitionUri :diagnose_body_temp
+	] ) .

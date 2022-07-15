@@ -1,0 +1,200 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`linkedDataForm`\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"http://hl7.org/fhir/DiagnosticReport.result\",
+	\"$Components\": [ {
+		\"$Name\": \"`layout`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"`textbox_0`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.code\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"`layout_1`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"`prefix_1`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label1_\"
+	}, {
+		\"$Name\": \"`textbox_1`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"http://hl7.org/fhir/Observation.valueInteger\" 
+	}, {
+		\"$Name\": \"`suffix_1`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label1_\"
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`textbox`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.code\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`layout`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"`prefix`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label_\"
+	}, {
+		\"$Name\": \"`textbox`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"http://hl7.org/fhir/Observation.valueInteger\" 
+	}, {
+		\"$Name\": \"`suffix`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label_\"
+	} ]
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`linkedDataForm`\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.valueQuantity\",
+	\"$Components\": [ {
+		\"$Name\": \"`layout`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"`textbox_0`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Quantity.system\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"`textbox_1`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Quantity.code\", \"Text\": \"_code1_\"
+}, {
+	\"$Name\": \"`layout_2`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"`prefix_2`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label2_\"
+	}, {
+		\"$Name\": \"`textbox_2`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"http://hl7.org/fhir/Quantity.value\" 
+	}, {
+		\"$Name\": \"`suffix_2`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label2_\"
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`linkedDataForm`\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"http://hl7.org/fhir/DiagnosticReport.result\",
+	\"$Components\": [ {
+		\"$Name\": \"`layout`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"`textbox_0`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.code\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"`checkbox_1`\", \"$Type\": \"CheckBox\", \"$Version\": \"2\", \"Width\": \"-2\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.valueBoolean\", \"Text\": \"_label1_\"
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`textbox`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.code\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`checkbox`\", \"$Type\": \"CheckBox\", \"$Version\": \"2\", \"Width\": \"-2\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.valueBoolean\", \"Text\": \"_label_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`textbox`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.code\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`linkedDataForm`\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"http://hl7.org/fhir/DiagnosticReport.result\",
+	\"$Components\": [ {
+		\"$Name\": \"`layout`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"`textbox_0`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.code\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"`linkedDataForm_1`\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"http://hl7.org/fhir/Observation.valueQuantity\",
+	\"$Components\": [ {
+		\"$Name\": \"`layout_1`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"`textbox_11_0`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Quantity.system\", \"Text\": \"_code10_\"
+}, {
+	\"$Name\": \"`textbox_11_1`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Quantity.code\", \"Text\": \"_code11_\"
+}, {
+	\"$Name\": \"`layout_11_2`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"`prefix_11_2`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label12_\"
+	}, {
+		\"$Name\": \"`textbox_11_2`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"http://hl7.org/fhir/Quantity.value\" 
+	}, {
+		\"$Name\": \"`suffix_11_2`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label12_\"
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`textbox`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Quantity.code\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`textbox`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"http://hl7.org/fhir/Quantity.system\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant3>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"`layout`\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"`prefix`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label_\"
+	}, {
+		\"$Name\": \"`textbox`\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"http://hl7.org/fhir/Quantity.value\" 
+	}, {
+		\"$Name\": \"`suffix`\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label_\"
+	} ]
+}""" .

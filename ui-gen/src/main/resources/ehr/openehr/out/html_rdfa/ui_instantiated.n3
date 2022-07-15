@@ -1,0 +1,204 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+{
+    ?attr
+        <https://openehr.org#object>
+            ?obj .
+    ?obj  rdf:type <https://openehr.org#C_DV_BOOLEAN> .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_label100_" "_id100_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?label ?id ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+
+{
+    ?attr
+        <https://openehr.org#object>
+            ?obj .
+    ?obj  rdf:type <https://openehr.org#C_DV_COUNT> .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_prefix-label100_" "_id100_" "_min100_" "_max100_" "_step100_" "_suffix-label100_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?label ?id "" "" "1"^^xsd:int "" ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+
+{
+    ?attr
+        <https://openehr.org#C_DV_ORDINAL>
+            ?ordinalValues .
+    ( ?ordinalNr {
+    ?ordinalValue
+        list:in ?ordinalValues .
+    ?ordinalValue
+        <https://openehr.org#value>
+            ?ordinalNr .} ?ordinalNrs )  log:collectAllIn _:b1 .
+    ?ordinalNrs
+        math:min ?min .
+    ?ordinalNrs
+        math:max ?max .
+    ( "(" ?min " - " ?max ")" )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?rangeLabel .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_prefix-label100_" "_id100_" "_min100_" "_max100_" "_step100_" "_suffix-label100_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?label ?id ?min ?max "1"^^xsd:int ?rangeLabel ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+
+{
+    ( "10"^^xsd:int ?prec )  math:exponentiation ?divisor .
+    ( "1"^^xsd:int ?divisor )  math:quotient ?step .
+    ?range
+        <https://openehr.org#lower>
+            ?min .
+    ?range
+        <https://openehr.org#lowerIncluded>
+            "true"^^xsd:boolean .
+    ?range
+        <https://openehr.org#upper>
+            ?max .
+    ?range
+        <https://openehr.org#upperIncluded>
+            "true"^^xsd:boolean .
+    ( "(" ?min " - " ?max ")" )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?rangeLabel .
+    ?attr
+        <https://openehr.org#C_DV_QUANTITY>
+            ?dvqs .
+    ?dvq  list:in ?dvqs .
+    ?dvq  <https://openehr.org#units>
+            ?unit .
+    ?dvq  <https://openehr.org#precision>
+            ?prec .
+    ?dvq  <https://openehr.org#magnitude>
+            ?range .
+    ?obs  <https://openehr.org#attribute>
+            ?attr .
+    ?obs  <https://openehr.org#nodeId>
+            ?id .
+    ?obs  rdfs:label ?label .
+    ( <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> ?id )  <http://www.w3.org/2000/10/swap/string#concatenation>
+            ?code .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ( "_code0_" "_code100_" "_prefix-label101_" "_id101_" "_min101_" "_max101_" "_step101_" "_suffix-label101_" ) "|" )  <http://www.w3.org/2000/10/swap/string#join>
+            ?regex .
+    ( ?output ?regex "%s" )  <http://www.w3.org/2000/10/swap/string#replace>
+            ?output2 .
+    ( ( ?output2 ) ( ?code ?unit ?label ?id ?min ?max ?step ?rangeLabel ) )  list:append ?appended .
+    ?appended
+        <http://www.w3.org/2000/10/swap/string#format>
+            ?output3 .}  =>  {
+    ?obs  <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output3 .} .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at95>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at95'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Please indicate whether you have cyanosis (blue/grey coloration around lips, fingernails). <input type='checkbox' id='at95' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at61>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at61'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Please rate your exertion level when performing activities. <input type='number' id='at61' min='0' max='10' step='1' property='https://openehr.org#dv_ordinal' /> (0 - 10)</div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at45>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at45'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Is the color of phlem, sputum or mucus green, yellow or rust-colored, and is this different from usual? <input type='checkbox' id='at45' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at120>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at120'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''><span style='display: none' property='https://openehr.org#units'>/min</span>Respiration rate <input type='number' id='at120' min='0.0' max='200.0' step='1' property='https://openehr.org#magnitude' /> (0.0 - 200.0)</div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at53>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at53'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Is there significant blood in the phlem, sputum or mucus, beyond flecks or streaks? <input type='checkbox' id='at53' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at151>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at151'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''><span style='display: none' property='https://openehr.org#units'>/min</span>Pulse rate <input type='number' id='at151' min='0.0' max='1000.0' step='1' property='https://openehr.org#magnitude' /> (0.0 - 1000.0)</div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at87>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at87'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Please indicate whether you have chest pain. <input type='checkbox' id='at87' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at200>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at200'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Your level of activity as recorded by your smartwatch throughout the day. <input type='number' id='at200' min='' max='' step='1' property='https://openehr.org#dv_ordinal' /> </div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at27>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at27'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Is your amount of phlem, sputum or mucus, less, the same or worse than usual? <input type='number' id='at27' min='0' max='10' step='1' property='https://openehr.org#dv_ordinal' /> (0 - 10)</div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at79>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at79'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Have you used your inhaler more often than usual? <input type='checkbox' id='at79' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at232>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at232'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''><span style='display: none' property='https://openehr.org#units'>Cel</span>Temperature <input type='number' id='at232' min='0.0' max='100.0' step='0.1' property='https://openehr.org#magnitude' /> (0.0 - 100.0)</div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at111>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at111'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Please indicate whether your ankles are swollen. <input type='checkbox' id='at111' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at103>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at103'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Please indicate whether you are feeling confused or have excessive drowsiness. <input type='checkbox' id='at103' property='https://openehr.org#dv_boolean' /></div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at208>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at208'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''><span style='display: none' property='https://openehr.org#units'>%</span>SpO₂ <input type='number' id='at208' min='0.0' max='100.0' step='0.1' property='https://openehr.org#magnitude' /> (0.0 - 100.0)</div></div></td></tr>" .
+
+<http://niche.cs.dal.ca/ui_copd.n3#at9>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='https://openehr.org#content' typeof=''><span style='display: none' property='https://openehr.org#nodeId' resource='http://niche.cs.dal.ca/ns/cig/input/fhir.owl#at9'></span><div property='https://openehr.org#events' typeof=''><div property='https://openehr.org#value' typeof=''>Is your cough, wheezing or stridor less, the same or worse than usual? <input type='number' id='at9' min='0' max='10' step='1' property='https://openehr.org#dv_ordinal' /> (0 - 10)</div></div></td></tr>" .

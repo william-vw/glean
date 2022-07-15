@@ -1,0 +1,353 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_bool>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"checkbox\", \"$Type\": \"CheckBox\", \"$Version\": \"2\", \"Width\": \"-2\", 
+	\"PropertyURI\": \"https://openehr.org#dv_boolean\", \"Text\": \"_label0_\"
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-event_quant>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#events\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#units\", \"Text\": \"_code00_\"
+}, {
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label01_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#magnitude\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label01_\"
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#nodeId\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-bool_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#content\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#nodeId\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#events\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"checkbox\", \"$Type\": \"CheckBox\", \"$Version\": \"2\", \"Width\": \"-2\", 
+	\"PropertyURI\": \"https://openehr.org#dv_boolean\", \"Text\": \"_label100_\"
+} ]
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#units\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label1_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#magnitude\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label1_\"
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_int1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#dv_ordinal\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label_\"
+	} ]
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-event_int>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#events\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label00_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#dv_ordinal\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label00_\"
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#magnitude\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label_\"
+	} ]
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_int>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label0_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#dv_ordinal\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label0_\"
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#units\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#nodeId\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-event_bool>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#events\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"checkbox\", \"$Type\": \"CheckBox\", \"$Version\": \"2\", \"Width\": \"-2\", 
+	\"PropertyURI\": \"https://openehr.org#dv_boolean\", \"Text\": \"_label00_\"
+} ]
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#content\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#nodeId\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#events\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label100_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#dv_ordinal\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label100_\"
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#nodeId\", \"Text\": \"_code_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_bool1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"checkbox\", \"$Type\": \"CheckBox\", \"$Version\": \"2\", \"Width\": \"-2\", 
+	\"PropertyURI\": \"https://openehr.org#dv_boolean\", \"Text\": \"_label_\"
+}""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        """{
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#content\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#nodeId\", \"Text\": \"_code0_\"
+}, {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#events\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"linkedDataForm\", \"$Type\": \"LinkedDataForm\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"PropertyURI\": \"https://openehr.org#value\",
+	\"$Components\": [ {
+		\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+		\"$Components\": [ {
+	\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Visible\": \"False\", 
+	\"PropertyURI\": \"https://openehr.org#units\", \"Text\": \"_code100_\"
+}, {
+	\"$Name\": \"layout\", \"$Type\": \"HorizontalArrangement\", \"$Version\": \"3\", \"Width\": \"-2\",
+	\"$Components\": [ {
+		\"$Name\": \"label1\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_prefix-label101_\"
+	}, {
+		\"$Name\": \"textbox\", \"$Type\": \"TextBox\", \"$Version\": \"7\", \"Width\": \"50\", \"Hint\": \"\", \"NumbersOnly\": \"True\", 
+		\"ObjectType\": \"xsd:numeric\", \"PropertyURI\": \"https://openehr.org#magnitude\" 
+	}, {
+		\"$Name\": \"label2\", \"$Type\": \"Label\", \"$Version\": \"5\", \"Width\": \"-1075\",
+		\"Text\": \"_suffix-label101_\"
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+} ]
+	} ]
+}""" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_struct> .

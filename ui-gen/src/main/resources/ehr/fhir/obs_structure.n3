@@ -1,0 +1,74 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+# METHOD 1
+
+_:x tpl:domainNamespace fhir: .
+
+_:b0 a tpl:UiElement ; tpl:level 0 ;
+	tpl:elements ( :ui-int_input :ui-bool_input :ui-quant_input ) .
+ 
+ 
+:ui-int_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ;
+	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:elements ( :ui-int_input1 :ui-int_input2 ) .
+	
+:ui-int_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	fhir:Observation.code :c .
+	
+:ui-int_input2 a tpl:UiElement ; tpl:inputType xsd:numeric ; 
+	fhir:Observation.valueInteger :v .
+
+
+:ui-present_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
+	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:elements ( :ui-present_input1 :ui-present_input2 ) .
+	
+:ui-present_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	fhir:Observation.code :c .
+	
+:ui-present_input2 a tpl:UiElement ; tpl:inputType xsd:boolean ; tpl:category in:category_present ; 
+	fhir:Observation.valueBoolean :v .
+
+
+:ui-yes_no_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
+	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:elements ( :ui-yes_no_input1 :ui-yes_no_input2 ) .
+	
+:ui-yes_no_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	fhir:Observation.code :c .
+	
+:ui-yes_no_input2 a tpl:UiElement ; tpl:inputType xsd:boolean ; tpl:category in:category_yes_no ; 
+	fhir:Observation.valueBoolean :v .
+
+
+:ui-quant_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
+	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:elements ( :ui-quant_input1 :ui-val_quant ) .
+	
+:ui-quant_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	fhir:Observation.code :c .
+	
+:ui-val_quant a tpl:UiElement ; tpl:structure true ; tpl:level 2 ;
+	tpl:inProperty fhir:Observation.valueQuantity ; 
+	tpl:elements ( :ui-val_quant1 :ui-val_quant2 :ui-val_quant3 ) .
+	
+:ui-val_quant1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
+	fhir:Quantity.system :s .
+	
+:ui-val_quant2 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:string ; 
+	fhir:Quantity.code :c .
+	
+:ui-val_quant3 a tpl:UiElement ; tpl:inputType xsd:numeric ; 
+	fhir:Quantity.value :v .

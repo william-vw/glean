@@ -1,0 +1,309 @@
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+#results {
+	display: none
+}
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+	integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+	crossorigin="anonymous">
+        </script>
+<script src="lib/N3.dist.js"></script>
+<script src="lib/rdfa.dist.js"></script>
+<script>
+	function localName(node) {
+		return node.id.substring(node.id.indexOf("#") + 1);
+	}
+
+    const { DataFactory } = N3;
+    const { namedNode, blankNode, literal, defaultGraph, quad } = DataFactory;
+    
+    const prefixes = {
+         xsd: 'http://www.w3.org/2001/XMLSchema#',
+         rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#', 
+         ns: 'http://niche.cs.dal.ca/copd_ui.n3#'
+     };
+    
+	function insertUserData() {
+		$("input").each((idx, input) => {
+			input = $(input);
+			var id = input.attr("id");
+			var prp = input.attr("property");
+			
+			// console.log(id, ": ", prp);
+			
+			var value = "";	
+			switch (input.attr('type')) {
+		
+			case 'number':
+				value = input.val() * 1;
+				break;
+			
+			case 'checkbox':
+				value = input.is(':checked');
+				break;
+			}
+			
+			var codeStmt = store.getQuads(null, null, prefixes.ns + id)[0];			
+			if (!codeStmt)
+				return;
+			
+			// console.log(prp, " = ", value);
+			
+			var start = codeStmt._subject;
+			var subject = find(start, prp);
+			
+			var valueStmt = store.getQuads(subject, prp, null)[0];
+			store.removeQuad(valueStmt);
+			store.addQuad(subject, prp, literal(value));
+		});
+        
+        sendDiary();
+    }
+	
+	function find(subject, targetPrp) {
+		var stmts = store.getQuads(subject, null, null);
+		for (var i = 0; i < stmts.length; i++) {
+			var stmt = stmts[i];
+			if (stmt._predicate.id == targetPrp)
+				return stmt._subject;
+			else {
+				var found = find(stmt._object, targetPrp);
+				if (found)
+					return found;
+			}
+		}
+	}
+    
+    function processDiary() {
+        store = new N3.Store({ prefixes: prefixes });
+
+        rdfaParser = new rdfa.RdfaParser({ contentType: 'text/html' })
+          .on('data', (quad, etc) => store.addQuad(quad))
+          .on('error', console.error)
+          .on('end', insertUserData);
+    	
+        //$('#curDateTime').attr('content', new Date().toISOString());
+        
+        rdfaParser.write($("body").html());
+        rdfaParser.end();
+    }
+    
+    function sendDiary() {
+    	const writer = new N3.Writer({ prefixes: prefixes });
+    	store.forEach(stmt => writer.addQuad(stmt));
+    	
+    	writer.end((error, result) => {
+        	console.log("sending diary");
+        	console.log(result);
+        	
+//         	$.ajax({ 
+//         		url: "http://localhost:8080/cds_service/diary/",
+//         		type: "post",
+//         		data: result,
+//         		dataType: "text",
+//        			error: (xhr, status, error) => {
+// 					console.log("error", xhr.responseText);
+//  				},
+//  				success: processResults
+//         	});
+		});
+    } 
+</script>
+</head>
+<body>
+	<form action="" method="POST" onsubmit="processDiary(); return false">
+		<table>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at9'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Is your cough, wheezing or stridor less, the same or worse than
+							usual? <input type='number' id='at9' min='0' max='10' step='1'
+								property='https://openehr.org#dv_ordinal' /> (0 - 10)
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at27'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Is your amount of phlem, sputum or mucus, less, the same or worse
+							than usual? <input type='number' id='at27' min='0' max='10'
+								step='1' property='https://openehr.org#dv_ordinal' /> (0 - 10)
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at45'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Is the color of phlem, sputum or mucus green, yellow or
+							rust-colored, and is this different from usual? <input
+								type='checkbox' id='at45'
+								property='https://openehr.org#dv_boolean' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at53'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Is there significant blood in the phlem, sputum or mucus, beyond
+							flecks or streaks? <input type='checkbox' id='at53'
+								property='https://openehr.org#dv_boolean' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at61'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Please rate your exertion level when performing activities. <input
+								type='number' id='at61' min='0' max='10' step='1'
+								property='https://openehr.org#dv_ordinal' /> (0 - 10)
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at79'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Have you used your inhaler more often than usual? <input
+								type='checkbox' id='at79'
+								property='https://openehr.org#dv_boolean' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at87'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Please indicate whether you have chest pain. <input
+								type='checkbox' id='at87'
+								property='https://openehr.org#dv_boolean' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at95'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Please indicate whether you have cyanosis (blue/grey coloration
+							around lips, fingernails). <input type='checkbox' id='at95'
+								property='https://openehr.org#dv_boolean' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at103'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Please indicate whether you are feeling confused or have
+							excessive drowsiness. <input type='checkbox' id='at103'
+								property='https://openehr.org#dv_boolean' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at111'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Please indicate whether your ankles are swollen. <input
+								type='checkbox' id='at111'
+								property='https://openehr.org#dv_boolean' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at120'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							<span style='display: none' property='https://openehr.org#units'>/min</span>Respiration
+							rate <input type='number' id='at120' min='0.0' max='200.0'
+								step='1' property='https://openehr.org#magnitude' /> (0.0 -
+							200.0)
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at151'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							<span style='display: none' property='https://openehr.org#units'>/min</span>Pulse
+							rate <input type='number' id='at151' min='0.0' max='1000.0'
+								step='1' property='https://openehr.org#magnitude' /> (0.0 -
+							1000.0)
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at200'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							Your level of activity as recorded by your smartwatch throughout
+							the day. <input type='number' id='at200' min='' max='' step='1'
+								property='https://openehr.org#dv_ordinal' />
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at208'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							<span style='display: none' property='https://openehr.org#units'>%</span>SpO₂
+							<input type='number' id='at208' min='0.0' max='100.0' step='0.1'
+								property='https://openehr.org#magnitude' /> (0.0 - 100.0)
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td property='https://openehr.org#content' typeof=''><span
+					style='display: none' property='https://openehr.org#nodeId'
+					resource='http://niche.cs.dal.ca/copd_ui.n3#at232'></span>
+				<div property='https://openehr.org#events' typeof=''>
+						<div property='https://openehr.org#value' typeof=''>
+							<span style='display: none' property='https://openehr.org#units'>Cel</span>Temperature
+							<input type='number' id='at232' min='0.0' max='100.0' step='0.1'
+								property='https://openehr.org#magnitude' /> (0.0 - 100.0)
+						</div>
+					</div></td>
+			</tr>
+			<tr>
+				<td><input type='submit' value='submit'></input></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>

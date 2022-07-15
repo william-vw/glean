@@ -1,0 +1,139 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#select-present_range_field>
+    rdf:value {
+            ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+                    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#dt_boolean> .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.category>
+                    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#category_present> .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.mutexWith>
+                    ?mutex .
+            ( ?mutex "," )  <http://www.w3.org/2000/10/swap/string#join>
+                    ?mutex_str .
+            ( ?mutex_str "http://.*?#(.*?)" "$1" )  <http://www.w3.org/2000/10/swap/string#replace>
+                    ?mutex_ln .
+            ?action
+                rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+                    ?req .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.title>
+                    ?label .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+                    ?code .
+            ( ?code ".*?#(.*)" )  <http://www.w3.org/2000/10/swap/string#scrape>
+                    ?code_ln .        } .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#select-yes_no_range_field>
+    rdf:value {
+            ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+                    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#dt_boolean> .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.category>
+                    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#category_yes_no> .
+            ?action
+                rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+                    ?req .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.title>
+                    ?label .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+                    ?code .
+            ( ?code ".*?#(.*)" )  <http://www.w3.org/2000/10/swap/string#scrape>
+                    ?code_ln .        } .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#select-qualified_field>
+    rdf:value {
+            ( "10"^^xsd:int ?prec )  math:exponentiation ?divisor .
+            ( "1"^^xsd:int ?divisor )  math:quotient ?step .
+            ( ?max "10"^^xsd:int )  math:logarithm ?log .
+            ?log  math:floor ?size .
+            ?range
+                <http://hl7.org/fhir/Range.low>
+                    _:b1 .
+            _:b1  <http://hl7.org/fhir/Quantity.value>
+                    ?min .
+            ?range
+                <http://hl7.org/fhir/Range.high>
+                    _:b2 .
+            _:b2  <http://hl7.org/fhir/Quantity.value>
+                    ?max .
+            ?range
+                rdfs:label ?rangeLabel .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.qualifiedInterval>
+                    ?interval .
+            ?interval
+                <http://hl7.org/fhir/ObservationDefinition.qualifiedInterval.range>
+                    ?range .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.quantitativeDetails>
+                    ?quant .
+            ?quant
+                <http://hl7.org/fhir/ObservationDefinition.quantitativeDetails.unit>
+                    ?unit .
+            ?unit
+                <http://hl7.org/fhir/CodeableConcept.coding>
+                    ?coding .
+            ?coding
+                <http://hl7.org/fhir/Coding.system>
+                    ?codeSystem .
+            ?coding
+                <http://hl7.org/fhir/Coding.code>
+                    ?unitCode .
+            ?coding
+                rdfs:label ?unitLabel .
+            ?quant
+                <http://hl7.org/fhir/ObservationDefinition.quantitativeDetails.decimalPrecision>
+                    ?prec .
+            ?action
+                rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+                    ?req .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.title>
+                    ?label .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+                    ?code .
+            ( ?code ".*?#(.*)" )  <http://www.w3.org/2000/10/swap/string#scrape>
+                    ?code_ln .        } .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#select-int_range_field>
+    rdf:value {
+            ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+                    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#dt_integer> .
+            ( ?max "10"^^xsd:int )  math:logarithm ?log .
+            ?log  math:floor ?size .
+            ?range
+                <http://hl7.org/fhir/Range.low>
+                    _:b3 .
+            _:b3  <http://hl7.org/fhir/Quantity.value>
+                    ?min .
+            ?range
+                <http://hl7.org/fhir/Range.high>
+                    _:b4 .
+            _:b4  <http://hl7.org/fhir/Quantity.value>
+                    ?max .
+            ?range
+                rdfs:label ?rangeLabel .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+                    ?range .
+            ?action
+                rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+                    ?req .
+            ?action
+                <http://hl7.org/fhir/ActivityDefinition.title>
+                    ?label .
+            ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+                    ?code .
+            ( ?code ".*?#(.*)" )  <http://www.w3.org/2000/10/swap/string#scrape>
+                    ?code_ln .        } .

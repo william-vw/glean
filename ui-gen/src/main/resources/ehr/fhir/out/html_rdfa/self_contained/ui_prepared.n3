@@ -1,0 +1,204 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-present_input2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<input type='checkbox' id='_id_' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='_mutex_' yes-no='false' /> <label for='_id_'>_label_</label>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "_prefix-label_ <input type='number' id='_id_' min='_min_' max='_max_' step='_step_' size='_size_' property='http://hl7.org/fhir/Observation.valueInteger' /> _suffix-label_" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#container_struct>
+    <http://niche.cs.dal.ca/ui_tpl.n3#separator>
+        "" ;
+    rdf:value """<html>
+<head><meta charset=\"utf-8\" />
+<style>
+#results { display: none }
+</style>
+
+<script src=\"https://code.jquery.com/jquery-3.6.0.min.js\"
+	integrity=\"sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=\"
+	crossorigin=\"anonymous\">
+        </script>
+<script src=\"lib/N3.dist.js\"></script>
+<script src=\"lib/rdfa.dist.js\"></script>
+<script>
+	function localName(node) {
+		return node.id.substring(node.id.indexOf(\"#\") + 1);
+	}
+
+    const { DataFactory } = N3;
+    const { namedNode, blankNode, literal, defaultGraph, quad } = DataFactory;
+    
+    const prefixes = {
+         xsd: 'http://www.w3.org/2001/XMLSchema#',
+         rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#', 
+         ns: 'http://niche.cs.dal.ca/copd_ui.n3#'
+     };
+    
+	function insertUserData() {
+		$(\"input\").each((idx, input) => {
+			input = $(input);
+			var id = input.attr(\"id\");
+			var prp = input.attr(\"property\");
+			
+			// console.log(id, \": \", prp);
+			
+			var value = \"\";	
+			switch (input.attr('type')) {
+		
+			case 'number':
+				value = input.val() * 1;
+				break;
+			
+			case 'checkbox':
+				value = input.is(':checked');
+				break;
+			}
+			
+			var codeStmt = store.getQuads(null, null, prefixes.ns + id)[0];			
+			if (!codeStmt)
+				return;
+			
+			// console.log(prp, \" = \", value);
+			
+			var start = codeStmt._subject;
+			var subject = find(start, prp);
+			
+			var valueStmt = store.getQuads(subject, prp, null)[0];
+			store.removeQuad(valueStmt);
+			store.addQuad(subject, prp, literal(value));
+		});
+        
+        sendDiary();
+    }
+	
+	function find(subject, targetPrp) {
+		var stmts = store.getQuads(subject, null, null);
+		for (var i = 0; i < stmts.length; i++) {
+			var stmt = stmts[i];
+			if (stmt._predicate.id == targetPrp)
+				return stmt._subject;
+			else {
+				var found = find(stmt._object, targetPrp);
+				if (found)
+					return found;
+			}
+		}
+	}
+    
+    function processDiary() {
+        store = new N3.Store({ prefixes: prefixes });
+
+        rdfaParser = new rdfa.RdfaParser({ contentType: 'text/html' })
+          .on('data', (quad, etc) => store.addQuad(quad))
+          .on('error', console.error)
+          .on('end', insertUserData);
+    	
+        //$('#curDateTime').attr('content', new Date().toISOString());
+        
+        rdfaParser.write($(\"body\").html());
+        rdfaParser.end();
+    }
+    
+    function sendDiary() {
+    	const writer = new N3.Writer({ prefixes: prefixes });
+    	store.forEach(stmt => writer.addQuad(stmt));
+    	
+    	writer.end((error, result) => {
+        	console.log(\"sending diary\");
+        	console.log(result);
+        	
+//         	$.ajax({ 
+//         		url: \"http://localhost:8080/cds_service/diary/\",
+//         		type: \"post\",
+//         		data: result,
+//         		dataType: \"text\",
+//        			error: (xhr, status, error) => {
+// 					console.log(\"error\", xhr.responseText);
+//  				},
+//  				success: processResults
+//         	});
+		});
+    } 
+</script></head>
+<body>
+	<form action=\"\" method=\"POST\" onsubmit=\"submitInputData(this); return false\">
+		<table>
+			%s
+			<tr>
+				<td><input type='submit' value='submit'></input></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>""" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span>_prefix-label1_ <input type='number' id='_id1_' min='_min1_' max='_max1_' step='_step1_' size='_size1_' property='http://hl7.org/fhir/Observation.valueInteger' /> _suffix-label1_</td></tr>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-yes_no_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-yes_no_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><div id='_id1_' property='http://hl7.org/fhir/Observation.valueBoolean'>_label1_: <input type='radio' name='_id1_' id='_id1_-yes' value='yes' /><label for='_id1_-yes'>yes</label>&nbsp;&nbsp;<input type='radio' name='_id1_' id='_id1_-no' value='no' /><label for='_id1_-no'>no</label></div></td></tr>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div property='http://hl7.org/fhir/Observation.valueQuantity' typeof=''><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='_code0_'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>_code1_</span>_prefix-label2_ <input type='number' id='_id2_' min='_min2_' max='_max2_' step='_step2_' size='_size2_' property='http://hl7.org/fhir/Quantity.value' /> _suffix-label2_</div>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-present_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><input type='checkbox' id='_id1_' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='_mutex1_' yes-no='false' /> <label for='_id1_'>_label1_</label></td></tr>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><div property='http://hl7.org/fhir/Observation.valueQuantity' typeof=''><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='_code10_'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>_code11_</span>_prefix-label12_ <input type='number' id='_id12_' min='_min12_' max='_max12_' step='_step12_' size='_size12_' property='http://hl7.org/fhir/Quantity.value' /> _suffix-label12_</div></td></tr>" ;
+    <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
+        <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='http://hl7.org/fhir/Quantity.code'>_code_</span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-present_input1>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code_'></span>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-yes_no_input2>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "<div id='_id_' property='http://hl7.org/fhir/Observation.valueBoolean'>_label_: <input type='radio' name='_id_' id='_id_-yes' value='yes' /><label for='_id_-yes'>yes</label>&nbsp;&nbsp;<input type='radio' name='_id_' id='_id_-no' value='no' /><label for='_id_-no'>no</label></div>" .
+
+<http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant3>
+    <http://niche.cs.dal.ca/ui_tpl.n3#output>
+        "_prefix-label_ <input type='number' id='_id_' min='_min_' max='_max_' step='_step_' size='_size_' property='http://hl7.org/fhir/Quantity.value' /> _suffix-label_" .

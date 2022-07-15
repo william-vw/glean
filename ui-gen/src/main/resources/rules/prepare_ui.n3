@@ -1,0 +1,110 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+{	?el a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ; 
+		?property ?z .
+	
+	:hidden_uri_input rdf:value ?code .
+	
+	_:x tpl:domainNamespace ?ns^log:uri .
+	?property!log:uri string:startsWith ?ns .
+
+	( ?code "_property_" ?property ) string:replace ?output
+
+} => {	?el tpl:output ?output } .
+
+
+{	?el a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:string ; 
+		?property ?z .
+	
+	:hidden_str_input rdf:value ?code .
+	
+	_:x tpl:domainNamespace ?ns^log:uri .
+	?property!log:uri string:startsWith ?ns .
+
+	( ?code "_property_" ?property ) string:replace ?output
+
+} => {	?el tpl:output ?output } .
+
+
+{	?el a tpl:UiElement ; tpl:inputType xsd:numeric ; ?property ?z .
+	
+	:numeric_input rdf:value ?code .
+	
+	_:x tpl:domainNamespace ?ns^log:uri .
+	?property!log:uri string:startsWith ?ns .
+
+	( ?code "_property_" ?property ) string:replace ?output
+
+} => {	?el tpl:output ?output } .
+
+
+{	?el a tpl:UiElement ; tpl:inputType xsd:boolean ; tpl:category in:category_present ;
+		?property ?z .
+	
+	:present_input rdf:value ?code .
+	
+	_:x tpl:domainNamespace ?ns^log:uri .
+	?property!log:uri string:startsWith ?ns .
+
+	( ?code "_property_" ?property ) string:replace ?output
+
+} => {	?el tpl:output ?output } .
+
+
+{	?el a tpl:UiElement ; tpl:inputType xsd:boolean ; tpl:category in:category_yes_no ;
+		?property ?z .
+	
+	:yes_no_input rdf:value ?code .
+	
+	_:x tpl:domainNamespace ?ns^log:uri .
+	?property!log:uri string:startsWith ?ns .
+
+	( ?code "_property_" ?property ) string:replace ?output
+
+} => {	?el tpl:output ?output } .
+
+
+{	?el a tpl:UiElement ; tpl:structure true ; tpl:elements ?elements .
+	
+	(?output3
+	{
+		?elements list:iterate ( ?idx ?element ) .
+		?element tpl:output ?output .
+		
+		# (need to be treated differently; element names must be *globally* unique)
+		# (see finalize_ui where names are additionally numbered) 
+		
+		# element names
+		( "`" "$1" "_" ?idx "$2" "`" ) string:concatenation ?replNames .
+		( ?output "`([a-zA-Z-]*?)([_\\d]*?)`" ?replNames ) string:replace ?output2 .
+		
+		# placeholders
+		( "_" "$1" ?idx "$2" "_" ) string:concatenation ?replPlaceholders .
+		( ?output2 "_([a-zA-Z-]*?)([\\d]*?)_" ?replPlaceholders ) string:replace ?output3 .
+	}
+	?outputs) log:collectAllIn _:x .
+
+	?elements list:length ?len .
+	?outputs!list:length math:equalTo ?len .
+
+	?el tpl:inProperty ?property ; tpl:lvl_struct ?struct .
+	?struct rdf:value ?code ; tpl:separator ?sep .
+
+	( ?outputs ?sep ) string:join ?content .
+
+	( ?code "_property_" ?property ) string:replace ?code2 .
+	( ?code2 ?content ) string:format ?output3 .
+
+} => {	?el tpl:output ?output3 } .

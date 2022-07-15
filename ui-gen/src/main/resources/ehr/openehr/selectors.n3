@@ -1,0 +1,78 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix oe: <https://openehr.org#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+:select-observation_id a tpl:Selector ;
+	rdf:value {
+#		?arch a oe:Archetype ; oe:definition ?def .
+#		?def!oe:attribute!oe:object!oe:attribute!oe:object!oe:attribute!oe:object!oe:attribute!oe:object!oe:attribute oe:object ?obs .
+		?obs oe:attribute ?attr ; oe:nodeId ?id ; rdfs:label ?label . 
+		( <#> ?id ) string:concatenation ?code .
+	} .
+	
+:select-ordinal_data a tpl:Selector ;
+	rdf:value {
+		?attr oe:C_DV_ORDINAL ?ordinalValues .
+		(?ordinalNr
+		{ 	?ordinalValue list:in ?ordinalValues .
+			?ordinalValue oe:value ?ordinalNr 
+		} ?ordinalNrs) log:collectAllIn _:x .
+		?ordinalNrs math:min ?min ;
+			math:max ?max .
+		( "(" ?min " - " ?max ")" ) string:concatenation ?rangeLabel .
+	} .
+	
+:select-count_data a tpl:Selector ;
+	rdf:value {
+		?attr oe:object ?obj .
+		?obj a oe:C_DV_COUNT .
+	} .
+
+:select-bool_data a tpl:Selector ;
+	rdf:value {
+		?attr oe:object ?obj .
+		?obj a oe:C_DV_BOOLEAN .
+	} .
+	
+:select-quantity_data a tpl:Selector ;
+	rdf:value {
+		?attr oe:C_DV_QUANTITY ?dvqs .
+		?dvq list:in ?dvqs ;
+			oe:units ?unit ;
+			oe:precision ?prec ;
+			oe:magnitude ?range .
+	} .
+	
+:select-range_data a tpl:Selector ;
+	rdf:value {
+		?range oe:lower ?min ;
+			oe:lowerIncluded true ;
+			oe:upper ?max ;
+			oe:upperIncluded true .
+		( "(" ?min " - " ?max ")" )  string:concatenation ?rangeLabel .
+	} .
+
+:select-ordinal_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_id , :select-ordinal_data .	
+
+:select-count_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_id , :select-count_data .
+	
+:select-bool_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_id , :select-bool_data .	
+	
+:select-quantity_field a tpl:CompositeSelector ;
+	tpl:selector :select-observation_id , :select-quantity_data , :select-range_data ,
+	[ rdf:value { 
+		(10 ?prec) math:exponentiation ?divisor .
+		(1 ?divisor) math:quotient ?step
+	} ] .

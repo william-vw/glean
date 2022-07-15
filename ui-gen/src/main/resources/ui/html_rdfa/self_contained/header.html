@@ -1,0 +1,111 @@
+<meta charset="utf-8" />
+<style>
+#results { display: none }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+	integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+	crossorigin="anonymous">
+        </script>
+<script src="lib/N3.dist.js"></script>
+<script src="lib/rdfa.dist.js"></script>
+<script>
+	function localName(node) {
+		return node.id.substring(node.id.indexOf("#") + 1);
+	}
+
+    const { DataFactory } = N3;
+    const { namedNode, blankNode, literal, defaultGraph, quad } = DataFactory;
+    
+    const prefixes = {
+         xsd: 'http://www.w3.org/2001/XMLSchema#',
+         rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#', 
+         ns: 'http://niche.cs.dal.ca/copd_ui.n3#'
+     };
+    
+	function insertUserData() {
+		$("input").each((idx, input) => {
+			input = $(input);
+			var id = input.attr("id");
+			var prp = input.attr("property");
+			
+			// console.log(id, ": ", prp);
+			
+			var value = "";	
+			switch (input.attr('type')) {
+		
+			case 'number':
+				value = input.val() * 1;
+				break;
+			
+			case 'checkbox':
+				value = input.is(':checked');
+				break;
+			}
+			
+			var codeStmt = store.getQuads(null, null, prefixes.ns + id)[0];			
+			if (!codeStmt)
+				return;
+			
+			// console.log(prp, " = ", value);
+			
+			var start = codeStmt._subject;
+			var subject = find(start, prp);
+			
+			var valueStmt = store.getQuads(subject, prp, null)[0];
+			store.removeQuad(valueStmt);
+			store.addQuad(subject, prp, literal(value));
+		});
+        
+        sendDiary();
+    }
+	
+	function find(subject, targetPrp) {
+		var stmts = store.getQuads(subject, null, null);
+		for (var i = 0; i < stmts.length; i++) {
+			var stmt = stmts[i];
+			if (stmt._predicate.id == targetPrp)
+				return stmt._subject;
+			else {
+				var found = find(stmt._object, targetPrp);
+				if (found)
+					return found;
+			}
+		}
+	}
+    
+    function processDiary() {
+        store = new N3.Store({ prefixes: prefixes });
+
+        rdfaParser = new rdfa.RdfaParser({ contentType: 'text/html' })
+          .on('data', (quad, etc) => store.addQuad(quad))
+          .on('error', console.error)
+          .on('end', insertUserData);
+    	
+        //$('#curDateTime').attr('content', new Date().toISOString());
+        
+        rdfaParser.write($("body").html());
+        rdfaParser.end();
+    }
+    
+    function sendDiary() {
+    	const writer = new N3.Writer({ prefixes: prefixes });
+    	store.forEach(stmt => writer.addQuad(stmt));
+    	
+    	writer.end((error, result) => {
+        	console.log("sending diary");
+        	console.log(result);
+        	
+//         	$.ajax({ 
+//         		url: "http://localhost:8080/cds_service/diary/",
+//         		type: "post",
+//         		data: result,
+//         		dataType: "text",
+//        			error: (xhr, status, error) => {
+// 					console.log("error", xhr.responseText);
+//  				},
+//  				success: processResults
+//         	});
+		});
+    } 
+</script>

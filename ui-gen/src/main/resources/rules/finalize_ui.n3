@@ -1,0 +1,78 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+# works but loses original ordering of elements
+
+#{	?tpl a tpl:UiTemplate ;
+#		tpl:container [
+#			tpl:select [ rdf:value ?select ] ;
+#			tpl:target ?target 
+#		] .
+#
+#	(	?select	
+#		{
+#			(?gen
+#				{ 	?target tpl:generated ?gen }
+#			?gens) log:collectAllIn _:x .
+#			
+#			?gens!list:length math:greaterThan 0 .
+#		}		
+#		
+#	) log:conjunction ?premise .
+#
+#} => { ?premise => { ?target tpl:combined ?gens } } .
+
+
+{	?el tpl:generated ?gen .
+
+	?container ?property ?el .
+	?property!log:uri string:notMatches tpl:!log:uri .
+
+} => { ?container tpl:generated ?gen } .
+
+
+{	?container ?property ?list .
+	?list log:rawType log:List .
+	?property!log:uri string:notMatches tpl:!log:uri .
+
+	(?gen2
+	{	?list list:iterate ( ?idx ?el ) .
+		?el tpl:generated ?gen . 
+		
+		# make sure element names are unique
+		( "$1" "_" ?idx "$2" ) string:concatenation ?replNames .
+		( ?gen "`([a-zA-Z-]*?)([_\\d]*?)`" ?replNames ) string:replace ?gen2 .
+		 
+	} ?gens) log:collectAllIn _:x . 
+	
+	?gens list:length ?len .
+	?len math:greaterThan 0 .
+	#?list!list:length math:equalTo ?len .
+
+} => { ?container tpl:combined ?gens } .
+
+{	?tpl a tpl:UiTemplate ;
+	tpl:container [
+		tpl:select [ rdf:value ?select ] ;
+		tpl:target ?target 
+	] .	
+
+	(	?select	
+		{
+			?target tpl:combined ?fields .
+			:container_struct rdf:value ?code ; tpl:separator ?sep .
+			( ?fields ?sep ) string:join ?inner .			
+			( ?code ?inner ) string:format ?output .
+		}
+		
+	) log:conjunction ?premise .
+
+} => { ?premise => { 0 log:outputString ?output } } .

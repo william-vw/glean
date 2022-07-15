@@ -1,0 +1,54 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math: <http://www.w3.org/2000/10/swap/math#> .
+@prefix string: <http://www.w3.org/2000/10/swap/string#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+@prefix list: <http://www.w3.org/2000/10/swap/list#> .
+@prefix oe: <https://openehr.org#> .
+@prefix tpl: <http://niche.cs.dal.ca/ui_tpl.n3#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/input/fhir.owl> .
+
+
+:tpl-count_field a tpl:UiTemplate ;
+	tpl:select :select-count_field ;
+	tpl:generate [
+		tpl:ui :ui-int_input ;
+		tpl:placeholders ( '_code0_' '_prefix-label100_' '_id100_' '_min100_' '_max100_' '_step100_' '_suffix-label100_' ) ;
+		tpl:values ( ?code ?label ?id "" "" 1 "" ) ;
+		tpl:target ?obs
+	] .
+	
+:tpl-bool_field a tpl:UiTemplate ;
+	tpl:select :select-bool_field ;
+	tpl:generate [
+		tpl:ui :ui-bool_input ;
+		tpl:placeholders ( '_code0_' '_label100_' '_id100_' ) ;
+		tpl:values ( ?code ?label ?id ) ;
+		tpl:target ?obs
+	] .
+	
+:tpl-ordinal_field a tpl:UiTemplate ;
+	tpl:select :select-ordinal_field ;
+	tpl:generate [
+		tpl:ui :ui-int_input ;
+		tpl:placeholders ( '_code0_' '_prefix-label100_' '_id100_' '_min100_' '_max100_' '_step100_' '_suffix-label100_' ) ;
+		tpl:values ( ?code ?label ?id ?min ?max 1 ?rangeLabel ) ;
+		tpl:target ?obs
+	] .
+
+:tpl-quantity_field a tpl:UiTemplate ;
+	tpl:select :select-quantity_field ;
+	tpl:generate [
+		tpl:ui :ui-quant_input ;
+		tpl:placeholders ( '_code0_' '_code100_' '_prefix-label101_' '_id101_' '_min101_' '_max101_' '_step101_' '_suffix-label101_' ) ;
+		tpl:values ( ?code ?unit ?label ?id ?min ?max ?step ?rangeLabel ) ;
+		tpl:target ?obs
+	] .
+
+:tpl-report a tpl:UiTemplate ; 
+	tpl:container [
+		tpl:select [ rdf:value { ?def a oe:Definition ; oe:attribute ?attr . ?attr oe:objects ?o } ] ;
+		tpl:target ?attr
+	] .
