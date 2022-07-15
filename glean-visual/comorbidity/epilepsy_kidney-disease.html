@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="lib/jquery-3.5.1-min.js"></script>
+<script src="lib/d3.v6.min.js"></script>
+<script src="lib/d3_utils.js"></script>
+<link rel="stylesheet" href="lib/cig.css" />
+<style>
+table { width: 95%; margin-left: 25px }
+</style>
+</head>
+<body>
+<table>
+	<tr>
+		<td colspan="2">
+			<fieldset>
+				<legend>General</legend>
+				<p>The clinical guidelines for Epilepsy recommend Anti-Epileptic Drugs (AED) such as Levetiracetam (LEV) for focal seizures.
+				However, in patients with comorbid Kidney Disease, Levetiracetam (LEV) will not be mainly eliminated by kidneys, meaning it will accumulate in the blood.</p>
+				<p>Sources for comorbidity management: <a href="https://onlinelibrary.wiley.com/doi/epdf/10.1111/j.1525-139X.2006.00195.x" target="_blank">Use of Antiepileptic Drugs in Patients with Kidney Disease</a>, <a href="https://www.drugs.com/disease-interactions/levetiracetam,keppra.html" target="_blank">Keppra (Levetiracetam) (1)</a>, <a href="https://www.epilepsy.com/living-epilepsy/epilepsy-and/professional-health-care-providers/co-existing-disorders/renal-12" target="_blank">Keppra (Levetiracetam) (2)</a>
+				</p>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fieldset>
+				<legend>Case 1</legend>
+				<p>In this case, the patient has comorbid Kidney Disease and Epilepsy with focal seizures. 
+				Hence, the regular focal AED treatment is replaced with an alternative focal AED treatment for Kidney Disease, 
+				which adjusts the dosage depending on the degree of renal impairment as correlated by Creatinine Clearance.</p>
+				<button id="case1">case 1</button>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset>
+				<legend>Case 2</legend>
+				<p>In this case, the patient has comorbid Kidney Disease and Epilepsy with absence seizures, 
+				for which other drugs are indicated, such as Valproate, which is mainly eliminated by the liver.
+				Hence, there is no need to replace the absence AED treatment.</p>
+				<button id="case2">case 2</button>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<fieldset id="operations">
+				<legend>Operations</legend>
+				<p></p>
+			</fieldset>
+		</td>
+</table>
+
+<hr />
+
+<div id="container"></div>
+
+<script type="module">
+// sources:
+// https://www.uptodate.com/contents/image/print?imageKey=NEPH%2F109485&topicKey=NEURO%2F2212&source=see_link
+// https://onlinelibrary.wiley.com/doi/epdf/10.1111/j.1525-139X.2006.00195.x
+// https://www.epilepsy.com/living-epilepsy/epilepsy-and/professional-health-care-providers/co-existing-disorders/renal-12
+// https://www.drugs.com/disease-interactions/levetiracetam,keppra.html
+
+import { VisualCIG } from '/lib/cig.js';
+
+const cig = new VisualCIG();
+
+var added = false;
+$("#case1").on('click', (e) => {
+	var parent = "diagnosed focal seizures";
+	var parentNode = cig.findNode(parent);
+	
+	var repl = { 
+		name: "reduced AED dosage",
+		taskSource: "Levetiracetam (Includes Keppra) <-> renal dysfunction (<a href=\"https://www.drugs.com/disease-interactions/levetiracetam,keppra.html\" target=\"_blank\">https://www.drugs.com/disease-interactions/levetiracetam,keppra.html</a>)",
+		description: "The clearance of levetiracetam is decreased in patients with renal impairment and is correlated with creatinine clearance. In study subjects with varying degrees of renal impairment, total body clearance of levetiracetam was reduced by 40% in the mild group (CrCl = 50 to 80 mL/min), 50% in the moderate group (CrCl = 30 to 50 mL/min), 60% in the severe group (CrCl < 30 mL/min), and 70% in anuric patients (end-stage renal disease) compared to patients with normal renal function (CrCl > 80 mL/min).\r\n\r\nTherapy with levetiracetam should be administered cautiously at reduced dosages in patients with impaired renal function. Dosage adjustments should be based on the degree of renal impairment (i.e. estimated creatinine clearance) in accordance with the product package labeling.\r\n\r\n<span class=\"note\">See also <a href=\"https://www.epilepsy.com/living-epilepsy/epilepsy-and/professional-health-care-providers/co-existing-disorders/renal-12\" target=\"_blank\">https://www.epilepsy.com/living-epilepsy/epilepsy-and/professional-health-care-providers/co-existing-disorders/renal-12</a></span>",
+		node_type: "task_node",
+		workflow_state: "inactiveState",
+		decisional_state: "chosenState" 
+	};
+	
+	if (!added) {
+		cig.update({
+			transits: [], operations: [],
+			adds: [{
+				parent: parentNode, data: repl
+			}]
+		});
+		added = true;
+	}
+	
+	var toRepl = "focal AED treatment";
+	var toReplNode = cig.findNode(toRepl);
+	
+	parentNode = cig.findNode(parent);
+	var replNode = cig.findNode(repl.name);
+	
+	cig.update({
+		transits: [{
+			node: parentNode, workflowState: 'startedState', decisionState: 'chosenState',
+			propagateDown: false
+		}, {
+			node: toReplNode, workflowState: 'discardedState', decisionState: undefined
+		}, {
+			node: replNode, workflowState: 'startedState', decisionState: 'chosenState'
+		}, {
+			node: [ cig.findNode("diagnosed absence seizures"), cig.findNode("diagnosed tonic-clonic seizures"), cig.findNode("diagnosed myoclonic seizures") ],
+				workflowState: undefined, decisionState: 'notChosenState'
+		}],
+		operations: [{
+			source: replNode, target: toReplNode, type: "<replaces>"
+		}]
+	});	
+	
+	$("#operations p")
+		.html("<b>replaced</b>: " + toRepl + "<br />" + "Treatment \"" + toRepl + "\" was replaced by \"" + repl.name + "\".");
+});
+
+$("#case2").on('click', (e) => {
+	var notChosenNode = cig.findNode("diagnosed focal seizures");
+	var startNode = cig.findNode("diagnosed absence seizures");
+	var inactiveNode = startNode.children[0].children[0];
+	cig.update({
+		transits: [{
+			node: notChosenNode, workflowState: 'inactiveState', decisionState: 'notChosenState'
+		}, {
+			node: startNode, workflowState: 'startedState', decisionState: 'chosenState'
+		}, {
+			node: inactiveNode, workflowState: 'inactiveState', decisionState: 'chosenState'
+		}],
+		operations: []
+	});
+
+	$("#operations p").html("");
+});
+
+const config = {
+	svg: { translate: "translate(25, 10)" },
+	legend: { x: 50 },
+	widthAdjust: -400
+}
+
+cig.show("json/Epilepsy Pharmacological Treatment.json", config);
+
+</script>
+</body>
+</html>

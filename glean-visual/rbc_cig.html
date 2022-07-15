@@ -1,0 +1,37 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="lib/jquery-3.5.1-min.js"></script>
+<script src="lib/d3.v6.min.js"></script>
+<script src="lib/d3_utils.js"></script>
+<script src="lib/N3.dist.js"></script>
+<script src="lib/rdfa.dist.js"></script>
+<script src="lib/extract_rdf.js"></script>
+<script src="lib/jqFhir.js"></script>
+<script src="lib/fhir_client.js"></script>
+<script src="lib/data_source.js"></script>
+<script src="lib/server.js"></script>
+<script src="lib/input.js"></script>
+<link rel="stylesheet" href="lib/cig.css" />
+</head>
+<body>
+
+<div id="main-container" class="container">
+</div>
+<button id="reset_source" style="position: absolute; top: 25px; right: 25px">reset server</button>
+
+<script type="module">
+import { VisualCIG } from '/lib/cig_tree.js';
+
+window.cig = new VisualCIG();
+const config = { 
+    translate: { x: -250, y: 0 }, 
+    ns: "http://niche.cs.dal.ca/ns/cig/rbc_match.owl#"
+};
+
+cig.show("json/btsf/rbc_match.json", config);
+
+</script>
+</body>
+</html>

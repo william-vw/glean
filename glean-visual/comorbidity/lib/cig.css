@@ -1,0 +1,107 @@
+.node { stroke: none; }
+.link { stroke: red; stroke-dasharray: 5 }
+.nodeCaption { font-size: 14px }
+.opCaption { font-size: 18px; font-weight: bold }
+.hierCaption { font-size: 16px; font-style: italic }
+
+td { width: 50% }
+hr { margin-top: 15px; margin-bottom: 15px; border: none; border-top: 1px solid grey; }
+
+#operations p { margin: 0 }
+
+#operations div { margin-top: 15px; }
+
+#container { position: relative; }
+
+.hints {
+	position: absolute;
+	top: 0px;
+}
+
+.tooltip {
+	background-color: white;
+	border: solid;
+	border-width: 1px;
+	/* border-radius: 5px; */
+	padding: 5px;
+	position: absolute;
+	font-size: 14px;
+}
+
+.source {
+	font-size: 14px;
+	margin-bottom: 25px;
+}
+
+.note { font-size: 14px	}
+
+/* https://www.w3schools.com/howto/howto_css_modals.asp */
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+ /* Modal Header */
+.modal-header {
+  padding: 2px 16px;
+  background-color: deepskyblue;
+  color: white;
+}
+
+/* Modal Body */
+.modal-body {
+	padding: 20px 20px;
+	font-size: 18px;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 2px 16px;
+  background-color: deepskyblue;
+  color: white;
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  top: 200px;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  animation-name: modalanimate;
+  animation-duration: 0.4s
+}
+
+/* Add Animation */
+@keyframes modalanimate {
+  from {top: 600px; opacity: 0}
+  to {top: 200px; opacity: 1}
+}
+
+/* The Close Button */
+.modal-close {
+  color: black;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: grey;
+  text-decoration: none;
+  cursor: pointer;
+}

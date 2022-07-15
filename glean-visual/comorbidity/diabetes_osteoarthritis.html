@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="lib/jquery-3.5.1-min.js"></script>
+<script src="lib/d3.v6.min.js"></script>
+<script src="lib/d3_utils.js"></script>
+<script src="lib/case.js"></script>
+<link rel="stylesheet" href="lib/cig.css" />
+<style>
+table { width: 95%; margin-left: 25px }
+</style>
+</head>
+<body>
+<table>
+	<tr>
+		<td colspan="2">
+			<fieldset>
+				<legend>General</legend>
+				<p>The clinical guidelines for Osteoarthritis (OA) recommend Non-Steroidal Anti-Inflammatory Drugs (NSAID), and guidelines for Diabetes type 2 recommend ACE inhibitors (ACEi), depending on the patient case. However, their concomitant use has been associated with reducing the anti-hypertensive effects of the ACEi, as well as potentially inflicting acute renal damage.</p>
+				<p>Sources for comorbidity management: <a href="https://lecom.edu/nsaids-and-ace-inhibitors/" target="_blank">NSAIDS and ACE-inhibitors - LECOM</a></p>
+			</fieldset>
+		</td>
+	<tr>
+		<td>
+			<fieldset>
+				<legend>Case 1</legend>
+				<p>NSAID treatment for OA and ACEi treatment for Diabetes has started. 
+				During the concomitant use of these two drugs, regular monitoring of serum creatinine, GFR, and blood pressure is recommended.</p>
+				<button id="case1">case 1</button>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset>
+				<legend>Case 2</legend>
+				<p>During the concomitant use of NSAID and ACEi, negative changes in renal or BP parameters are observed. Discontinuation of the NSAIDs should be considered to see if the values normalize. Then, alternative therapies to NSAIDs should be considered.</p>
+				<button id="case2">case 2</button>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<fieldset id="operations">
+				<legend>Operations</legend>
+				<p></p>
+			</fieldset>
+		</td>
+</table>
+
+<hr />
+
+<div id="container"></div>
+
+<script type="module">
+import { VisualCIG } from '/lib/cig.js';
+
+const cig = new VisualCIG();
+
+var added = false;
+$("#case1").on('click', (e) => {
+	if (!checkCase(1))
+		return;
+
+	var parentNode = cig.findNode('treatment with CVD');
+	var add = { 
+		name: "monitor sCr, GFR, BP",
+		taskSource: "NSAIDS and ACE-inhibitors - LECOM (<a href=\"https://lecom.edu/nsaids-and-ace-inhibitors/\" target=\"_blank\">https://lecom.edu/nsaids-and-ace-inhibitors/</a>)",
+		description: "If combination therapy is needed in patients with impaired renal function and/or in those with less-controlled hypertension, therapy can still be recommended, however, regular monitoring of serum creatinine, GFR, and blood pressure will be warranted under those circumstances.",
+		node_type: "task_node",
+		workflow_state: "startedState",
+		decisional_state: "chosenState" 
+	};
+	
+	if (!added) {
+		cig.update({
+			transits: [], operations: [],
+			adds: [{
+				parent: parentNode, data: add
+			}]
+		});
+		added = true;
+	}
+	
+	var adjusted = "treatment with CVD";
+
+	cig.update({
+		transits: [{ 
+			node: cig.findNode("check efficacy acetaminophen"), workflowState: 'completedState', decisionState: undefined,
+			propagateDown: false
+		}, { 
+			node: [ cig.findNode("prescribe NSAID"), cig.findNode("CVD protection") ], 
+				workflowState: 'startedState', decisionState: undefined, propagateDown: false	
+			
+		}, { 
+			node: cig.findNode("treatment without CVD"), workflowState: undefined, decisionState: 'notChosenState',
+			propagateDown: true
+		}, {
+			node: [ cig.findNode("treatment with CVD"), cig.findNode("Statin + ACEi/ARB + ASA") ], 
+				workflowState: 'adjustedState', decisionState: undefined, propagateDown: false
+		}],
+		operations: [{
+			source: cig.findNode("prescribe NSAID"), target: cig.findNode("treatment with CVD"), type: "<impacts>" 
+		}, {
+			source: cig.findNode(add.name), target: cig.findNode("Statin + ACEi/ARB + ASA"), type: "<monitor>", curve: 'down' 
+		}]
+	});
+	
+	$("#operations p")
+		.css('text-decoration', "none")
+		.html("<b>adjusted</b>: " + adjusted + "<br />" + "Task \"" + add.name + " is added for the regular monitoring of serum creatinine, GFR, and blood pressure.");
+});
+
+$("#case2").on('click', (e) => {
+	if (!checkCase(2))
+		return;
+
+	var discarded = "prescribe NSAID";	
+	cig.update({
+		transits: [{
+			node: cig.findNode("prescribe NSAID"), workflowState: 'discardedState', decisionState: undefined,
+			propagateDown: false
+		}, {
+			node: cig.findNode("treatment with CVD"), workflowState: 'startedState', decisionState: undefined,
+			propagateDown: false
+		}],
+		operations: [{
+			source: cig.findNode("monitor sCr, GFR, BP"), target: cig.findNode("Statin + ACEi/ARB + ASA"), type: "<monitor>", curve: 'down' 
+		}]
+	});
+	
+	$("#operations p")
+		.css('text-decoration', "none")
+		.append("<div><b>discarded</b>: " + discarded + "<br />" + "The task \"" + discarded + "\" is discarded</div>");
+});
+
+const config = {
+	svg: { translate: "translate(-50, 10)" },
+	legend: { x: 50 }
+}
+
+cig.show("json/Diabetes type2 - Osteoarthritis.json", config, () => {
+	var activeNode = cig.findNode("health behavior interventions");
+	var activeNode2 = cig.findNode("blood glucose lowering therapy");
+	var activeNode3 = cig.findNode("CVD protection");
+	
+	var activeNode4 = cig.findNode("weight loss");
+	var activeNode5 = cig.findNode("regular exercise");
+	
+	cig.update({
+		transits: [{
+			node: [ activeNode, activeNode2, activeNode3, activeNode4, activeNode5 ], 
+				workflowState: 'activeState', decisionState: undefined, propagateDown: false
+		}], 
+		operations: []
+	});
+});
+</script>
+</body>
+</html>

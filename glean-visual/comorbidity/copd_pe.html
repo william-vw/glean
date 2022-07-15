@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="lib/jquery-3.5.1-min.js"></script>
+<script src="lib/d3.v6.min.js"></script>
+<script src="lib/d3_utils.js"></script>
+<script src="lib/case.js"></script>
+<link rel="stylesheet" href="lib/cig.css" />
+<style>
+table { width: 95%; margin-left: 25px }
+td { width: 33% }
+</style>
+</head>
+<body>
+<table>
+	<tr>
+		<td colspan="2">
+			<fieldset>
+				<legend>General</legend>
+				<p>The clinical guidelines recommend multidetector CTPA is the method of choice for imaging in patients with suspected Pulmonary Embolism. 
+				Whereas guidelines state that imaging (X-ray, CT scan) is not useful to establish a diagnosis for Chronic Obstructive Pulmonary Disease (COPD), it is valuable in excluding alternative diagnoses to COPD and establishing the presence of significant comorbidities. 
+				It is possible to re-use the results of a CT-PA chest scan for differential diagnoses of COPD.</p>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fieldset>
+				<legend>Case 1</legend>
+				<p>The clinician chose a multidetector CTPA scan for PE diagnosis. 
+				The results of the CTPA scan (PE) can be re-used for differential diagnoses of COPD. 
+				Hence, the COPD differential diagnosis scans are cancelled.</p>
+				<button id="case1">case 1</button>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset>
+				<legend>Case 2</legend>
+				<p>The diagnosis for COPD has been delayed due to unforeseeable circumstances. 
+				At this point, the CTPA scan results can no longer be re-used for differential diagnosis of COPD, as they were obtained too long ago and would be out-of-date.
+				Hence, the discarding of the COPD differential diagnosis is undone.
+				</p>
+				<button id="case2">case 2</button>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<fieldset id="operations">
+				<legend>Operations</legend>
+				<p></p>
+			</fieldset>
+		</td>
+</table>
+
+<hr />
+
+<div id="container"></div>
+
+<script type="module">
+// sources:
+// Global Initiative for Chronic Obstructive Lung Disease Guidelines (2018)
+// 2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism developed in collaboration with the European Respiratory Society (ERS)
+
+import { VisualCIG } from '/lib/cig.js';
+
+const cig = new VisualCIG();
+
+$("#case1").on('click', (e) => {
+	if (!checkCase(1))
+		return;
+
+	var discardName = "COPD differential diagnosis";
+	var discardNode = cig.findNode(discardName);
+	
+	var retainName = "PE multidetector CTPA";
+	var retainNode = cig.findNode(retainName);
+	
+	cig.update({
+		transits: [{
+			node: [ cig.findNode("PE lung scintigraphy"), cig.findNode("PE pulmonary angiography") ], 
+				workflowState: undefined, decisionState: 'notChosenState', propagateDown: true
+		}, {
+			node: [ cig.findNode("PE diagnosis"), cig.findNode("PE multidetector CTPA") ], 
+				workflowState: "startedState", decisionState: undefined, propagateDown: false
+		}, {
+			node: cig.findNode("PE risk stratification"), workflowState: "activeState", decisionState: undefined, 
+			propagateDown: false
+		}, {
+			node: discardNode, workflowState: 'discardedState', decisionState: undefined, propagateDown: true
+		}], 
+		operations: [{ source: retainNode, target: discardNode, type: "<redundant>" }]
+	});
+	
+	$("#operations p")
+		.css('text-decoration', "none")
+		.html("<b>discarded</b>: " + discardName + "<br />" + "Treatment \"" + discardName + "\" was discarded.");
+});
+
+$("#case2").on('click', (e) => {
+	if (!checkCase(2))
+		return;
+
+	$("#operations p").css('text-decoration', "line-through");
+	
+	cig.update({
+		transits: [{
+			node: cig.findNode("COPD differential diagnosis"), workflowState: "inactiveState", decisionState: undefined
+		}, {
+			node: cig.findNode("COPD diagnosis"), workflowState: "delayedState", decisionState: undefined, 
+			propagateDown: true
+		}, {
+			node: [ cig.findNode("PE multidetector CTPA"), cig.findNode("PE risk stratification" )], 
+				workflowState: "completedState", decisionState: undefined, propagateDown: false
+		}],
+		operations: []
+	});
+});
+
+const config = {
+	svg: { translate: "translate(0, 10)" },
+	legend: { x: 0 }
+}
+
+cig.show("json/Chronic Obstructive Pulmonary Disease - Pulmonary Embolism.json", config);
+
+</script>
+</body>
+</html>

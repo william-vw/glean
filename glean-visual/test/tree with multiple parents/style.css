@@ -1,0 +1,24 @@
+#tree_view {
+  width: 100%;
+  height: 100%;
+  margin-top: 30px;
+} 
+
+.node {
+  cursor: pointer;
+  text-anchor: start;
+}
+
+.node rect {
+  stroke: gray;
+	stroke-width: 1.5px;
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.link, .mpLink {
+  fill: none;
+  stroke: #ccc;
+}

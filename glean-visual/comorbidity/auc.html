@@ -1,0 +1,31 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="lib/jquery-3.5.1-min.js"></script>
+<script src="lib/d3.v6.min.js"></script>
+<script src="lib/d3_utils.js"></script>
+<link rel="stylesheet" href="lib/cig.css" />
+</head>
+<body>
+
+<hr />
+
+<div id="container">
+</div>
+
+<script type="module">
+import { VisualCIG } from '/lib/cig.js';
+
+var cig = new VisualCIG();
+
+const config = {
+	svg: { translate: "translate(-50, 10)" },
+	legend: { x: 50 }
+}
+
+cig.show("json/Acute Uncomplicated Cystitis.json", config);
+
+</script>
+</body>
+</html>

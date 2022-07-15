@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="lib/jquery-3.5.1-min.js"></script>
+<script src="lib/d3.v6.min.js"></script>
+<script src="lib/d3_utils.js"></script>
+<script src="lib/case.js"></script>
+<link rel="stylesheet" href="lib/cig.css" />
+<style>
+table { width: 95%; margin-left: 25px }
+td { width: 33% }
+</style>
+</head>
+<body>
+<table>
+	<tr>
+		<td colspan="3">
+			<fieldset>
+				<legend>General</legend>
+				<p>Clinical guidelines recommend Warfarin for Venous ThromboEmbolism (VTE) in many cases; and antibiotics treatment is recommended for Group A Streptococcal (GAS) Pharyngitis (Clindamycin, due to immediate type penicillin hypersensitivity). 
+				However, most antibiotics adversely interact with Warfarin, decreasing the metabolism of Warfarin.</p>
+				<p>Sources for comorbidity management: <a href="https://pubmed.ncbi.nlm.nih.gov/26780746/" target="_blank"> Guidance for the practical management of warfarin therapy in the treatment of venous thromboembolism</a></p>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fieldset>
+				<legend>Case 1</legend>
+				<p>Warfarin treatment for VTE and antibiotics treatment for GAS pharyngitis has started. 
+				Since a drug (Clindamycin) was added that interacts with Warfarin, more frequent INR testing needs to be performed until INR stability is re-established.</p>
+				<button id="case1">case 1</button>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset>
+				<legend>Case 2</legend>
+				<p>	Warfarin treatment for VTE is still ongoing, and antibiotics treatment (Clindamycin) for GAS pharyngitis has completed. 
+				Since a drug (Clindamycin) is being discontinued that interacts with Warfarin, more frequent INR testing needs to be performed until INR stability is re-established.</p>
+				<button id="case2">case 2</button>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset>
+				<legend>Case 3</legend>
+				<p>Warfarin treatment is still ongoing, and antibiotics treatment (Clindamycin) for GAS pharyngitis has completed. 
+				During the more frequent INR testing caused by discontinuation of an interacting drug (Clindamycin), a stable INR has been observed. 
+				Hence, the increase of INR testing frequency is cancelled.</p>
+				<button id="case3">case 3</button>
+			</fieldset>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<fieldset id="operations">
+				<legend>Operations</legend>
+				<p></p>
+			</fieldset>
+		</td>
+</table>
+
+<hr />
+
+<div id="container"></div>
+
+<script type="module">
+// sources:
+// Guidance for the practical management of warfarin therapy in the treatment of venous thromboembolism
+// Clinical Practice Guideline for the Diagnosis and Management of Group A Streptococcal Pharyngitis: 2012 Update by the Infectious Diseases Society of America 
+
+import { VisualCIG } from '/lib/cig.js';
+
+const cig = new VisualCIG();
+
+function antibioticsCompleted() {
+	var node = cig.findNode("penicillin-hypersensitivity treatment");	
+	cig.update({
+		transits: [{
+			node: node, workflowState: 'completedState', decisionState: undefined
+		}, {
+			node: node.children[0], workflowState: 'activeState', decisionState: undefined
+		}],
+		operations: []
+	});
+}
+
+function antibioticsStarted() {
+	var node = cig.findNode("penicillin-hypersensitivity treatment");	
+	cig.update({
+		transits: [{
+			node: node, workflowState: 'startedState', decisionState: undefined, 
+				propagateDown: false, propagateUp: true
+		}, {
+			node: node.children[0], workflowState: 'inactiveState', decisionState: undefined
+		}],
+		operations: []
+	});
+}
+
+function paramCase(suffix, adjusting, adjusted) {
+	var adjustingNode = cig.findNode(adjusting);
+	var adjustedNode = cig.findNode(adjusted);
+	
+	cig.update({
+		transits: [{
+			node: adjustedNode, workflowState: 'adjustedState', decisionState: undefined, 
+			propagateDown: false
+		}],
+		operations: [{
+			source: adjustingNode, target: adjustedNode, type: "<adjust " + suffix + ">"
+		}]
+	});
+}
+
+$("#case1").on('click', (e) => {
+	if (!checkCase(1))
+		return;
+
+	cig.update({
+		transits: [{
+			node: [ cig.findNode("penicillin treatment"), cig.findNode("non penicillin-hypersensitivity treatment") ], 
+				workflowState: undefined, decisionState: 'notChosenState', propagateDown: true
+		}],
+		operations: []
+	})
+
+	var adjusting = "penicillin-hypersensitivity treatment";
+	var adjusted = "measure INR frequently";
+	
+	$("#operations p")
+		.css('text-decoration', "none")
+		.html("<b>adjusted</b>: " + adjusted + "<br />" + "INR is more closely monitored during Erythromycin treatment (e.g., every day, or every few days), possibly adjusting the Warfarin dose to compensate.");
+	
+	antibioticsStarted();
+	
+	paramCase("during", adjusting, adjusted);
+});
+
+$("#case2").on('click', (e) => {
+	if (!checkCase(2))
+		return;
+
+	var adjusting = "penicillin-hypersensitivity treatment";
+	var adjusted = "measure INR frequently";
+	
+	$("#operations p")
+		.css('text-decoration', "none")
+		.html("<b>adjusted</b>: " + adjusted + "<br />" + "INR is more closely monitored after Erythromycin treatment (e.g., every day, or every few days), possibly adjusting the Warfarin dose to compensate.");
+		
+	antibioticsCompleted();
+	
+	paramCase("after", adjusting, adjusted);
+});
+
+$("#case3").on('click', (e) => {
+	if (!checkCase(3))
+		return;
+
+	$("#operations p").css('text-decoration', "line-through");
+	
+	var adjustedNode = cig.findNode("measure INR frequently");
+	cig.update({
+		transits: [{
+			node: adjustedNode, workflowState: 'startedState', decisionState: undefined, 
+			propagateDown: false
+		}],
+		operations: []
+	});
+	
+	antibioticsCompleted();
+});
+
+const config = {
+	svg: { translate: "translate(0, 10)" },
+	legend: { x: 0 }
+}
+
+cig.show("json/GAS Pharyngitis - VTE Warfarin.json", config);
+
+</script>
+</body>
+</html>
