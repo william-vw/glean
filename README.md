@@ -10,7 +10,7 @@ It consists of the following modules:
 
 - [`fhir-server`](fhir-server). This module implements a FHIR server that allows communication between the FSM and its visualization.
 
-- [`ui-gen`](ui-gen). This module generates HTML input forms based on HL7 FHIR data constraints (used by glean-core). It is a slightly modified version of another [git repo](https://github.com/william-vw/ui_gen), 
+- [`ui-gen`](ui-gen). This module generates HTML input forms based on HL7 FHIR data constraints (used by glean-core). It is a slightly modified version of another [git repo](https://github.com/william-vw/ui_gen).
 
 When referring to this work, please use the following citation:
 
