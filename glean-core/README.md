@@ -6,7 +6,7 @@ You can clone this repo and create a Java project from the `pom.xml` file. It wi
 
 ## Finite State Machine
 
-All logical rules and OWL ontologies collectively implementing the FSM can be found under [resources/logic](tree/main/src/main/resources/logic):
+All logical rules and OWL ontologies collectively implementing the FSM can be found under [resources/logic](src/main/resources/logic):
 - [State transitions](tree/main/src/main/resources/logic/workflow). A set of state transition rules, using our [custom formalism](https://doi.org/10.1007/978-3-031-09342-5_1), that govern the transitioning between task states.
 - [Decisional criteria](blob/main/src/main/resources/logic/condition/condition.n3). A set of rules for checking decision criteria in TNM decision nodes.
 - [GLEAN ontology](blob/main/src/main/resources/logic/glean.owl). The GLEAN ontology defining the terms to be used within GLEAN TNM.
