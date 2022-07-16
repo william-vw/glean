@@ -2,7 +2,7 @@
 
 This module includes the Finite State Machine (FSM) implementation of Task Network Model (TNM) execution semantics, together with a set of tests and tools described below.
 
-You can clone this repo and create a Java project from the `pom.xml` file. It will be easier to use [Eclipse](https://www.eclipse.org/ide/) as the repo already includes the necessary project files (but you can use any IDE). The repo directly includes all dependencies as jar files (see [`lib/`](lib) folder).
+You can clone this repo and create a Java project from the `pom.xml` file. It will be easier to use [Eclipse](https://www.eclipse.org/ide/) as the repo already includes the necessary project files (but you can use any IDE). The repo directly includes all dependencies as jar files (see [`lib/`](lib) folder). It has the [ui-gen](https://github.com/william-vw/glean/tree/main/ui-gen), [utils](https://github.com/william-vw/glean/tree/main/utils) and [rdf-utils](https://github.com/william-vw/glean/tree/main/rdf-utils) modules and [jen3](https://github.com/william-vw/jen3) project as dependencies.
 
 ## Finite State Machine
 
