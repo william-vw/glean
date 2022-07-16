@@ -7,12 +7,12 @@ You can clone this repo and create a Java project from the `pom.xml` file. It wi
 ## Finite State Machine
 
 All logical rules and OWL ontologies collectively implementing the FSM can be found under [resources/logic](src/main/resources/logic):
-- [State transitions](src/main/resources/logic/workflow). A set of state transition rules, using our [custom formalism](https://doi.org/10.1007/978-3-031-09342-5_1), that govern the transitioning between task states.
+- [State transitions](src/main/resources/logic/workflow). A set of state transition rules, using our custom formalism, that govern the transitioning between task states.
 - [Decisional criteria](src/main/resources/logic/condition/condition.n3). A set of rules for checking decision criteria in TNM decision nodes.
 - [GLEAN ontology](src/main/resources/logic/glean.owl). The GLEAN ontology defining the terms to be used within GLEAN TNM.
 
 Use the [WorkflowLogic](src/main/java/wvw/glean/workflow/WorkflowLogic.java) class (`regenerate` method) to convert updated state transition rules into a set of Linear Logic (LL) rules.
-Behind the scenes, this method utilizes the Notation3 rules in the [resources/logic/gen](src/main/resources/logic/gen) folder, which inspect the state transition rules and generate corresponding LL rules.
+Behind the scenes, this method utilizes a Notation3 ruleset in the [resources/logic/gen](src/main/resources/logic/gen) folder, depending on the specified options (e.g., with logging, using hybrid forward/backward), which inspect the state transition rules and generate corresponding LL rules.
 To run the FSM, the generated LL rules can then be loaded into a [Notation3](https://w3c.github.io/N3/spec/) reasoner (e.g., [jen3](https://github.com/william-vw/jen3), [eye](https://github.com/josd/eye)).
 
 ## Example Guidelines
