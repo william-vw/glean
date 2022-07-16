@@ -84,6 +84,7 @@ public class UiGen {
 
 		uiGen.prepare(EhrStandards.FHIR, UiFormats.HTML_RDFA, OutputOptions.SELF_CONTAINED);
 		uiGen.prepare(EhrStandards.FHIR, UiFormats.HTML_RDFA, OutputOptions.TABLE);
+		
 //		uiGen.prepare(EhrStandards.FHIR, UiFormats.YAIL);
 	}
 

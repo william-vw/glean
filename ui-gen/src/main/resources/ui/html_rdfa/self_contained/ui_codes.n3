@@ -40,7 +40,7 @@
 	tpl:separator "" .
 
 
-{ 	<file:///Users/wvw/git/cig/ui_gen/src/main/resources/ui/html_rdfa/self_contained/header.html> log:content ?header .
+{ 	<file:///Users/wvw/git/cig/glean/ui-gen/src/main/resources/ui/html_rdfa/self_contained/header.html> log:content ?header .
 
 	:container_struct_param rdf:value ?code ; tpl:separator ?sep .
 	( ?code ?header "%s" ) string:format ?code2 .
