@@ -1,6 +1,6 @@
 # GuideLine Execution and Abstraction in N3 (GLEAN)
 
-This project allows you to execute and visualize Task Network Models (TNM), a type of workflow used by Computer Interpretable Guidelines. For more, please see [this publication](https://doi.org/10.1007/978-3-031-09342-5_1).
+This project allows you to execute and visualize Task Network Models (TNM), a type of workflow used by Computer Interpretable Guidelines. For more, please see [our publication](https://doi.org/10.1007/978-3-031-09342-5_1) on this work.
 
 It consists of the following modules:
 
