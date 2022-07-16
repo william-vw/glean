@@ -53,6 +53,8 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// - print workflow
 
+		String outFolder = "/Users/wvw/git/cig/glean/visualcig-js/json/";
+		
 		// -- lipid
 
 		String name = "lipid/ckd_dyslipidemia";
@@ -95,7 +97,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		System.out.println("html? " + html);
 	}
 
-	public void printWorkflow(String name, String ns) throws Exception {
+	public void printWorkflow(String name, String ns, String outFolder) throws Exception {
 		long start = System.currentTimeMillis();
 
 		WorkflowModel wf = new CIGModel(ns).initialize().load(getClass(), "cig/" + name + ".n3",
@@ -116,7 +118,6 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		String out = printer.getString();
 //		System.out.println(out);
 
-		String outFolder = "/Users/wvw/git/cig/visualize/json/";
 		String outPath = outFolder + name + ".json";
 		IOUtils.writeFile(outPath, out, false);
 
