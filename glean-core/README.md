@@ -27,4 +27,4 @@ This module includes the following tests:
 
 ## Visualization
 
-Using [WorkflowPrinter](src/main/java/wvw/glean/workflow/print/WorkflowPrinter.java), you can convert a GLEAN TNM to JSON format, which can be loaded into [VisualCIG.js](https://github.com/william-vw/glean/visualcig-js). In order to convert the ActivityDefinition resources into HTML forms, the module relies on the [ui-gen module](https://github.com/william-vw/glean/ui-gen).
+Using [WorkflowPrinter](src/main/java/wvw/glean/workflow/print/WorkflowPrinter.java), you can convert a GLEAN TNM to JSON format, which can be loaded into [VisualCIG.js](https://github.com/william-vw/glean/tree/main/visualcig-js). In order to convert the ActivityDefinition resources into HTML forms, the module relies on the [ui-gen module](https://github.com/william-vw/glean/tree/main/ui-gen).
