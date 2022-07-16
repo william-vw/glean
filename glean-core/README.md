@@ -11,13 +11,13 @@ All logical rules and OWL ontologies collectively implementing the FSM can be fo
 - [Decisional criteria](src/main/resources/logic/condition/condition.n3). A set of simple rules for checking decision criteria in TNM decision nodes.
 - [GLEAN ontology](src/main/resources/logic/glean.owl). The GLEAN ontology defining the terms to be used within GLEAN TNM.
 
-Use the [WorkflowLogic](src/main/java/wvw/glean/workflow/WorkflowLogic.java) class (`regenerate` method) to convert updated state transition rules into a set of Linear Logic (LL) rules.
-Behind the scenes, this method utilizes a Notation3 ruleset in the [resources/logic/gen](src/main/resources/logic/gen) folder, depending on the specified options (e.g., with logging, using hybrid forward/backward), which inspect the state transition rules and generate corresponding LL rules.
+Use [WorkflowLogic](src/main/java/wvw/glean/workflow/WorkflowLogic.java)`#regenerate` to convert any updated state transitions into a set of Linear Logic (LL) rules.
+Behind the scenes, this method utilizes a Notation3 ruleset in the [resources/logic/gen](src/main/resources/logic/gen) folder, depending on the specified options (e.g., with logging, using hybrid forward/backward), which inspects the state transition rules and generate corresponding LL rules.
 To run the FSM, the generated LL rules can then be loaded into a [Notation3](https://w3c.github.io/N3/spec/) reasoner (e.g., [jen3](https://github.com/william-vw/jen3), [eye](https://github.com/josd/eye)).
 
 ## Example Guidelines
 
-Under [resources/cig/lipid](src/main/resources/cig/lipid), you can find GLEAN TNMs for lipid management for patients with chronic kidney disease; the top-level workflow is represented by [ckd_dyslipidemia.n3](src/main/resources/cig/lipid/ckd_dyslipidemia.n3). In the [`input/`](src/main/resources/cig/lipid/input) subfolder, you can find [HL7 FHIR ActivityDefinitions](https://www.hl7.org/fhir/activitydefinition.html) that specify data constraints on the health data needed by decision nodes. 
+Under [resources/cig/lipid](src/main/resources/cig/lipid), you can find GLEAN TNMs for lipid management for patients with chronic kidney disease; the top-level workflow is represented by [ckd_dyslipidemia.n3](src/main/resources/cig/lipid/ckd_dyslipidemia.n3). In the [input/](src/main/resources/cig/lipid/input) subfolder, you can find [HL7 FHIR ActivityDefinitions](https://www.hl7.org/fhir/activitydefinition.html) that specify data constraints on the health data needed by decision nodes. 
 
 ## Testing
 
@@ -27,4 +27,4 @@ This module includes the following tests:
 
 ## Visualization
 
-Using [CIGWorkflowPrinter](src/main/java/wvw/glean/cig/CIGWorkflowPrinter.java), you can convert a GLEAN TNM to JSON format, which can be loaded into [VisualCIG.js](https://github.com/william-vw/glean/tree/main/visualcig-js). In order to convert the ActivityDefinition resources into HTML forms, the module relies on the [ui-gen module](https://github.com/william-vw/glean/tree/main/ui-gen). See the `CIGWorkflowPrinter#main` method for an example.
+Using [CIGWorkflowPrinter](src/main/java/wvw/glean/cig/CIGWorkflowPrinter.java), you can convert a GLEAN TNM to JSON format, which can be loaded into [VisualCIG.js](https://github.com/william-vw/glean/tree/main/visualcig-js). In order to convert the ActivityDefinition resources into HTML forms, the module relies on the [ui-gen module](https://github.com/william-vw/glean/tree/main/ui-gen). See the `CIGWorkflowPrinter#main` method for examples.
