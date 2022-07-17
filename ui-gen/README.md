@@ -4,7 +4,7 @@ This module is able to generate UIs from health data constraints (openEHR, HL7 F
 
 See the [UiGen](src/wvw/cig/uigen/UiGen.java) class to run the UI code generation process. For an example on how this code is being called, see [CIGWorkflowPrinter](https://github.com/william-vw/glean/blob/main/glean-core/src/main/java/wvw/glean/cig/CIGWorkflowPrinter.java).
 
-**Note**: whenever `ui_codes.n3` files are modified (i.e., files defining snippets for a particular UI format), the `UiGen#prepare` method with corresponding parameters should be called first. See the `UiGen#main` method for examples. (Currently, the `ui_codes.n3` file for self-contained HTML+RDFa files, i.e., incl. a header file, contains an absolute file path that should be updated for your system.)
+**Note**: whenever `ui_codes.n3` files are modified (i.e., files defining snippets for a particular UI format), the `UiGen#prepare` method with corresponding parameters should be called first. See the `UiGen#main` method for examples. (Currently, the [`ui_codes.n3`](https://github.com/william-vw/glean/blob/main/ui-gen/src/main/resources/ui/html_rdfa/self_contained/ui_codes.n3) file for self-contained HTML+RDFa files, i.e., incl. a header file, contains an absolute file path that should be updated for your system.)
 
 ## Resources
 
