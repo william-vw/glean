@@ -14,7 +14,7 @@ Afterwards, to view a particular workflow, point your browser towards `http://lo
 
 The [statin_cig.html](statin_cig.html) and [statin_cig_form.html](statin_cig_form.html) files show how to setup a workflow visualization:
 
-- After [printing the workflow JSON code](https://github.com/william-vw/glean/glean-core#visualization), ensure the JSON file was written to the `json/` folder and then refer to it in the following call: `cig.show("json/[json file]", config);`
+- After [printing the workflow JSON code](https://github.com/william-vw/glean/tree/main/glean-core#visualization), ensure the JSON file was written to the `json/` folder and then refer to it in the following call: `cig.show("json/[json file]", config);`
 
 - Depending on whether you would like a workflow- or form-based visualization, use the following import statements:  
 `import { VisualCIG } from '/lib/cig_tree.js';` OR  
