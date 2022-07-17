@@ -11,9 +11,7 @@ chmod +x *.sh
 - run within the fhir-server/ directory:
 mvn clean install tomcat7:redeploy
 
-(if you are not well, acquainted with maven, 
-this requires you to recursively `mvn install` the fhir-server dependencies in its pom.xml file,
-i.e., utils, rdf-utils, ui-gen, and glean-core)   
+(first, this will require you to recursively run `mvn install` on the dependencies listed in the fhir-server pom.xml file: utils, rdf-utils, ui-gen, and glean-core; and re-install them whenever they are updated)
 
 
 - setup user for pushing war file
