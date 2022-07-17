@@ -749,8 +749,10 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 	};
 
 	this._editor_showButtons((d) => true, 'editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius);
-	this._editor_showButtons((d) => true, 'appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius, this._editor_appendNode);
-	this._editor_showButtons((d) => d.parent && d.parent.parent !== undefined, 'removeBtn', '\uf1f8', -btnConfig.offset, -btnConfig.offset, btnConfig.radius, this._editor_removeNode);
+	this._editor_showButtons((d) => true, 'appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius, 
+		this._editor_appendNode);
+	this._editor_showButtons((d) => d.parent && d.parent.parent !== undefined, 'removeBtn', '\uf1f8', -btnConfig.offset, -btnConfig.offset, btnConfig.radius, 
+		this._editor_removeNode);
 }
 
 VisualCIG.prototype._editor_showButtons = function (filter, cls, icon, xOffset, yOffset, radius, onclick) {
@@ -791,9 +793,14 @@ VisualCIG.prototype._editor_showButtons = function (filter, cls, icon, xOffset, 
 }
 
 VisualCIG.prototype._editor_appendNode = function (d) {
+	const name = prompt("Enter the new task name:");
+	if (name == null)
+		return;
+
+	const id = name.replace(" ", "_");
 	d.data.children.push({
-		"id": "New_task",
-		"name": "New task",
+		"id": id,
+		"name": name,
 		"composed": true,
 		"in_workflow": window.cig._workflow.id,
 		"node_type": "atomic_task",
@@ -808,7 +815,6 @@ VisualCIG.prototype._editor_appendNode = function (d) {
 }
 
 VisualCIG.prototype._editor_removeNode = function (d) {
-	console.log(d);
 	const children = d.parent.data.children;
 	for (var i = 0; i < children.length; i++) {
 		var child = children[i];
