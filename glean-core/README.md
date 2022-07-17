@@ -27,6 +27,8 @@ This module includes the following tests:
 
 ## Visualization
 
-Using [CIGWorkflowPrinter](src/main/java/wvw/glean/cig/CIGWorkflowPrinter.java), you can convert a GLEAN TNM to JSON format, which can be loaded into [VisualCIG.js](https://github.com/william-vw/glean/tree/main/visualcig-js). In order to convert the ActivityDefinition resources into HTML forms, the module relies on the [ui-gen module](https://github.com/william-vw/glean/tree/main/ui-gen). (In the ui-gen module, note that the [ui_codes.n3 file](https://github.com/william-vw/glean/blob/main/ui-gen/src/main/resources/ui/html_rdfa/self_contained/ui_codes.n3) for self-contained HTML+RDFa files, i.e., incl. a header file, contains an absolute file path that should be updated for your system.)
+Using [CIGWorkflowPrinter](src/main/java/wvw/glean/cig/CIGWorkflowPrinter.java), you can convert a GLEAN TNM to JSON format, which can be loaded into [VisualCIG.js](https://github.com/william-vw/glean/tree/main/visualcig-js). Update the file output path in `CIGWorkflowPrinter#main` for your system.
+
+In order to convert the ActivityDefinition resources into HTML forms, the module relies on the [ui-gen module](https://github.com/william-vw/glean/tree/main/ui-gen). 
 
 See the `CIGWorkflowPrinter#main` method for examples.
