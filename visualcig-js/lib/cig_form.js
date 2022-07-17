@@ -83,6 +83,10 @@ CIGForm.prototype._hideRecursivelyFrom = function (workflow) {
     }
 }
 
+CIGForm.prototype.createNew = function(config) {
+    console.error("creating new CIG from form view not supported");
+}
+
 CIGForm.prototype._showFromData = function (data, config, callback) {
     this._init(data, config);
 

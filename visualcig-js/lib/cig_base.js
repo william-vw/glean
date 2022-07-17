@@ -18,6 +18,34 @@ window.source = new DataServer();
 // 		operations: [{ source, target, type }] (mandatory; can be empty)
 //		adds: [{ parent, data }] (optional)
 
+// -- new CIG
+
+CIGBase.prototype.createNew = function(config) {
+	const json = {
+		"id": "New_CIG",
+		"name": "New CIG Workflow",
+		"composed": false,
+		"node_type": "composite_task",
+		"workflow_state": "activeState",
+		"decisional_state": "chosenState",
+		"description": "Some description here",
+		"children": [ {
+            "id": "First_task",
+            "name": "First task",
+            "composed": true,
+            "in_workflow": "New_CIG",
+            "node_type": "atomic_task",
+            "workflow_state": "activeState",
+            "decisional_state": "chosenState",
+            "description": "Description",
+            "inputForm": undefined,
+			"children": []
+		} ]
+	};
+
+	this._showFromData(json, config);
+}
+
 CIGBase.prototype.show = function (json, config, callbacks) {
 	const cb = () => {
 		if (callbacks && callbacks.beforeRefresh)

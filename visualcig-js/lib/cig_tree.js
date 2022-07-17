@@ -185,6 +185,11 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 
 	// - setup tree layout
 
+	this._refreshTreeLayout(callback);
+}
+
+// TODO editor: only refresh parts that are needed after adding/removing nodes
+VisualCIG.prototype._refreshTreeLayout = function(callback) {
 	// (let's not show the workflow node)
 	const nodeData = this._workflow.data.children[0];
 	this._root = d3.hierarchy(nodeData);
@@ -201,6 +206,8 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 
 	// - initialize svg element
 
+	// editor: remove any prior SVG element
+	this._container.selectAll('svg').remove();
 	this._svg = this._container.append('svg');
 
 	var g = this._svg.append('g');
@@ -220,16 +227,16 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 		.attr('class', (d) => d);
 
 	// - show legend
-	this._showLegend(config);
+	this._showLegend(this._config);
 
 	// - adjust tree position, e.g., based on legend
-	const treeTr = this._adjustTreePos(config);
+	const treeTr = this._adjustTreePos(this._config);
 
 	// - show hierarchy (tree)
 
 	this._showAndFormatTree();
 
-	if (!config.isTaskWindow) {
+	if (!this._config.isTaskWindow) {
 		this._setupTooltip();
 		this._setupInfoBox();
 	}
@@ -254,7 +261,7 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 		.attr("width", g.node().getBBox().x + actualSize.width + padding)
 		.attr("height", g.node().getBBox().y + actualSize.height + padding);
 
-	if (!config.isTaskWindow) {
+	if (!this._config.isTaskWindow) {
 		const svgTr = this._settings.dim.svg.translate;
 		this._svg.attr("transform", 'translate(' + svgTr.x + "," + svgTr.y + ")");
 	}
@@ -266,7 +273,7 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 	this._setupLoadingIcon();
 
 	// - reset button
-	this._setupResetBtn(config);
+	this._setupResetBtn(this._config);
 
 	if (callback)
 		callback();
@@ -699,6 +706,8 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 		.attr("height", (d) => d.bbox.height - 1)
 		.style("fill", "white");
 
+
+	// - event listeners
 	// const allNodes = this._nodes.selectAll("circle.node,rect.node,path.node");
 
 	const config = this._config;
@@ -707,7 +716,7 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 		.on("mouseover", (e, d) => this._nodeTooltip_onMouseOver(e, d, config))
 		.on("mouseout", this._nodeTooltip_onMouseOut);
 
-	this._nodes.selectAll("circle.node,rect.node,path.node,text")
+	this._nodes.selectAll("circle.node,rect.node,path.node,text.nodeCaption")
 		// (non-root) composite tasks are handled specially (see below)
 		.filter((d) => (d && d.data.node_type != 'composite_task' &&
 			(d.data.description || d.data.source || d.data.inputForm || d.data.insert)))
@@ -717,7 +726,7 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 	var self = this;
 
 	// var cc = clickcancel();
-	this._nodes.selectAll("circle.node,rect.node,text")
+	this._nodes.selectAll("circle.node,rect.node,text.nodeCaption")
 		.filter((d) => (d && d.data.node_type == 'composite_task'))
 		.on("dblclick", function (e, d) {
 			// unsure why this is needed ..
@@ -730,6 +739,86 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 
 	// cc.on("click", this._nodeInfoBox_onClick);
 	// cc.on("dblclick", this._showHideCompositeChildren);
+
+
+	// - editor
+
+	const btnConfig = {
+		radius: this._settings.nodeStyle.circle.radius / 1.5,
+		offset: this._settings.nodeStyle.circle.radius,
+	} ;
+
+	this._editor_showButtons('editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius);
+	this._editor_showButtons('appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius, this._editor_appendNode);
+	this._editor_showButtons('removeBtn', '\uf1f8', -btnConfig.offset, -btnConfig.offset, btnConfig.radius, this._editor_removeNode);
+}
+
+VisualCIG.prototype._editor_showButtons = function(cls, icon, xOffset, yOffset, radius, onclick) {
+	const editBtn = this._nodes
+		.filter((d) => d.data.hidden === undefined) //{ console.log(d); return true; })
+		.append('g')
+		.attr('transform', (d) => "translate(" + (d.x + xOffset) + "," + (d.y + yOffset) + ")");
+
+	editBtn.append('circle')
+		.classed(cls, true)
+		.style('stroke', 'black')
+		.style('stroke-width', '1px')
+		.style('fill', 'white')
+		.attr('cx', (d) => 0)
+		.attr('cy', (d) => 0)
+		.attr('r', radius);
+
+	editBtn.append('text')
+			.attr('x', (d) => -radius / 2)
+			.attr('y', (d) => +radius / 2)
+			.attr('font-family', 'FontAwesome')
+			.attr('font-size', "10px")
+			.style('fill', 'black')
+			.text(icon);
+
+	editBtn.selectAll('circle')
+		.on('mouseover', (e, d, config) => d3.select(e.target).style('stroke-width', "2px"))
+		.on('mouseout', (e, d, config) => d3.select(e.target).style('stroke-width', "1px"))
+		.style('cursor', "pointer");
+
+	editBtn.selectAll('text')
+		.on('mouseover', (e, d, config) => d3.select(e.target.parentNode.childNodes[0]).style('stroke-width', "2px"))
+		.on('mouseout', (e, d, config) => d3.select(e.target.parentNode.childNodes[0]).style('stroke-width', "1px"))
+		.style('cursor', "pointer");
+
+	editBtn.selectAll('circle,text')
+		.on('click', (e, d, config) => onclick(d));
+}
+
+VisualCIG.prototype._editor_appendNode = function(d) {
+	d.data.children.push({
+		"id": "New_task",
+		"name": "New task",
+		"composed": true,
+		"in_workflow": window.cig._workflow.id,
+		"node_type": "atomic_task",
+		"workflow_state": "activeState",
+		"decisional_state": "chosenState",
+		"description": "Description",
+		"inputForm": undefined,
+		"children": []
+	});
+
+	window.cig._refreshTreeLayout();
+}
+
+VisualCIG.prototype._editor_removeNode = function(d) {
+	console.log(d);
+	const children = d.parent.data.children;
+	for (var i = 0; i < children.length; i++) {
+		var child = children[i];
+		if (child == d.data) {
+			children.splice(i, 1);
+			break;
+		}
+	}
+	
+	window.cig._refreshTreeLayout();
 }
 
 // - formatting
