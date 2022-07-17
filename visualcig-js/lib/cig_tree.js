@@ -189,7 +189,7 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 }
 
 // TODO editor: only refresh parts that are needed after adding/removing nodes
-VisualCIG.prototype._refreshTreeLayout = function(callback) {
+VisualCIG.prototype._refreshTreeLayout = function (callback) {
 	// (let's not show the workflow node)
 	const nodeData = this._workflow.data.children[0];
 	this._root = d3.hierarchy(nodeData);
@@ -746,16 +746,16 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 	const btnConfig = {
 		radius: this._settings.nodeStyle.circle.radius / 1.5,
 		offset: this._settings.nodeStyle.circle.radius,
-	} ;
+	};
 
-	this._editor_showButtons('editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius);
-	this._editor_showButtons('appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius, this._editor_appendNode);
-	this._editor_showButtons('removeBtn', '\uf1f8', -btnConfig.offset, -btnConfig.offset, btnConfig.radius, this._editor_removeNode);
+	this._editor_showButtons((d) => true, 'editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius);
+	this._editor_showButtons((d) => true, 'appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius, this._editor_appendNode);
+	this._editor_showButtons((d) => d.parent && d.parent.parent !== undefined, 'removeBtn', '\uf1f8', -btnConfig.offset, -btnConfig.offset, btnConfig.radius, this._editor_removeNode);
 }
 
-VisualCIG.prototype._editor_showButtons = function(cls, icon, xOffset, yOffset, radius, onclick) {
+VisualCIG.prototype._editor_showButtons = function (filter, cls, icon, xOffset, yOffset, radius, onclick) {
 	const editBtn = this._nodes
-		.filter((d) => d.data.hidden === undefined) //{ console.log(d); return true; })
+		.filter((d) => filter(d) && d.data.hidden === undefined) //{ console.log(d); return true; })
 		.append('g')
 		.attr('transform', (d) => "translate(" + (d.x + xOffset) + "," + (d.y + yOffset) + ")");
 
@@ -769,12 +769,12 @@ VisualCIG.prototype._editor_showButtons = function(cls, icon, xOffset, yOffset, 
 		.attr('r', radius);
 
 	editBtn.append('text')
-			.attr('x', (d) => -radius / 2)
-			.attr('y', (d) => +radius / 2)
-			.attr('font-family', 'FontAwesome')
-			.attr('font-size', "10px")
-			.style('fill', 'black')
-			.text(icon);
+		.attr('x', (d) => -radius / 2)
+		.attr('y', (d) => +radius / 2)
+		.attr('font-family', 'FontAwesome')
+		.attr('font-size', "10px")
+		.style('fill', 'black')
+		.text(icon);
 
 	editBtn.selectAll('circle')
 		.on('mouseover', (e, d, config) => d3.select(e.target).style('stroke-width', "2px"))
@@ -790,7 +790,7 @@ VisualCIG.prototype._editor_showButtons = function(cls, icon, xOffset, yOffset, 
 		.on('click', (e, d, config) => onclick(d));
 }
 
-VisualCIG.prototype._editor_appendNode = function(d) {
+VisualCIG.prototype._editor_appendNode = function (d) {
 	d.data.children.push({
 		"id": "New_task",
 		"name": "New task",
@@ -807,7 +807,7 @@ VisualCIG.prototype._editor_appendNode = function(d) {
 	window.cig._refreshTreeLayout();
 }
 
-VisualCIG.prototype._editor_removeNode = function(d) {
+VisualCIG.prototype._editor_removeNode = function (d) {
 	console.log(d);
 	const children = d.parent.data.children;
 	for (var i = 0; i < children.length; i++) {
@@ -817,7 +817,7 @@ VisualCIG.prototype._editor_removeNode = function(d) {
 			break;
 		}
 	}
-	
+
 	window.cig._refreshTreeLayout();
 }
 
@@ -901,7 +901,7 @@ VisualCIG.prototype._refreshHeader = function () {
 	const workflowState = this._workflow.data.workflow_state;
 	if (workflowState == 'completedState') {
 		state.style('display', 'block');
-		
+
 		if (!header.classed('main-header'))
 			state.html("(close to continue)");
 
