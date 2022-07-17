@@ -748,10 +748,12 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 		offset: this._settings.nodeStyle.circle.radius,
 	};
 
-	this._editor_showButtons((d) => true, 'editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius);
-	this._editor_showButtons((d) => true, 'appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius, 
+	this._editor_showButtons((d) => true, 'editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius,
+		this._editor_editNode);
+	this._editor_showButtons((d) => true, 'appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius,
 		this._editor_appendNode);
-	this._editor_showButtons((d) => d.parent && d.parent.parent !== undefined, 'removeBtn', '\uf1f8', -btnConfig.offset, -btnConfig.offset, btnConfig.radius, 
+	this._editor_showButtons((d) => d.parent && d.parent.parent !== undefined, 'removeBtn', '\uf1f8',
+		-btnConfig.offset, -btnConfig.offset, btnConfig.radius,
 		this._editor_removeNode);
 }
 
@@ -789,10 +791,14 @@ VisualCIG.prototype._editor_showButtons = function (filter, cls, icon, xOffset, 
 		.style('cursor', "pointer");
 
 	editBtn.selectAll('circle,text')
-		.on('click', (e, d, config) => onclick(d));
+		.on('click', (e, d, config) => onclick(e, d));
 }
 
-VisualCIG.prototype._editor_appendNode = function (d) {
+VisualCIG.prototype._editor_editNode = function (e, d) {
+	window.cig._nodeInfoBox_onClick(e, d);
+}
+
+VisualCIG.prototype._editor_appendNode = function (e, d) {
 	const name = prompt("Enter the new task name:");
 	if (name == null)
 		return;
@@ -814,7 +820,12 @@ VisualCIG.prototype._editor_appendNode = function (d) {
 	window.cig._refreshTreeLayout();
 }
 
-VisualCIG.prototype._editor_removeNode = function (d) {
+VisualCIG.prototype._editor_removeNode = function (e, d) {
+	if (d.children.length > 0) {
+		if (!confirm("This node has " + d.children.length + " children. Are you sure you want to remove it?"))
+			return;
+	}
+
 	const children = d.parent.data.children;
 	for (var i = 0; i < children.length; i++) {
 		var child = children[i];
@@ -1130,8 +1141,10 @@ VisualCIG.prototype._nodeInfoBox_onClick = function (e, d) {
 	var cig = d.cig;
 	cig._showInfoBox(e, d, title, content, cig);
 
-	e.stopPropagation();
-	e.handled = true;
+	if (e) {
+		e.stopPropagation();
+		e.handled = true;
+	}
 	infoBoxOpen = true;
 }
 
