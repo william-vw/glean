@@ -151,10 +151,6 @@ a { color: lightgrey }
 	font-size: 18px;
 }
 
-.infobox-body br {
-  margin-bottom: 15px;
-}
-
 .infobox-body h3 {
   border-bottom: 1px solid;
   margin-bottom: 10px;
@@ -163,6 +159,9 @@ a { color: lightgrey }
 .infobox-body table input[type='submit'] {
   margin-top: 15px;
 }
+
+.infobox-body .edit input { margin-bottom: 10px; }
+.infobox-body .edit textarea { margin-bottom: 10px; }
 
 .infobox-footer {
   padding: 2px 16px;

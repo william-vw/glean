@@ -106,7 +106,7 @@ async function submitInputData(element) {
     const check = checkInputData(container);
     if (check !== true) {
         console.error("submitInputData", check);
-        error.css('display', 'block')
+        error.css('display', 'block');
         error.html(check);
 
         return;

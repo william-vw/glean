@@ -37,7 +37,7 @@ CIGBase.prototype.createNew = function(config) {
             "node_type": "atomic_task",
             "workflow_state": "activeState",
             "decisional_state": "chosenState",
-            "description": "Description",
+            "description": "",
             "inputForm": undefined,
 			"children": []
 		} ]

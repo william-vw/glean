@@ -186,6 +186,14 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 	// - setup tree layout
 
 	this._refreshTreeLayout(callback);
+
+
+	// - setup infobox, tooltip
+
+	if (!this._config.isTaskWindow) {
+		this._setupTooltip();
+		this._setupInfoBox();
+	}
 }
 
 // TODO editor: only refresh parts that are needed after adding/removing nodes
@@ -235,11 +243,6 @@ VisualCIG.prototype._refreshTreeLayout = function (callback) {
 	// - show hierarchy (tree)
 
 	this._showAndFormatTree();
-
-	if (!this._config.isTaskWindow) {
-		this._setupTooltip();
-		this._setupInfoBox();
-	}
 
 	this._refreshHeader();
 
@@ -743,18 +746,20 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 
 	// - editor
 
-	const btnConfig = {
-		radius: this._settings.nodeStyle.circle.radius / 1.5,
-		offset: this._settings.nodeStyle.circle.radius,
-	};
+	if (this._config.editing) {
+		const btnConfig = {
+			radius: this._settings.nodeStyle.circle.radius / 1.5,
+			offset: this._settings.nodeStyle.circle.radius,
+		};
 
-	this._editor_showButtons((d) => true, 'editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius,
-		this._editor_editNode);
-	this._editor_showButtons((d) => true, 'appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius,
-		this._editor_appendNode);
-	this._editor_showButtons((d) => d.parent && d.parent.parent !== undefined, 'removeBtn', '\uf1f8',
-		-btnConfig.offset, -btnConfig.offset, btnConfig.radius,
-		this._editor_removeNode);
+		this._editor_showButtons((d) => true, 'editBtn', '\uf303', btnConfig.offset, -btnConfig.offset, btnConfig.radius,
+			this._editor_editNode);
+		this._editor_showButtons((d) => true, 'appendBtn', '+', btnConfig.offset, btnConfig.offset, btnConfig.radius,
+			this._editor_appendNode);
+		this._editor_showButtons((d) => d.parent && d.parent.parent !== undefined, 'removeBtn', '\uf1f8',
+			-btnConfig.offset, -btnConfig.offset, btnConfig.radius,
+			this._editor_removeNode);
+	}
 }
 
 VisualCIG.prototype._editor_showButtons = function (filter, cls, icon, xOffset, yOffset, radius, onclick) {
@@ -795,7 +800,7 @@ VisualCIG.prototype._editor_showButtons = function (filter, cls, icon, xOffset, 
 }
 
 VisualCIG.prototype._editor_editNode = function (e, d) {
-	window.cig._nodeInfoBox_onClick(e, d);
+	window.cig._editor_nodeEditBox_onClick(e, d);
 }
 
 VisualCIG.prototype._editor_appendNode = function (e, d) {
@@ -812,7 +817,7 @@ VisualCIG.prototype._editor_appendNode = function (e, d) {
 		"node_type": "atomic_task",
 		"workflow_state": "activeState",
 		"decisional_state": "chosenState",
-		"description": "Description",
+		"description": "",
 		"inputForm": undefined,
 		"children": []
 	});
@@ -821,8 +826,8 @@ VisualCIG.prototype._editor_appendNode = function (e, d) {
 }
 
 VisualCIG.prototype._editor_removeNode = function (e, d) {
-	if (d.children.length > 0) {
-		if (!confirm("This node has " + d.children.length + " children. Are you sure you want to remove it?"))
+	if (d.children && d.children.length > 0) {
+		if (!confirm("This node has " + d.children.length + " child(ren). Are you sure you want to remove it?"))
 			return;
 	}
 
@@ -902,13 +907,65 @@ VisualCIG.prototype._setupHeader = function (config) {
 	} else
 		header.classed('main-header', true);
 
+	if (config.editing) {
+		this._editor_setupHeaderInput(header);
 
-	header.append('div')
-		.classed('title', true)
-		.text(this._data.name);
+	} else {
+		header.append('div')
+			.classed('title', true)
+			.text(this._data.name);
+	}
 
 	header.append('div')
 		.classed('workflow-status', true);
+}
+
+VisualCIG.prototype._editor_setupHeaderInput = function (header) {
+	// regular textfield
+	const staticTitle = header.append('div')
+		.classed('title', true)
+		.text(this._data.name);
+
+	// input textfield
+	const dynTitle = header.append('input')
+		.attr('class', 'title')
+		.attr('type', 'text')
+		.attr('id', 'cig_title')
+		.attr('value', this._data.name)
+		.style('display', 'none');
+
+	// when clicking on title, change to input field
+	staticTitle.on('click', (e) => {
+		staticTitle.style('display', 'none');
+
+		dynTitle.style('display', 'block');
+		dynTitle.node().focus();
+	});
+
+	// when pressing enter, save new title & change to regular field
+	// when pressing escape, simply change to regular field
+	dynTitle
+		.on('keyup', (e) => {
+			if (e.key == "Enter") { // enter
+				this._data.name = dynTitle.node().value;
+				staticTitle.text(this._data.name);
+			}
+			if (e.key == "Enter" || e.key == "Escape") {
+				staticTitle.style('display', 'block');
+				dynTitle.style('display', 'none');
+			}
+		});
+
+	// when clicking anywhere else in document, change to regular field
+	$(document).on('click', (e) => {
+		if ($(e.target).attr('class') == 'title')
+			return;
+
+		if (staticTitle.style('display') == 'none') {
+			staticTitle.style('display', 'block');
+			dynTitle.style('display', 'none');
+		}
+	});
 }
 
 VisualCIG.prototype._refreshHeader = function () {
@@ -1127,7 +1184,7 @@ VisualCIG.prototype._nodeInfoBox_onClick = function (e, d) {
 	}
 
 	if (d.data.description !== undefined)
-		content = d.data.description;
+		content += d.data.description;
 
 	if (d.data.insert !== undefined) {
 		var insert = d.data.insert;
@@ -1226,35 +1283,139 @@ VisualCIG.prototype._infoBox_onClose = function (e, cig) {
 	}
 }
 
+// -- edit box
+
+// TODO make InfoBox class & subclasses
+// TODO not needed to re-create the content here - consider adding template
+VisualCIG.prototype._editor_nodeEditBox_onClick = function (e, d) {
+	var element = $(
+		`<div class="edit">
+			<div style="margin-bottom: 15px">
+				Type:
+					<input type="radio" name="type" id="decision_task" value="decision_task"><label for="decision_task">decision</label></input> | 
+					<input type="radio" name="type" id="composite_task" value="composite_task"><label for="composite_task">composite</label></input> | 
+					<input type="radio" name="type" id="atomic_task" value="atomic_task"><label for="atomic_task">task</label></input> | 
+					<input type="radio" name="type" id="endpoint" value="endpoint"><label for="endpoint">endpoint</label></input>
+			</div>
+			<label for="title">Name:</label> <input type="text" id="title" name="title" value="${d.data.name}"></input><br />
+			<label for="source">Source:</label> <input type="text" id="source" name="source">${d.data.source ? d.data.source : ""}</input><br />
+			<label for="description">Description:</label><br/><textarea id="description" name='description' cols="50" rows="4">${d.data.description ? d.data.description : ""}</textarea><br />
+		</div>`);
+	// <label for="insert">Insert:</label><input id='insert' name='insert' value="${d.data.insert ? d.data.insert : ""}" />
+
+	// (pre-select current node type)
+	element.find(`#${d.data.node_type}`).prop('checked', true);
+
+	var cig = d.cig;
+	cig._editor_showEditBox(e, d, element, cig);
+
+	if (e) {
+		e.stopPropagation();
+		e.handled = true;
+	}
+	infoBoxOpen = true;
+}
+
+VisualCIG.prototype._editor_updateNodeInfo = function (element, d) {
+	const newType = element.find("input[name=type]:checked").val();
+	const newName = element.find("input#title").val();
+	const newSource = element.find("input#source").val();
+	const newDescription = element.find("textarea#description").val();
+	// const newInsert = element.find("input#insert").val();
+
+	console.log(newType + ", " + newName + ", " + newSource + ", " + newDescription);
+
+	var errorMsgs = [];
+	if (newName === "")
+		errorMsgs.push("Name is required.");
+
+	const error = element.find(".input-error");
+	if (errorMsgs.length > 0) {
+		console.log(element);
+		error.css('display', 'block');
+		error.html(errorMsgs.join("<br />"));
+	} else
+		error.css('display', 'none');
+
+	d.data.name = newName;
+	d.data.id = newName.replace(" ", "_");
+	d.data.source = newSource;
+	d.data.description = newDescription;
+	d.data.node_type = newType;
+
+	window.cig._infoBox_onClose({}, cig);
+	window.cig._refreshTreeLayout();
+}
+
+VisualCIG.prototype._editor_showEditBox = function (e, d, element, cig) {
+	const infoBox = $('.infobox');
+
+	infoBox.find('.infobox-header h2').html("Edit task");
+	const body = infoBox.find('.infobox-body')
+	body.empty();
+
+	body.append(element);
+
+	// add error placeholder
+	body.append("<div class='input-error'></div>");
+
+	// add submit & cancel btn
+	body.append(
+		`<div style="margin-top: 10px;">
+			<input type='submit' value='submit'></input>
+			&nbsp;&nbsp;<input type='submit' value='cancel'></input>
+		</div>`);
+
+	body.find("input[value=submit]").on("click", (e) => this._editor_updateNodeInfo(body, d));
+	body.find('input').on('keypress', (e) => {
+		if (e.which === 13) // enter
+			this._editor_updateNodeInfo(body, d)
+	});
+	body.find("input[value=cancel]").on("click", (e) => this._infoBox_onClose({}, cig));
+
+	// infoBox.attr('id', d.data.id);
+
+	const node = d3.select(e.target);
+	// const bbox0 = $(node.node()).offset();
+	const bbox = getAbsoluteBoundingBox(node);
+	// console.log("bbox", bbox0, bbox);
+
+	infoBox
+		.css('left', (bbox.left + bbox.width + 5) + "px")
+		.css('top', (bbox.top + (bbox.height / 2) - 75) + "px");
+
+	infoBox.css('display', "block");
+}
+
 // - composite tasks
 
 // will need to be updated
 /* VisualCIG.prototype._toggleCompositeChildren = function (e, d) {
 	const cig = d.cig;
-
+	
 	d = d.data;
 	this._showHideChildren(d);
-
+	
 	cig._treeChanged = true;
-
+	
 	cig._refresh();
 }
-
+	
 VisualCIG.prototype._showHideChildren = function (d) {
 	if (d.children)
 		this._hideChildren(d);
 	else
 		this._showChildren(d);
 }
-
+	
 VisualCIG.prototype._showChildren = function (d) {
 	d.children = d._children;
 	d._children = null;
 }
-
+	
 VisualCIG.prototype._hideChildren = function (d) {
 	const subTasks = d.children.filter((d2) => d2.composed);
-
+	
 	// support for non-subtask "children"
 	// (these would be "next's" in reality)
 	d._children = subTasks;
@@ -1284,18 +1445,18 @@ VisualCIG.prototype._openTaskWindow = function (e, d) {
 		/* $(document).on('click', (e) => {
 			if (infoBoxOpen || e.handled) return; // let infobox deal with the click
 			if (taskStack.length == 1) return;
-
+	
 			if (e.target.nodeName == 'HTML' || e.target.nodeName == 'BODY') {
 				cig._closeTaskWindow(e, taskStack.pop());
-
+	
 			} else {
 				const task = taskStack[taskStack.length - 1];
 				const targetId = e.target.parentNode.getAttribute("id");
 				const targetName = e.target.parentNode.nodeName;
-
+	
 				if (targetName != 'g' // clicked a node or link
 					&& targetId != task.id) {
-
+	
 					cig._closeTaskWindow(e, taskStack.pop());
 				}
 			}
