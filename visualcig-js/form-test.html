@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <script src="lib/jquery-3.5.1-min.js"></script> -->
+    <!-- <script src="lib/jquery-ui-1.13.2/jquery-ui.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="lib/form-builder/form-builder.min.js"></script>
+    <script src="lib/form-builder/form-render.min.js"></script>
+    <style>
+        #form-render {
+            display: none
+        }
+    </style>
+    <script>
+        function initForm() {  
+        // jQuery(function ($) {
+            var fbEditor = $(document.getElementById('form-editor')),
+                fbRender = $(document.getElementById('form-render')),
+                fbOptions = {
+                    showActionButtons: false
+                },
+                formBuilder = fbEditor.formBuilder(fbOptions);
+
+            $('#edit-toggle').click(function () {
+                fbEditor.toggle();
+                fbRender.toggle();
+                if (this.innerHTML == 'Render') {
+                    this.innerHTML = 'Build';
+                    fbRender.formRender({
+                        formData: formBuilder.formData
+                    });
+                }
+                else
+                    this.innerHTML = 'Render'
+            });
+
+        // });
+
+            // const formBuilder = $(document.getElementById('form-editor')).formBuilder();
+
+            // $("#edit-toggle").on('click', () => {
+            //     console.log(formBuilder.formData);
+            //     jQuery(function ($) {
+            //         $('#form-render').fbRender({
+            //             dataType: 'json',
+            //             formData: formBuilder.formData
+            //         });
+            //         console.log($('#form-render').fbRender('html'));
+            //     });
+            // });
+        }
+    </script>
+</head>
+
+<body onload="initForm()">
+    <button id="edit-toggle">Render</button>
+    <div id="form-render">
+        <form></form>
+    </div>
+    <div id="form-editor"></div>
+</body>
+
+</html>
