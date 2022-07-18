@@ -1,4 +1,5 @@
 $(document).ready((e) => {
+    // TODO initialize this element in cig_base.js!
     // TODO potential for race condition
     $('#reset_source').on('click', () => source.resetSource());
 });

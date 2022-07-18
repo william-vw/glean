@@ -20,7 +20,7 @@ window.source = new DataServer();
 
 // -- new CIG
 
-CIGBase.prototype.createNew = function(config) {
+CIGBase.prototype.createNew = function (config) {
 	const json = {
 		"id": "New_CIG",
 		"name": "New CIG Workflow",
@@ -29,19 +29,21 @@ CIGBase.prototype.createNew = function(config) {
 		"workflow_state": "activeState",
 		"decisional_state": "chosenState",
 		"description": "Some description here",
-		"children": [ {
-            "id": "First_task",
-            "name": "First task",
-            "composed": true,
-            "in_workflow": "New_CIG",
-            "node_type": "atomic_task",
-            "workflow_state": "activeState",
-            "decisional_state": "chosenState",
-            "description": "",
-            "inputForm": undefined,
+		"children": [{
+			"id": "First_task",
+			"name": "First task",
+			"composed": true,
+			"in_workflow": "New_CIG",
+			"node_type": "atomic_task",
+			"workflow_state": "activeState",
+			"decisional_state": "chosenState",
+			"description": "",
+			"inputForm": undefined,
 			"children": []
-		} ]
+		}]
 	};
+
+	this._initialize(config);
 
 	this._showFromData(json, config);
 }
@@ -57,10 +59,30 @@ CIGBase.prototype.show = function (json, config, callbacks) {
 			callbacks.afterRefresh();
 	};
 
+	this._initialize(config);
+
 	if ((typeof json) === "string")
 		this._showFromUrl(json, config, cb);
 	else
 		this._showFromData(json, config, cb);
+}
+
+CIGBase.prototype._initialize = function (config) {
+	this._addMainButtons(config);
+}
+
+CIGBase.prototype._addMainButtons = function (config) {
+	const container = $(
+		`<div class="button_container" style="position: absolute; top: 25px; right: 25px">
+		</div>`);
+
+	container.append(`<button id="reset_source" style="float: right">reset server</button>`);
+
+	if (config.editing)
+		container.append(`<button id="export_json" style="float: right">export json</button>
+			<button id="load_json" style="float: right">load json</button>`);
+
+	$('body').append(container);
 }
 
 CIGBase.prototype.loading_start = function () {
@@ -88,7 +110,7 @@ CIGBase.prototype.onInputFromServer = function (node, input) {
 	node.data.input = input;
 }
 
-CIGBase.prototype.onUserInput = function(taskId) {}
+CIGBase.prototype.onUserInput = function (taskId) { }
 
 // - end API
 
