@@ -160,6 +160,22 @@ CIGBase.prototype._setup = function (data, config) {
 	this._workflow = { data: this._data };
 }
 
+CIGBase.prototype._resetId = function (newId) {
+	const oldId = this.id;
+
+	this.id = newId;
+	this._data.id = newId;
+
+	this._propagateId(this._data, oldId, newId);
+}
+
+CIGBase.prototype._propagateId = function (node, oldId, newId) {
+	if (node.in_workflow == oldId)
+		node.in_workflow = newId;
+	
+	node.children.forEach((child) => this._propagateId(child, oldId, newId));
+}
+
 // subclasses need to implement:
 // _showFromData
 // _baseWorkflow

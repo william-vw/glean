@@ -948,9 +948,7 @@ VisualCIG.prototype._editor_setupHeaderInput = function (header) {
 		.on('keyup', (e) => {
 			if (e.key == "Enter") { // enter
 				this._data.name = dynTitle.node().value;
-
-				this.id = this._data.name.replaceAll(" ", "_");
-				this._data.id = this.id;
+				this._resetId(this._data.name.replaceAll(" ", "_"));
 				
 				staticTitle.text(this._data.name);
 			}
