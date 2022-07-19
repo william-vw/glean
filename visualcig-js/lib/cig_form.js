@@ -88,7 +88,7 @@ CIGForm.prototype.createNew = function(config) {
 }
 
 CIGForm.prototype._showFromData = function (data, config, callback) {
-    this._init(data, config);
+    this._setup(data, config);
 
     this._map = {};
     this._setupData(data, 0);

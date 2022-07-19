@@ -129,7 +129,7 @@ VisualCIG.prototype.findNodeByName = function (name) {
 }
 
 VisualCIG.prototype.findNodeById = function (id) {
-	if (id == this._workflow.id)
+	if (id == this.id)
 		return this._workflow;
 	else
 		return [this._root, ... this._root.descendants()].find((d) => d.data.id == id);
@@ -160,7 +160,7 @@ VisualCIG.prototype.update = function ({ transits, operations, adds }) {
 // showFromUrl
 
 VisualCIG.prototype._showFromData = function (data, config, callback) {
-	this._init(data, config);
+	this._setup(data, config);
 
 	this._inputs = [];
 
@@ -185,7 +185,7 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 
 	// - setup tree layout
 
-	this._refreshTreeLayout(callback);
+	this._refreshFromData(callback);
 
 
 	// - setup infobox, tooltip
@@ -197,7 +197,7 @@ VisualCIG.prototype._showFromData = function (data, config, callback) {
 }
 
 // TODO editor: only refresh parts that are needed after adding/removing nodes
-VisualCIG.prototype._refreshTreeLayout = function (callback) {
+VisualCIG.prototype._refreshFromData = function (callback) {
 	// (let's not show the workflow node)
 	const nodeData = this._workflow.data.children[0];
 	this._root = d3.hierarchy(nodeData);
@@ -813,7 +813,7 @@ VisualCIG.prototype._editor_appendNode = function (e, d) {
 		"id": id,
 		"name": name,
 		"composed": true,
-		"in_workflow": window.cig._workflow.id,
+		"in_workflow": window.cig.id,
 		"node_type": "atomic_task",
 		"workflow_state": "activeState",
 		"decisional_state": "chosenState",
@@ -822,7 +822,7 @@ VisualCIG.prototype._editor_appendNode = function (e, d) {
 		"children": []
 	});
 
-	window.cig._refreshTreeLayout();
+	window.cig._refreshFromData();
 }
 
 VisualCIG.prototype._editor_removeNode = function (e, d) {
@@ -840,7 +840,7 @@ VisualCIG.prototype._editor_removeNode = function (e, d) {
 		}
 	}
 
-	window.cig._refreshTreeLayout();
+	window.cig._refreshFromData();
 }
 
 // - formatting
@@ -948,6 +948,10 @@ VisualCIG.prototype._editor_setupHeaderInput = function (header) {
 		.on('keyup', (e) => {
 			if (e.key == "Enter") { // enter
 				this._data.name = dynTitle.node().value;
+
+				this.id = this._data.name.replaceAll(" ", "_");
+				this._data.id = this.id;
+				
 				staticTitle.text(this._data.name);
 			}
 			if (e.key == "Enter" || e.key == "Escape") {
@@ -981,6 +985,11 @@ VisualCIG.prototype._refreshHeader = function () {
 
 	} else
 		state.style('display', 'none');
+
+	// editor
+	const title = this._data.name;
+	header.select('div.title').html(title);
+	header.select('input.title').attr('value', title);
 };
 
 // - tooltip
@@ -1338,13 +1347,13 @@ VisualCIG.prototype._editor_updateNodeInfo = function (element, d) {
 		error.css('display', 'none');
 
 	d.data.name = newName;
-	d.data.id = newName.replace(" ", "_");
+	d.data.id = newName.replaceAll(" ", "_");
 	d.data.source = newSource;
 	d.data.description = newDescription;
 	d.data.node_type = newType;
 
 	window.cig._infoBox_onClose({}, cig);
-	window.cig._refreshTreeLayout();
+	window.cig._refreshFromData();
 }
 
 VisualCIG.prototype._editor_showEditBox = function (e, d, element, cig) {
@@ -1432,7 +1441,7 @@ VisualCIG.prototype._openTaskWindow = function (e, d) {
 
 	// means this is the main CIG
 	if (taskStack === null) {
-		taskStack = [{ id: cig._workflow.id, data: cig._workflow.data, nr: -1 }];
+		taskStack = [{ id: cig.id, data: cig._workflow.data, nr: -1 }];
 
 		// (new listener will override former one)
 		$(document).on('keyup', (e) => {

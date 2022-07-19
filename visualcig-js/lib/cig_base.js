@@ -78,11 +78,40 @@ CIGBase.prototype._addMainButtons = function (config) {
 
 	container.append(`<button id="reset_source" style="float: right">reset server</button>`);
 
-	if (config.editing)
+	if (config.editing) {
 		container.append(`<button id="export_json" style="float: right">export json</button>
-			<button id="load_json" style="float: right">load json</button>`);
+			<button id="load_json" style="float: right">load json</button>
+			<input type='file' id='load_json_file' style='display: none' />`);
+
+		container.find('#export_json').on('click', this._editor_exportJson);
+		container.find('#load_json').on('click', (e) => $('#load_json_file').trigger('click'));
+		container.find('#load_json_file').on('change', this._editor_loadJson);
+	}
 
 	$('body').append(container);
+}
+
+CIGBase.prototype._editor_exportJson = function (e) {
+	const cig = window.cig;
+
+	const data = JSON.stringify(cig._data, null, 4);
+	const fileName = cig.id + ".json";
+
+	download(data, fileName, 'text/json');
+}
+
+CIGBase.prototype._editor_loadJson = function () {
+	const file = this.files[0];
+
+	readFile(file, (data) => { 
+		const json = JSON.parse(data);
+		// console.log("loaded:", data); 
+
+		const cig = window.cig;
+		cig._setup(json, cig._config); // same config as before
+		cig._refreshFromData();
+
+	}, (e) => console.log("error:", e));
 }
 
 CIGBase.prototype.loading_start = function () {
@@ -118,7 +147,7 @@ CIGBase.prototype._showFromUrl = function (jsonUrl, config, callback) {
 	d3.json(jsonUrl).then((data) => this._showFromData(data, config, callback));
 }
 
-CIGBase.prototype._init = function (data, config) {
+CIGBase.prototype._setup = function (data, config) {
 	this.id = data.id;
 	this._data = data;
 	this._config = config;
@@ -128,9 +157,10 @@ CIGBase.prototype._init = function (data, config) {
 		prefixes.ns = config.ns;
 
 	// ('data' object will be workflow node itself)
-	this._workflow = { id: this._data.id, data: this._data };
+	this._workflow = { data: this._data };
 }
 
 // subclasses need to implement:
 // _showFromData
 // _baseWorkflow
+//_refreshFromData
