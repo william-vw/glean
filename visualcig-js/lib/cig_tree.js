@@ -111,6 +111,10 @@ VisualCIG.prototype._settings = {
 				other: 'none'
 			}
 		}
+	},
+	formBuilder: {
+		showActionButtons: false,
+		disableFields: ['autocomplete', 'button', 'file', 'hidden']
 	}
 };
 
@@ -721,8 +725,9 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 
 	this._nodes.selectAll("circle.node,rect.node,path.node,text.nodeCaption")
 		// (non-root) composite tasks are handled specially (see below)
+		// (editor)
 		.filter((d) => (d && d.data.node_type != 'composite_task' &&
-			(d.data.description || d.data.source || d.data.inputForm || d.data.insert)))
+			(d.data.description || d.data.source || d.data.inputForm || d.data.formBuilderData || d.data.insert)))
 		.style('cursor', "pointer")
 		.on("click", this._nodeInfoBox_onClick);
 
@@ -949,7 +954,7 @@ VisualCIG.prototype._editor_setupHeaderInput = function (header) {
 			if (e.key == "Enter") { // enter
 				this._data.name = dynTitle.node().value;
 				this._resetId(this._data.name.replaceAll(" ", "_"));
-				
+
 				staticTitle.text(this._data.name);
 			}
 			if (e.key == "Enter" || e.key == "Escape") {
@@ -1146,6 +1151,9 @@ VisualCIG.prototype._setupInfoBox = function () {
 		.append("div")
 		.classed('infobox input-form', true);
 
+	if (this._config.editing)
+		infoBox.classed('editor', true);
+
 	var content = infoBox.append("div")
 		.classed("infobox-content", true);
 
@@ -1181,7 +1189,7 @@ VisualCIG.prototype._nodeInfoBox_onClick = function (e, d) {
 
 	var content = "";
 
-	if (d.data.source !== undefined)
+	if (d.data.source)
 		content = `<div><b>Source</b>: ${d.data.source}</div>`;
 	else {
 		if (d.data.taskSource !== undefined)
@@ -1199,8 +1207,10 @@ VisualCIG.prototype._nodeInfoBox_onClick = function (e, d) {
 		content += "<br />" + insert;
 	}
 
-	if (d.data.inputForm !== undefined)
+	if (d.data.inputForm)
 		content += "<h3>Input:</h3>" + d.data.inputForm;
+	else if (d.data.formBuilderData)
+		content += "<h3>Input:</h3><table style='width: 100%'><tr><td id='form-render'></td></tr></table>";
 
 	var cig = d.cig;
 	cig._showInfoBox(e, d, title, content, cig);
@@ -1238,34 +1248,46 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 	const body = infoBox.find('.infobox-body')
 	body.html(content);
 
-	if (d.data && d.data.inputForm) {
-		// - first, update the html content
+	if (d.data) {
 
-		// add 'disabled' property & note, if needed
-		const state = d.data.workflow_state;
+		// (editor)
+		if (d.data.inputForm || d.data.formBuilderData) {
+			// - first, update the html content
 
-		// add submit & reset btn
-		$("<tr><td>" +
-			"<input type='submit' value='submit'></input>" +
-			"&nbsp;&nbsp;<input type='submit' value='reset'></input>" +
-			"</td></tr>"
-		).insertAfter(body.find('tr:last-child'));
+			// add 'disabled' property & note, if needed
+			const state = d.data.workflow_state;
 
-		body.find("input[value=submit]").on("click", (e) => submitInputData(e.target));
-		body.find("input[value=reset]").on("click", (e) => source.resetObservations(e.target));
+			// add submit & reset btn
+			$("<tr><td>" +
+				"<input type='submit' value='submit'></input>" +
+				"&nbsp;&nbsp;<input type='submit' value='reset'></input>" +
+				"</td></tr>"
+			).insertAfter(body.find('tr:last-child'));
 
-		if (state == 'inactiveState' || state == 'discardedState') {
-			const name = state.substring(0, state.length - "state".length);
-			body.find('input').prop('disabled', true);
-			$(`<div class='infobox-nope'>(currently ${name})</div>`).insertBefore(body.find('table'));
+			body.find("input[value=submit]").on("click", (e) => submitInputData(e.target));
+			body.find("input[value=reset]").on("click", (e) => source.resetObservations(e.target));
+
+			if (state == 'inactiveState' || state == 'discardedState') {
+				const name = state.substring(0, state.length - "state".length);
+				body.find('input').prop('disabled', true);
+				$(`<div class='infobox-nope'>(currently ${name})</div>`).insertBefore(body.find('table'));
+			}
+
+			// add error placeholder
+			$("<tr><td colspan='2'><div class='input-error'></td></tr>"
+			).insertBefore(body.find('tr:last-child'));
+
+			if (d.data.inputForm) {
+				setupInput(body, d.data);
+				infoBox.attr('id', d.data.id);
+			
+			} else {
+				const fbRender = body.find('#form-render');
+				fbRender.formRender({
+					formData: this._formBuilder.formData
+				});
+			}
 		}
-
-		// add error placeholder
-		$("<tr><td colspan='2'><div class='input-error'></td></tr>"
-		).insertBefore(body.find('tr:last-child'));
-
-		setupInput(body, d.data);
-		infoBox.attr('id', d.data.id);
 	}
 
 	const node = d3.select(e.target);
@@ -1307,7 +1329,9 @@ VisualCIG.prototype._editor_nodeEditBox_onClick = function (e, d) {
 			<label for="title">Name:</label> <input type="text" id="title" name="title" value="${d.data.name}"></input><br />
 			<label for="source">Source:</label> <input type="text" id="source" name="source">${d.data.source ? d.data.source : ""}</input><br />
 			<label for="description">Description:</label><br/><textarea id="description" name='description' cols="50" rows="4">${d.data.description ? d.data.description : ""}</textarea><br />
-		</div>`);
+		</div>
+		
+		<div id="form-editor"></div>`);
 	// <label for="insert">Insert:</label><input id='insert' name='insert' value="${d.data.insert ? d.data.insert : ""}" />
 
 	// (pre-select current node type)
@@ -1330,7 +1354,11 @@ VisualCIG.prototype._editor_updateNodeInfo = function (element, d) {
 	const newDescription = element.find("textarea#description").val();
 	// const newInsert = element.find("input#insert").val();
 
+	const newForm = this._formBuilder.formData;
+
+	console.log("new");
 	console.log(newType + ", " + newName + ", " + newSource + ", " + newDescription);
+	console.log(newForm);
 
 	var errorMsgs = [];
 	if (newName === "")
@@ -1349,6 +1377,7 @@ VisualCIG.prototype._editor_updateNodeInfo = function (element, d) {
 	d.data.source = newSource;
 	d.data.description = newDescription;
 	d.data.node_type = newType;
+	d.data.formBuilderData = newForm;
 
 	window.cig._infoBox_onClose({}, cig);
 	window.cig._refreshFromData();
@@ -1380,7 +1409,13 @@ VisualCIG.prototype._editor_showEditBox = function (e, d, element, cig) {
 	});
 	body.find("input[value=cancel]").on("click", (e) => this._infoBox_onClose({}, cig));
 
-	// infoBox.attr('id', d.data.id);
+	const fbEditor = body.find("#form-editor");
+	// courtesy
+	// https://github.com/kevinchappell/formBuilder/issues/559
+	fbEditor.formBuilder(this._settings.formBuilder).promise.then(formBuilder => {
+		this._formBuilder = formBuilder;
+		formBuilder.actions.setData(d.data.formBuilderData);
+	});
 
 	const node = d3.select(e.target);
 	// const bbox0 = $(node.node()).offset();

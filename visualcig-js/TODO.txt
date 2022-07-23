@@ -1,0 +1,20 @@
+> editor
+
+- input options
+adapted "controls" (w/ taxon code, etc.)
+
+- conditions
+some easy input format ..
+
+
+> exec options
+
+- hack together json-specific exec engine
+
+- use code-gen to create js exec engine
+	cope w/ recursivity, etc. (will need fixpoint-style / chase loop)
+	likely, a better representation of cig in json
+
+- use js reasoner to exec semantics
+	well, js reasoner
+	convert json cig to rdf format

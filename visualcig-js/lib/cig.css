@@ -118,6 +118,10 @@ a { color: lightgrey }
   opacity: 0.8;
 } */
 
+.editor {
+  width: 50%;
+}
+
 .tooltip:hover .tooltiptext {
   opacity: 1;
 }
@@ -509,3 +513,7 @@ div.vertical-placeholder {
   height: 100%;
   background: black;
 } */
+
+#form-editor {
+  color: black;
+}
