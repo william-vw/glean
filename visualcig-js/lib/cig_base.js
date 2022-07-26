@@ -95,7 +95,9 @@ CIGBase.prototype._addMainButtons = function (config) {
 
 CIGBase.prototype._editor_editToggle = function (e) {
 	const cig = window.cig;
-	
+
+	e.target.innerHTML = (cig._config.editing ? "showing" : "editing");
+
 	cig._config.editing = !cig._config.editing;
 	cig._refreshFromData();
 }

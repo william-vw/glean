@@ -7,6 +7,7 @@ body { padding: 0; margin: 0 }
 .nodeCaption { font-size: 14px }
 .opCaption { font-size: 18px; font-weight: bold }
 .hierCaption { font-size: 14px; font-style: italic }
+.parallelCaption { font-size: 20px; font-weight: thin }
 
 hr { margin-top: 15px; margin-bottom: 15px; border: none; border-top: 1px solid grey; }
 a { color: lightgrey }

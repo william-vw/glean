@@ -602,6 +602,8 @@ VisualCIG.prototype._showTreeLinks = function (hierLinksData) {
 		.attr('stroke-width', 1)
 		.attr('marker-end', 'url(#tree_arrow)');
 
+	// - captions
+
 	var conditionals = gs.filter((d) => d.condition || d.target.data.condition);
 
 	conditionals.append('text')
@@ -632,9 +634,20 @@ VisualCIG.prototype._showTreeLinks = function (hierLinksData) {
 		.style('cursor', "pointer")
 		.on("click", this._linkInfoBox_onClick);
 
+
+	// - "parallel" captions
+
+	gs.filter((d) => { console.log(d.source.data); return d.source.data.node_type == 'parallel_split'; })
+		.append('text')
+		.classed("parallelCaption", true)
+		.attr('x', (d, i) => (!d.curved ? linkCentroidX(d) : (d.source.x + 100)))
+		.attr('y', (d, i) => (!d.curved ? (linkCentroidY(d) + 10) : linkCentroidY(d)))
+		.attr('text-anchor', 'middle')
+		.text((d) => "| |");
+
+	// (- support for ad-hoc lines for comorbid demos)
 	var lineGen = d3.line();
 
-	// (support for ad-hoc lines for comorbid demos)
 	hierLinks
 		.filter((d) => d.target.data.after !== undefined)
 		.append('path') // need path when coloring line .. lol
