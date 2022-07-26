@@ -65,6 +65,10 @@ VisualCIG.prototype._settings = {
 		diamond: {
 			width: 12,
 			height: 18
+		},
+		hexagon: {
+			width: 10,
+			height: 9
 		}
 	},
 	decisionalState: {
@@ -468,6 +472,10 @@ VisualCIG.prototype._showLegend = function (config) {
 	legend.append('text').attr('x', x + xTextIncr).attr('y', y + yTextIncr).text('decision node');
 
 	y += 20;
+	legend.append('path').attr('d', hexagon(8, 7, x + 8, y)).style('fill', 'white').style('stroke', 'black');
+	legend.append('text').attr('x', x + xTextIncr).attr('y', y + yTextIncr).text('parallel split');
+
+	y += 20;
 	legend.append('circle').attr('cx', x + 8).attr('cy', y).attr('r', 8).style('fill', 'white').style('stroke', 'black');
 	legend.append('text').attr('x', x + xTextIncr).attr('y', y + yTextIncr).text('composite node');
 
@@ -659,6 +667,25 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 
 	this._nodes = nodes0.enter();
 
+	// -- decision nodes
+
+	this._nodes.filter((d) => d.data.node_type == 'decision_task')
+		.append('path')
+		.classed('node', true)
+		.attr('d', (d) => downTriangle(this._settings.nodeStyle.triangle.width,
+			this._settings.nodeStyle.triangle.height, d.x, d.y));
+
+	// -- parallel splits
+
+	this._nodes.filter((d) => (d.data.node_type == 'parallel_split'))
+		.append("path")
+		.classed('node', true)
+		.attr('d', (d) => hexagon(this._settings.nodeStyle.hexagon.width,
+			this._settings.nodeStyle.hexagon.height, d.x, d.y))
+		.style("stroke-width", 1)
+		.style("stroke-dasharray", "1,0")
+		.style("stroke", "black");
+
 	// -- composite nodes
 
 	this._nodes.filter((d) => d.data.node_type == 'composite_task')
@@ -688,14 +715,6 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 		.style("stroke-width", 1)
 		.style("stroke-dasharray", "1,0")
 		.style("stroke", "black");
-
-	// -- decision nodes
-
-	this._nodes.filter((d) => d.data.node_type == 'decision_task')
-		.append('path')
-		.classed('node', true)
-		.attr('d', (d) => downTriangle(this._settings.nodeStyle.triangle.width,
-			this._settings.nodeStyle.triangle.height, d.x, d.y));
 
 	// -- captions
 
@@ -809,14 +828,16 @@ VisualCIG.prototype._editor_editNode = function (e, d) {
 }
 
 VisualCIG.prototype._editor_appendNode = function (e, d) {
-	const name = prompt("Enter the new task name:");
-	if (name == null)
+	const task = prompt("Enter the new task name:");
+	if (task == null)
 		return;
 
-	const id = name.replace(" ", "_");
-	d.data.children.push({
+	const cond = prompt("Enter a condition label (optional):");
+
+	const id = task.replace(" ", "_");
+	const child = {
 		"id": id,
-		"name": name,
+		"name": task,
 		"composed": true,
 		"in_workflow": window.cig.id,
 		"node_type": "atomic_task",
@@ -825,8 +846,12 @@ VisualCIG.prototype._editor_appendNode = function (e, d) {
 		"description": "",
 		"inputForm": undefined,
 		"children": []
-	});
+	};
 
+	if (cond)
+		child.condition = { label: cond };
+
+	d.data.children.push(child);
 	window.cig._refreshFromData();
 }
 
@@ -1040,7 +1065,7 @@ VisualCIG.prototype._nodeTooltip_onMouseOver = function (e, d, config) {
 			node.attr('r', cig._settings.nodeStyle.circle.radius * factor)
 			break;
 
-		case 'decision_task':
+		case '	task':
 			var newWidth = cig._settings.nodeStyle.triangle.width * factor;
 			var newHeight = cig._settings.nodeStyle.triangle.height * factor;
 			node.attr('d', (d) => downTriangle(newWidth, newHeight, d.x, d.y));
@@ -1280,7 +1305,7 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 			if (d.data.inputForm) {
 				setupInput(body, d.data);
 				infoBox.attr('id', d.data.id);
-			
+
 			} else {
 				const fbRender = body.find('#form-render');
 				fbRender.formRender({
@@ -1322,6 +1347,7 @@ VisualCIG.prototype._editor_nodeEditBox_onClick = function (e, d) {
 			<div style="margin-bottom: 15px">
 				Type:
 					<input type="radio" name="type" id="decision_task" value="decision_task"><label for="decision_task">decision</label></input> | 
+					<input type="radio" name="type" id="parallel_split" value="parallel_split"><label for="parallel_split">parallel split</label></input> | 
 					<input type="radio" name="type" id="composite_task" value="composite_task"><label for="composite_task">composite</label></input> | 
 					<input type="radio" name="type" id="atomic_task" value="atomic_task"><label for="atomic_task">task</label></input> | 
 					<input type="radio" name="type" id="endpoint" value="endpoint"><label for="endpoint">endpoint</label></input>
@@ -1356,9 +1382,9 @@ VisualCIG.prototype._editor_updateNodeInfo = function (element, d) {
 
 	const newForm = this._formBuilder.formData;
 
-	console.log("new");
-	console.log(newType + ", " + newName + ", " + newSource + ", " + newDescription);
-	console.log(newForm);
+	// console.log("new");
+	// console.log(newType + ", " + newName + ", " + newSource + ", " + newDescription);
+	// console.log(newForm);
 
 	var errorMsgs = [];
 	if (newName === "")

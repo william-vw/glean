@@ -55,6 +55,17 @@ function diamond(width, height, x0, y0) {
     return `M ${x} ${y} L ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4} z`;
 }
 
+function hexagon(width, height, x0, y0) {
+    var x1 = x0 - width; var y1 = y0;
+    var x2 = x0 - width / 2; var y2 = y0 - height;
+    var x3 = x0 + width / 2; var y3 = y0 - height;
+    var x4 = x0 + width; var y4 = y0;
+    var x5 = x0 + width / 2; var y5 = y0 + height;
+    var x6 = x0 - width / 2; var y6 = y0 + height;
+
+    return `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4} L ${x5} ${y5} L ${x6} ${y6} z`;
+}
+
 // Copies a variable number of methods from source to target.
 d3.rebind = function (target, source) {
     var i = 1, n = arguments.length, method;

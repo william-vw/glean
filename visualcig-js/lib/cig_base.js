@@ -76,19 +76,28 @@ CIGBase.prototype._addMainButtons = function (config) {
 		`<div class="button_container" style="position: absolute; top: 25px; right: 25px">
 		</div>`);
 
-	container.append(`<button id="reset_source" style="float: right">reset server</button>`);
-
 	if (config.editing) {
 		container.append(`<button id="export_json" style="float: right">export json</button>
 			<button id="load_json" style="float: right">load json</button>
-			<input type='file' id='load_json_file' style='display: none' />`);
+			<input type='file' id='load_json_file' style='display: none' />
+			<button id="edit_toggle" style="float: right; margin-right: 25px;">editing</button>`);
 
-		container.find('#export_json').on('click', this._editor_exportJson);
+		container.find('#edit_toggle').on('click', this._editor_editToggle);
 		container.find('#load_json').on('click', (e) => $('#load_json_file').trigger('click'));
+		container.find('#export_json').on('click', this._editor_exportJson);
 		container.find('#load_json_file').on('change', this._editor_loadJson);
-	}
+
+	} else
+		container.append(`<button id="reset_source" style="float: right">reset server</button>`);
 
 	$('body').append(container);
+}
+
+CIGBase.prototype._editor_editToggle = function (e) {
+	const cig = window.cig;
+	
+	cig._config.editing = !cig._config.editing;
+	cig._refreshFromData();
 }
 
 CIGBase.prototype._editor_exportJson = function (e) {
@@ -103,7 +112,7 @@ CIGBase.prototype._editor_exportJson = function (e) {
 CIGBase.prototype._editor_loadJson = function () {
 	const file = this.files[0];
 
-	readFile(file, (data) => { 
+	readFile(file, (data) => {
 		const json = JSON.parse(data);
 		// console.log("loaded:", data); 
 
@@ -172,7 +181,7 @@ CIGBase.prototype._resetId = function (newId) {
 CIGBase.prototype._propagateId = function (node, oldId, newId) {
 	if (node.in_workflow == oldId)
 		node.in_workflow = newId;
-	
+
 	node.children.forEach((child) => this._propagateId(child, oldId, newId));
 }
 
