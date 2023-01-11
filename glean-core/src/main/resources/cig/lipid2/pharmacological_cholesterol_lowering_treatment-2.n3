@@ -1,0 +1,391 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
+prefix fhir: <http://hl7.org/fhir/>
+prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
+
+:Pharmacological_Cholesterol_Lowering_Treatment-2 a cig:MedicalWorkflow ;
+	state:in gl:Inactive ;
+	gl:conditional false ;
+	#state:in gl:Active ;
+	
+	rdfs:label "Pharmacological Cholesterol-Lowering Treatment Workflow" ;
+	
+	cig:inputFile "/cig/lipid/input/pharmacological_cholesterol_lowering_treatment.n3" ;
+	
+	gl:subTask :assess_age_start-2 , :assess_kidney_transplant-2 , :assess_egfr_value-2 , 
+		:treat_statin_egfr-2 , :treat_statin_kidney_transplant-2 , :assess_dialysis_treatment-2 , 
+		:assess_statin_use-2 , :assess_age_no_dialysis-2 , :treat_statin_no_dialysis-2 , :assess_cv_risk-2 ,
+		:continue_statin_treatment-2 , :do_not_initiate_statins-2 , :treat_statin_high_risk-2 ,
+		:no_statin_treatment_low_risk-2 .
+	
+	
+:assess_age_start-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Age?" ;
+	
+	cig:input :assess_age_report ;
+	
+	gl:decisionBranch [ 
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label ">= 50 years" ;
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_age ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notLessThan 50 }
+				] )
+		] ;
+		gl:branchTarget :assess_egfr_value-2
+		
+	] , [ 
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "18-49 years" ;
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_age ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notLessThan 18 ;
+							math:notGreaterThan 49 }
+				] )
+		] ;
+		gl:branchTarget :assess_kidney_transplant-2
+		 
+	] .
+
+	
+:assess_egfr_value-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "eGFR value?" ;
+	
+	cig:input :assess_egfr_value_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label ">=60" ;
+			rdfs:comment ">=60 ml/min/ 1.73m2" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_egfr ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notLessThan 60 }
+				] )
+		] ;
+	
+		gl:branchTarget :treat_statin_egfr-2 
+		
+	] , [ 
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "< 60" ;
+			rdfs:comment "< 60 ml/min/ 1.73m2" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_egfr ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:lessThan 60 }
+				] )
+		] ;
+		
+		gl:branchTarget :assess_kidney_transplant-2	
+	
+	] .
+	
+:treat_statin_egfr-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "treat with statins" ;
+	rdfs:comment """2.1.2: In adults aged >=50 years with CKD and eGFR>=60 ml/min/1.73m2 (GFR categories G1-G2) we recommend treatment with a statin. (1B)""" ;
+	cig:insert "/cig/lipid/html/statin_info.html" .
+
+	
+:assess_kidney_transplant-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Kidney transplant?" ;
+	
+	cig:input :assess_kidney_transplant_report ;
+	
+	gl:decisionBranch [ 
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_kidney_transplant ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+		
+		gl:branchTarget :treat_statin_kidney_transplant-2
+	
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "no" ;	
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_kidney_transplant ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+	
+		gl:branchTarget :assess_dialysis_treatment-2
+	] .
+	
+	
+:treat_statin_kidney_transplant-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "treat with statins" ;
+	rdfs:comment """2.4: In adult kidney transplant recipients, we suggest treatment with a statin. (2B)""" ;
+	cig:insert "/cig/lipid/html/statin_info.html" .
+	
+	
+:assess_dialysis_treatment-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Treatment with dialysis?" ;
+	
+	cig:input :assess_dialysis_treatment_report ;
+	
+	gl:decisionBranch [ 
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_dialysis_treatment ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+		
+		gl:branchTarget :assess_statin_use-2
+	
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_dialysis_treatment ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+	
+		gl:branchTarget :assess_age_no_dialysis-2
+	] .
+	
+	
+:assess_statin_use-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Using statins or statin/ezetimibe?" ;
+	
+	cig:input :assess_statin_use_report ;
+	
+	gl:decisionBranch [ 
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_statin_ezetimibe ;
+								fhir:Observation.valueBoolean true } 
+						] )
+		] ;
+		gl:branchTarget :continue_statin_treatment-2
+		 
+	] , [ 
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			cond:allOf ( [ cond:premise 
+							{ ?obs fhir:Observation.code :code_statin_ezetimibe ;
+								fhir:Observation.valueBoolean false } 
+						] )
+		] ;
+		gl:branchTarget :do_not_initiate_statins-2
+	] .
+	
+
+:assess_age_no_dialysis-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "Age?" ;
+	
+	cig:input :assess_age_report ;
+	
+	gl:decisionBranch [ 
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "18-49 years" ;
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_age ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notLessThan 18 ;
+							math:notGreaterThan 49 }
+				] )
+		] ;
+		gl:branchTarget :assess_cv_risk-2
+		 
+	] , [ 
+		state:in gl:Inactive ;
+		gl:order 2 ;
+		
+		gl:precondition [
+			rdfs:label ">= 50 years" ;
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_age ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notLessThan 50 }
+				] )
+		] ;
+		gl:branchTarget :treat_statin_no_dialysis-2
+	] .
+	
+	
+:treat_statin_no_dialysis-2 a gl:EndPoint ;	
+	state:in gl:Inactive ;
+	gl:conditional false ;
+	
+	rdfs:label "treat with statins or statin/ezetimibe" ;
+	cig:insert "/cig/lipid/html/statin_info.html" .
+
+
+:assess_cv_risk-2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "assess CV risk" ;
+	rdfs:comment """Note that CV risk should be re-assessed on an annual basis, as changes in clinical condition may warrant treatment with a statin.""" ;
+	
+	cig:input :assess_cv_risk_report ;
+	
+	gl:decisionBranch [ 
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "high risk" ;
+			rdfs:comment """Prior MI or
+Prior Coronary revascularization or
+Prior ischemic stroke or Transient ischemic attack or
+Diabetes or
+Estimated 10-year incidence of coronary death or non-fatal MI >10% using a validated risk calculator""" ;
+			
+			cond:anyOf ( 
+				[ cond:premise { ?obs fhir:Observation.code :code_prior_mi ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_prior_coronary_revascularization ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_prior_ischemic_stroke ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_prior_transient_ischemic_attack ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_diabetes ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_estimated_10-year_incidence_coronary_death ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_likelihood_non_fatal_mi ; 
+							fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:greaterThan 10 }
+				]
+			)
+		] ;
+		gl:branchTarget :treat_statin_high_risk-2
+		 
+	] , [ 
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "no" ;
+			rdfs:comment """No CV risk factor or 
+Estimated 10-year incidence of coronary death or non-fatal MI >10% using a validated risk calculator""" ;
+			
+			cond:allOf (
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_no_cv_risk_factors ; 
+						fhir:Observation.valueBoolean true }
+				] )
+		] ;
+		gl:branchTarget :no_statin_treatment_low_risk-2
+	] .
+	
+	
+:treat_statin_high_risk-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "treat with statin" ;
+	rdfs:comment """2.2: In adults aged 18–49 years with CKD but not treated with chronic dialysis or kidney transplantation, we
+suggest statin treatment in people with one or more of the following (2A):
+•	known coronary disease (myocardial infarction or coronary revascularization)
+•	diabetes mellitus
+•	prior ischemic stroke
+•	estimated 10-year incidence of coronary death or non-fatal myocardial infarction >10%""" ;
+	
+	cig:insert "/cig/lipid/html/statin_info.html" .
+	
+	
+:no_statin_treatment_low_risk-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "do not initiate statins" .
+	
+
+:continue_statin_treatment-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "continue statin or statin/ezetimibe" ;
+	rdfs:comment """2.3.2: In patients already receiving statins or statin/ezetimibe combination at the time of dialysis initiation, we suggest that these agents be continued. (2C)""" ;
+	cig:insert "/cig/lipid/html/statin_info.html" .
+
+:do_not_initiate_statins-2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "do not initiate statins" ;
+	rdfs:comment """2.3.1: In adults with dialysis-dependent CKD, we suggest that statins or statin/ezetimibe combination not be initiated. (2A)""" .

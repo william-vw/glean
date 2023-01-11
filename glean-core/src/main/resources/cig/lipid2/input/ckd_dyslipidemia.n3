@@ -1,0 +1,116 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+@base <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#> .
+
+:prior_lipid_profile_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_prior_lipid_profile
+	]) .
+
+:action_prior_lipid_profile a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_prior_lipid_profile" ;
+	fhir:ActivityDefinition.title "Prior measurement of lipid profile" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_lipid_profile ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
+	
+	
+:evaluate_dyslipidemia_severity_report a fhir:PlanDefinition ;
+	fhir:PlanDefinition.url <copd_diary_observations> ;
+	fhir:PlanDefinition.name "copd_diary_observations" ;
+	fhir:PlanDefinition.title "COPD observations" ;
+	fhir:PlanDefinition.status "active" ; 
+	fhir:PlanDefinition.action ( [
+		fhir:PlanDefinition.action.definitionUri :action_fasting_triglycerides
+	] [
+		fhir:PlanDefinition.action.definitionUri :action_ldl_cholesterol
+	] ) .
+	
+	
+:action_ldl_cholesterol a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_ldl_cholesterol" ;
+	fhir:ActivityDefinition.title "LDL cholesterol" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_ldl_cholesterol ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "mmol/L" ; # millimole per liter
+					rdfs:label "mmol/L"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 2
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 100 ] ;
+				rdfs:label "(1-100)"
+			]
+		]
+	] .
+	
+:action_fasting_triglycerides a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_fasting_triglycerides" ;
+	fhir:ActivityDefinition.title "Fasting triglycerides" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_fasting_triglycerides ;
+		# fhir:ObservationDefinition.category .. ;
+		fhir:ObservationDefinition.quantitativeDetails [
+			fhir:ObservationDefinition.quantitativeDetails.unit [ 
+				fhir:CodeableConcept.coding [
+					fhir:Coding.system <http://unitsofmeasure.org> ;
+					fhir:Coding.code "mmol/L" ; # millimole per liter
+					rdfs:label "mmol/L"
+    			]
+    		] ;
+    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 2
+		] ;
+		fhir:ObservationDefinition.qualifiedInterval [
+			fhir:ObservationDefinition.qualifiedInterval.range [
+				fhir:Range.low  [ fhir:Quantity.value 1 ] ;
+				fhir:Range.high [ fhir:Quantity.value 100 ] ;
+				rdfs:label "(1-100)"
+			]
+		]
+	] .
+
+# codes
+    
+# TODO
+
+:code_ckd
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://www.snomed.org> ;
+		fhir:Coding.code "289161009" # Finding of appetite (finding)
+    ] .
+
+in:category_survey
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <http://terminology.hl7.org/CodeSystem/observation-category> ;
+		fhir:Coding.code "survey"
+	] .
+	
+in:category_present
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "symptom-present"
+	] .
+	
+in:category_yes_no
+	fhir:CodeableConcept.coding [
+		fhir:Coding.system <> ;
+		fhir:Coding.code "yes-no"
+	] .
