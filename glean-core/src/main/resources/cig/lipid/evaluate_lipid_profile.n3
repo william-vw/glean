@@ -8,13 +8,13 @@ prefix fhir: <http://hl7.org/fhir/>
 prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
 :Evaluate_Lipid_Profile a cig:MedicalWorkflow ;
-	state:in gl:Inactive ;
+	# state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "Evaluate lipid profile" ;
 	
-	#gl:root true ;
-	#state:in gl:Active ;
+	gl:root true ;
+	state:in gl:Active ;
 	
 	cig:inputFile "/cig/lipid/input/evaluate_lipid_profile.n3" ;
 	

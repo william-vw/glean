@@ -19,7 +19,8 @@ public class CIGTest {
 //	private static ReasonTypes reason = ReasonTypes.FORWARD;
 
 	private static N3ModelSpec spec = N3ModelSpec.get(Types.N3_MEM_HYBRID_INF);
-	private static ReasonTypes reason = ReasonTypes.HYBRID;
+//	private static ReasonTypes reason = ReasonTypes.HYBRID;
+	private static ReasonTypes reason = ReasonTypes.FORWARD;
 
 //	private static String cigNs = NS.ckd;
 //	private static String cigPath = "cig/lipid/evaluate_lipid_profile-simple.n3";
@@ -111,21 +112,21 @@ public class CIGTest {
 				+ "ns:df_0_0 <http://hl7.org/fhir/Observation.code> ns:code_lipid_profile;\n"
 				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.");
 
-		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
-				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
-				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n" + "\n"
-				+ "ns:df_1_0 <http://hl7.org/fhir/Observation.code> ns:code_age;\n"
-				+ "    	<http://hl7.org/fhir/Observation.valueQuantity> ns:df_1_1 ."
-				+ "ns:df_1_1 <http://hl7.org/fhir/Quantity.value> 19 .");
-
-		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
-				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
-				+ "@prefix fhir: <http://hl7.org/fhir/>.\n"
-				+ "@prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>.\n"
-				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n\n"
-				+ "_:df_2_0 <http://hl7.org/fhir/Observation.code> ns:code_kidney_transplant;\n"
-				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.\n"
-				+ "ns:assess_kidney_transplant-2 gl:hasInputData _:df_2_0.\n");
+//		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+//				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+//				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n" + "\n"
+//				+ "ns:df_1_0 <http://hl7.org/fhir/Observation.code> ns:code_age;\n"
+//				+ "    	<http://hl7.org/fhir/Observation.valueQuantity> ns:df_1_1 ."
+//				+ "ns:df_1_1 <http://hl7.org/fhir/Quantity.value> 19 .");
+//
+//		cig.loadString("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+//				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+//				+ "@prefix fhir: <http://hl7.org/fhir/>.\n"
+//				+ "@prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>.\n"
+//				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n\n"
+//				+ "_:df_2_0 <http://hl7.org/fhir/Observation.code> ns:code_kidney_transplant;\n"
+//				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.\n"
+//				+ "ns:assess_kidney_transplant-2 gl:hasInputData _:df_2_0.\n");
 
 		return cig.transitAll();
 

@@ -12,7 +12,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 	state:in gl:Active ;
 	rdfs:label "RBC Matching" ;
 
-	cig:inputFile "/cig/btsf/input/rbc_match.n3" ;
+	cig:inputFile "/cig/rbc/input/rbc_match.n3" ;
 
 	gl:root true ;
 	gl:subTask :check_routine_match , :emergency_request , :match_abo_rhd , :match_antibody ,
@@ -171,16 +171,22 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 			rdfs:label "yes" ;
 			rdfs:comment """Patient is a female of childbearing age (< 45)""" ;
 			
+			#cond:allOf (
+			#	[ cond:premise { 
+			#		?obs fhir:Observation.code :code_age ; 
+			#			fhir:Observation.valueQuantity ?quantity . 
+			#			?quantity fhir:Quantity.value ?value .
+			#			?value math:lessThan 45 
+			#	} ]
+			#	[ cond:premise { 
+			#		?obs fhir:Observation.code :code_female ; 
+			#			fhir:Observation.valueBoolean true .
+			#	} ]
+			#)
 			cond:allOf (
 				[ cond:premise { 
-					?obs fhir:Observation.code :code_age ; 
-						fhir:Observation.valueQuantity ?quantity . 
-						?quantity fhir:Quantity.value ?value .
-						?value math:lessThan 45 
-				} ]
-				[ cond:premise { 
-					?obs fhir:Observation.code :code_female ; 
-						fhir:Observation.valueBoolean true .
+					?obs fhir:Observation.code :code_female_childbearing_age ;
+						fhir:Observation.valueBoolean true 
 				} ]
 			)
 		] ;
@@ -194,16 +200,22 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 			rdfs:label "no" ;
 			rdfs:comment """Patient is not a female of childbearing age (< 45)""" ;
 			
-			cond:anyOf (
+			#cond:anyOf (
+			#	[ cond:premise { 
+			#		?obs fhir:Observation.code :code_age ; 
+			#			fhir:Observation.valueQuantity ?quantity . 
+			#			?quantity fhir:Quantity.value ?value .
+			#			?value math:notLessThan 45 
+			#	} ]
+			#	[ cond:premise { 
+			#		?obs fhir:Observation.code :code_male ; 
+			#			fhir:Observation.valueBoolean true .
+			#	} ]
+			#)
+			cond:allOf (
 				[ cond:premise { 
-					?obs fhir:Observation.code :code_age ; 
-						fhir:Observation.valueQuantity ?quantity . 
-						?quantity fhir:Quantity.value ?value .
-						?value math:notLessThan 45 
-				} ]
-				[ cond:premise { 
-					?obs fhir:Observation.code :code_male ; 
-						fhir:Observation.valueBoolean true .
+					?obs fhir:Observation.code :code_female_childbearing_age ;
+						fhir:Observation.valueBoolean false 
 				} ]
 			)
 		] ;
@@ -363,7 +375,7 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 						fhir:Observation.valueBoolean true .
 				} ]
 				[ cond:premise { 
-					?obs fhir:Observation.code :code_female ;
+					?obs fhir:Observation.code :code_female_childbearing_age ;
 						fhir:Observation.valueBoolean true .
 				} ]
 			)
@@ -378,14 +390,14 @@ prefix : <http://niche.cs.dal.ca/ns/cig/rbc_match.owl#>
 			rdfs:label "no" ;
 			rdfs:comment """There is no determined need for phenotype matching.""" ;
 			
-			cond:allOf (
+			cond:anyOf (
 				[ cond:premise { 
 					?obs fhir:Observation.code :code_unique_antibody ;
-						fhir:Observation.valueBoolean true .
+						fhir:Observation.valueBoolean false .
 				} ]
 				[ cond:premise { 
-					?obs fhir:Observation.code :code_male ;
-						fhir:Observation.valueBoolean true .
+					?obs fhir:Observation.code :code_female_childbearing_age ;
+						fhir:Observation.valueBoolean false .
 				} ]
 			)
 		] ;

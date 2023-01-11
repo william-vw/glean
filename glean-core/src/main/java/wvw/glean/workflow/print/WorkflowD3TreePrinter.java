@@ -44,9 +44,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 		return prepare(wf, null, wf, 0, false);
 	}
 
-	protected Node prepare(Resource entity, Node parent, Resource workflow, int depth,
-			boolean composed) {
-
+	protected Node prepare(Resource entity, Node parent, Resource workflow, int depth, boolean composed) {
 		Resource task = getTask(entity);
 		String id = getId(task);
 
@@ -60,8 +58,7 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 			node.setWorkflow(workflow);
 
 		if (entity.hasProperty(kb.resource("gl:order"))) {
-			int order = entity.getPropertyResourceValue(kb.resource("gl:order")).asLiteral()
-					.getInt();
+			int order = entity.getPropertyResourceValue(kb.resource("gl:order")).asLiteral().getInt();
 			node.setOrder(order);
 		}
 
@@ -184,11 +181,12 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 		if (curNode.getParents().size() > 1) {
 
-			str.append(printKeyArray("otherParents", curNode.getParents().stream()
-					.filter(p -> !p.getParent().equals(curParent))
-					.map(p -> "{" + printKeyString("id", getId(p.getParent().getTask()), true)
-							+ printKeyValue("condition", getCondition(p.getEntity())) + "}")
-					.collect(Collectors.toList()), false, true));
+			str.append(printKeyArray("otherParents",
+					curNode.getParents().stream().filter(p -> !p.getParent().equals(curParent))
+							.map(p -> "{" + printKeyString("id", getId(p.getParent().getTask()), true)
+									+ printKeyValue("condition", getCondition(p.getEntity())) + "}")
+							.collect(Collectors.toList()),
+					false, true));
 		}
 
 		String type = getType(task);
@@ -258,7 +256,8 @@ public class WorkflowD3TreePrinter extends WorkflowJsonPrinter {
 
 		if (entity.hasProperty(kb.resource("gl:precondition"))) {
 			Resource cond = entity.getProperty(kb.resource("gl:precondition")).getObject();
-
+			
+			
 			if (cond.equals(kb.resource("gl:Other")))
 				label = "other";
 

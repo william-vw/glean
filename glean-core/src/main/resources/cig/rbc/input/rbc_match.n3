@@ -23,8 +23,7 @@
 		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
 		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
 		fhir:ObservationDefinition.mutexWith ( )
-	] .
-	
+	] .	
 	
 :check_need_irr_blood_report a fhir:PlanDefinition ;
 	fhir:PlanDefinition.url <check_need_irr_blood_report> ;
@@ -52,12 +51,15 @@
 	fhir:PlanDefinition.title "Female of childbearing age (< 45)?" ;
 	fhir:PlanDefinition.status "active" ; 
 	fhir:PlanDefinition.action ( [
-		fhir:PlanDefinition.action.definitionUri :action_check_male
-	] [
-		fhir:PlanDefinition.action.definitionUri :action_check_female
-	] [
-		fhir:PlanDefinition.action.definitionUri :action_check_age
+		fhir:PlanDefinition.action.definitionUri :action_check_female_childbearing_age
 	] ) .
+#	fhir:PlanDefinition.action ( [
+#		fhir:PlanDefinition.action.definitionUri :action_check_male
+#	] [
+#		fhir:PlanDefinition.action.definitionUri :action_check_female
+#	] [
+#		fhir:PlanDefinition.action.definitionUri :action_check_age
+#	] ) .
 
 :action_check_male a fhir:ActivityDefinition ;
 	fhir:ActivityDefinition.name "action_check_male" ;
@@ -93,7 +95,7 @@
 					rdfs:label "years"
     			]
     		] ;
-    		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
+   		fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 0
 		] ;
 		fhir:ObservationDefinition.qualifiedInterval [
 			fhir:ObservationDefinition.qualifiedInterval.range [
@@ -103,7 +105,16 @@
 			]
 		]
 	] .
-	
+
+:action_check_female_childbearing_age a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_check_female_childbearing_age" ;
+	fhir:ActivityDefinition.title "Female of childbearing age?" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_female_childbearing_age ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( )
+	] .
 	
 :check_kell_status_report a fhir:PlanDefinition ;
 	fhir:PlanDefinition.url <check_kell_status_report> ;
@@ -174,9 +185,10 @@
 	fhir:PlanDefinition.status "active" ; 
 	fhir:PlanDefinition.action (
 		[ fhir:PlanDefinition.action.definitionUri :action_phenotype_unique_antibody ]
-		[ fhir:PlanDefinition.action.definitionUri :action_check_male ]
-		[ fhir:PlanDefinition.action.definitionUri :action_check_female ]
-		[ fhir:PlanDefinition.action.definitionUri :action_check_age ]
+		#[ fhir:PlanDefinition.action.definitionUri :action_check_male ]
+		#[ fhir:PlanDefinition.action.definitionUri :action_check_female ]
+		#[ fhir:PlanDefinition.action.definitionUri :action_check_age ]
+		[ fhir:PlanDefinition.action.definitionUri :action_phenotype_female_childbearing_age ]
 		[ fhir:PlanDefinition.action.definitionUri :action_phenotype_chronic_transf ]
 		[ fhir:PlanDefinition.action.definitionUri :action_phenotype_sicke_cell ]
 	) .
@@ -195,7 +207,7 @@
 	fhir:ActivityDefinition.name "action_phenotype_female_childbearing_age" ;
 	fhir:ActivityDefinition.title "Female of childbearing age (< 45)?" ;
 	fhir:ActivityDefinition.observationResultRequirement [
-		fhir:ObservationDefinition.code ::code_female_childbearing_age ;
+		fhir:ObservationDefinition.code :code_female_childbearing_age ;
 		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
 		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
 		fhir:ObservationDefinition.mutexWith ( )

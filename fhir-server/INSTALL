@@ -11,12 +11,24 @@ chmod +x *.sh
 - run within the fhir-server/ directory:
 mvn clean install tomcat7:redeploy
 
-(first, this will require you to recursively run `mvn install` on the dependencies listed in the fhir-server pom.xml file: utils, rdf-utils, ui-gen, and glean-core; and re-install them whenever they are updated)
+this will require you to recursively run `clean install` on the dependencies listed in the fhir-server pom.xml file:
+utils, rdf-utils, ui-gen, and glean-core; and re-install them whenever they are updated
+
+(for jen3: put `-Drat.skip=true clean install`)
 
 
 - setup user for pushing war file
 (if running into broken pipe error messages)
 
+add to [tomcat-folder]/conf/tomcat-users.xml:	
+  	<role rolename="manager-gui"/>
+  	<role rolename="manager-script"/>
+  	<role rolename="manager-jmx"/>
+  	<role rolename="manager-status"/>
+
+  	<user username="admin" password="admin" roles="manager-script,manager-jmx,manager-gui" />
+
+(if that doesn't work: 
 add following to tomcat7-maven-plugin:
 	<configuration>
 		<username>admin</username>
@@ -30,11 +42,4 @@ add [tomcat-folder]/conf/settings.xml:
 	    <username>admin</username>
 	    <password>admin</password>
 	</server>
-
-add to [tomcat-folder]/conf/tomcat-users.xml:	
-  	<role rolename="manager-gui"/>
-  	<role rolename="manager-script"/>
-  	<role rolename="manager-jmx"/>
-  	<role rolename="manager-status"/>
-
-  	<user username="admin" password="admin" roles="manager-script,manager-jmx,manager-gui" />
+)

@@ -53,7 +53,7 @@ public class CIGServer extends RestfulServer {
 
 		// setup known models
 		models.put("Dyslipidemia_CKD", new ModelEntry("lipid/ckd_dyslipidemia", NS.ckd));
-		models.put("RBC_Match", new ModelEntry("btsf/rbc_match", NS.rbc));
+		models.put("RBC_Match", new ModelEntry("rbc/rbc_match", NS.rbc));
 	}
 
 	public CIGModel createCig(WorkflowReference workflowRef) {

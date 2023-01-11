@@ -29,6 +29,7 @@ import wvw.cig.uigen.UiGen.UiFormats;
 import wvw.glean.workflow.WorkflowModel;
 import wvw.glean.workflow.WorkflowModel.LoadOptions;
 import wvw.glean.workflow.print.WorkflowD3TreePrinter;
+import wvw.glean.workflow.print.WorkflowJsPrinter;
 import wvw.glean.workflow.print.WorkflowJsonPrinter;
 import wvw.glean.workflow.print.WorkflowJsonPrinter.PrintJsonTaskHook;
 import wvw.glean.workflow.print.WorkflowPrinter;
@@ -42,6 +43,8 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 	private UiGen uiGen = new UiGen();
 
+	private String ontologyPath = "cig/ontology.n3";
+
 	public static void main(String[] args) throws Exception {
 		CIGWorkflowPrinter printer = new CIGWorkflowPrinter();
 
@@ -49,21 +52,23 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// (NOTE: when editing ui_codes, need to re-run UiGen!)
 
-//		printer.printUi("/cig/lipid/input/ckd_dyslipidemia.n3", "ckd:prior_lipid_profile_report");
+//		printer.printUi("/cig/rbc/input/rbc_match.n3",
+//				"http://niche.cs.dal.ca/ns/cig/rbc_match.owl#check_female_childbearing_age_report");
 
 		// - print workflow
 
-		String outFolder = "/Users/wvw/git/cig/glean/visualcig-js/json/";
-		
+		String outFolder = "/Users/wvw/git/glean/visualcig-js/json/";
+
 		// -- lipid
 
-		String name = "lipid/ckd_dyslipidemia";
+//		String name = "lipid/ckd_dyslipidemia";
+		String name = "lipid2/evaluate_lipid_profile";
 		String ns = NS.ckd;
 		printer.printWorkflow(name, ns, outFolder);
 
 		// -- rbc
 
-//		String name = "btsf/rbc_match";
+//		String name = "rbc/rbc_match";
 //		String ns = NS.rbc;
 //		printer.printWorkflow(name, ns, outFolder);
 	}
@@ -90,8 +95,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 //		reportNeeds.write(System.out);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		uiGen.generate(EhrStandards.FHIR, UiFormats.HTML_RDFA, reportNeeds, tmpDir, out,
-				OutputOptions.TABLE);
+		uiGen.generate(EhrStandards.FHIR, UiFormats.HTML_RDFA, reportNeeds, tmpDir, out, OutputOptions.TABLE);
 
 		String html = new String(out.toByteArray()).trim();
 		System.out.println("html? " + html);
@@ -105,26 +109,43 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 //		wf.getKb().printAll();
 
-		// string
+		// - string
+
 //		WorkflowPrinter printer = new WorkflowStringPrinter(); // WorkflowD3TreePrinter();
 //		printer.print(wf);
 //		
 //		System.out.println(printer.getString());
 
-		// json
+		// - json
+
 		WorkflowPrinter printer = new WorkflowD3TreePrinter(this);
 		printer.print(wf);
 
 		String out = printer.getString();
-//		System.out.println(out);
+//		System.out.println("json:\n" + out);
 
 		String outPath = outFolder + name + ".json";
 		IOUtils.writeFile(outPath, out, false);
 
-		long end = System.currentTimeMillis();
-		LOG.info("writing json: " + (end - start) + "ms");
+		LOG.info("written json to " + outPath);
 
-		LOG.info("written to " + outPath);
+		// - js
+
+		N3Model ontology = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));
+		ontology.read(IOUtils.getResourceStream(getClass(), ontologyPath), "");
+
+		printer = new WorkflowJsPrinter(ontology);
+		printer.print(wf);
+
+		out = printer.getString();
+		System.out.println("js:\n" + out);
+
+		outPath = outFolder + name + ".js";
+		IOUtils.writeFile(outPath, out, false);
+		LOG.info("written js to " + outPath);
+
+		long end = System.currentTimeMillis();
+		LOG.info("total writing: " + (end - start) + "ms");
 	}
 
 	// (returns whether json was updated by this hook)
@@ -190,7 +211,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		// input-file was not edited after html was previously generated
 		// so, simply return previously generated html
 
-		if (inputFile.lastModified() <= htmlFile.lastModified())
+		if (htmlFile.exists() && inputFile.lastModified() <= htmlFile.lastModified())
 			try {
 				String html = IOUtils.readFromFile(htmlFile);
 				LOG.info("loaded html file: " + htmlFile.getPath());
@@ -227,8 +248,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			uiGen.generate(EhrStandards.FHIR, UiFormats.HTML_RDFA, reportNeeds, tmpDir, out,
-					OutputOptions.TABLE);
+			uiGen.generate(EhrStandards.FHIR, UiFormats.HTML_RDFA, reportNeeds, tmpDir, out, OutputOptions.TABLE);
 
 			String html = new String(out.toByteArray()).trim();
 //			System.out.println(html);
@@ -269,8 +289,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		reportNeeds.add(it);
 
-		Collection actions = inputData
-				.list(input, inputData.resource("fhir:PlanDefinition.action"), (Resource) null)
+		Collection actions = inputData.list(input, inputData.resource("fhir:PlanDefinition.action"), (Resource) null)
 				.next().getObject().asCollection();
 
 		Iterator<Resource> elements = actions.getElements();

@@ -27,7 +27,6 @@ import org.apache.jen3.vocabulary.RDFS;
 import org.apache.log4j.Logger;
 
 import wvw.semweb.kb.jena.JenaKb;
-import wvw.utils.log.Log;
 import wvw.utils.map.HashMultiMap;
 import wvw.utils.map.MultiMap;
 import wvw.utils.rdf.NS;
@@ -57,7 +56,7 @@ public abstract class WorkflowModel {
 			InitOptions.LOGGING };
 	public static InitOptions[] transitTest = { InitOptions.DO_TRANSIT };
 
-	public static ReasonTypes defaultReason = ReasonTypes.HYBRID;
+	public static ReasonTypes defaultReason = ReasonTypes.FORWARD; // ReasonTypes.HYBRID;
 	protected static N3ModelSpec defaultSpec = N3ModelSpec.get(Types.N3_MEM_HYBRID_INF);
 
 //	protected static String root = "src/main/resources/";
@@ -200,7 +199,8 @@ public abstract class WorkflowModel {
 					else
 						sources.add(srcStr);
 
-					Log.i("(resolving: " + srcStr + ")");
+//					Log.i("(resolving: " + srcStr + ")");
+					System.out.println("(resolving: " + srcStr + ")");
 
 					long start = System.currentTimeMillis();
 					JenaKb kb2 = null;
@@ -220,7 +220,7 @@ public abstract class WorkflowModel {
 						e.printStackTrace();
 					}
 					long end = System.currentTimeMillis();
-					Log.i("(time: " + (end - start) + "ms)");
+					System.out.println("(time: " + (end - start) + "ms)");
 				}
 			}
 
