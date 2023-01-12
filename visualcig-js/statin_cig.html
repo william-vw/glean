@@ -10,8 +10,9 @@
 <script src="lib/extract_rdf.js"></script>
 <script src="lib/jqFhir.js"></script>
 <script src="lib/fhir_client.js"></script>
-<script src="lib/data_source.js"></script>
-<script src="lib/server.js"></script>
+<script src="lib/source/data_source.js"></script>
+<!-- <script src="lib/source/server.js"></script> -->
+<script src="lib/source/fsm.js"></script>
 <script src="lib/input.js"></script>
 <link rel="stylesheet" href="lib/cig.css" />
 </head>
@@ -30,8 +31,7 @@ const config = {
     ns: 'http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#' 
 }
 
-cig.show("json/lipid/ckd_dyslipidemia.json", config);
-// cig.show(data, config);
+cig.load("/wf/lipid/evaluate_lipid_profile.js", config);
 
 </script>
 </body>

@@ -60,7 +60,7 @@ public class TaskResourceProvider extends CIGResourceProvider {
 		List<Task> ret = new ArrayList<>();
 
 		List<EntityState> states = cig.transitAll(workflowRef.getWorkflowId());
-//		cig.printAllTransits(states, true);
+		cig.printAllTransits(states, true);
 
 		states.forEach(state -> {
 			// ignore decision-branches

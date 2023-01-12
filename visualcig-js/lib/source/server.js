@@ -5,6 +5,8 @@ function DataServer() {
 DataServer.prototype = DataSource.prototype;
 DataServer.prototype.constructor = DataServer;
 
+DataServer.prototype.setup = function(wf) {}
+
 DataServer.prototype.submitObservation = function(reference, rdf) {
     this._bulkSend([
         () => this._sendToServer('DELETE', this._deleteEntry('Observation', reference)),

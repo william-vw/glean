@@ -29,16 +29,21 @@ import wvw.semweb.codegen.parse.rule.ann.ParameterAnnotation.ParameterTypes;
 
 public class WorkflowJsPrinter extends WorkflowPrinter {
 
+	private StringBuffer fnStr = new StringBuffer();
+
 	private int eCnt = 0;
 	private int cCnt = 0;
 	private Map<Resource, JsObj> map = new HashMap<>();
 
-	private N3Model ontology;
+	private String jsonStr;
 
-	private CodeModel codeModel = new CodeModel();
+	private N3Model jsOntology;
+	private CodeModel jsCodeModel = new CodeModel();
 
-	public WorkflowJsPrinter(N3Model ontology) {
-		this.ontology = ontology;
+	public WorkflowJsPrinter(N3Model jsOntology, String jsonStr) {
+		this.jsOntology = jsOntology;
+
+		this.jsonStr = jsonStr;
 	}
 
 	@Override
@@ -49,16 +54,29 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 		if (wf == null)
 			return;
 
-		print(wf);
+		JsObj ret = print(wf);
 
 		try {
+			jsCodeModel.removeStruct("Entity");
+			
 			GenerateJavaScript codeGen = new GenerateJavaScript();
-			String cls = codeGen.generate(codeModel);
-			System.out.println("cls: " + cls);
+			String cls = codeGen.generate(jsCodeModel);
+			cls = cls.replaceAll("(\\s|^)class(\\s)", "$1export class$2");
+
+			str.append(cls);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		String fn = fnStr.toString().replaceAll("\n", "\n\t");
+
+		str.append("\n\n").append("export function createWorkflow() {\n\t");
+		str.append(fn);
+		str.append("\n\t").append("return ").append(ret.varName);
+		str.append("\n}");
+
+		str.append("\n\nexport var jsonWorkflow = ").append(jsonStr);
 	}
 
 	private JsObj print(Resource r) {
@@ -71,19 +89,19 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 		r.listProperties(kb.resource("gl:subTask")).forEachRemaining(stmt -> {
 			JsObj ret = print(stmt.getObject());
 
-			str.append(obj.varName).append(".subTask.push(").append(ret.varName).append(")\n");
+			fnStr.append(obj.varName).append(".subTask.push(").append(ret.varName).append(")\n");
 		});
 
 		r.listProperties(kb.resource("gl:decisionBranch")).forEachRemaining(stmt -> {
 			JsObj ret = print(stmt.getObject());
 
-			str.append(obj.varName).append(".decisionBranch.push(").append(ret.varName).append(")\n");
+			fnStr.append(obj.varName).append(".decisionBranch.push(").append(ret.varName).append(")\n");
 		});
 
 		if (r.hasProperty(kb.resource("gl:branchTarget"))) {
 			JsObj ret = print(r.getProperty(kb.resource("gl:branchTarget")).getObject());
 
-			str.append(obj.varName).append(".branchTarget = ").append(ret.varName).append("\n");
+			fnStr.append(obj.varName).append(".branchTarget = ").append(ret.varName).append("\n");
 		}
 
 		r.listProperties(kb.resource("gl:next")).forEachRemaining(stmt -> {
@@ -94,8 +112,8 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 
 			JsObj ret = print(stmt.getObject());
 
-			str.append(obj.varName).append(".next.push(").append(ret.varName).append(")\n");
-			str.append(ret.varName).append(".nextOf.push(").append(obj.varName).append(")\n");
+			fnStr.append(obj.varName).append(".next.push(").append(ret.varName).append(")\n");
+			fnStr.append(ret.varName).append(".nextOf.push(").append(obj.varName).append(")\n");
 		});
 
 		return obj;
@@ -119,40 +137,40 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 			type = "Entity.DecisionTask";
 
 		} else if (r.hasProperty(kb.resource("gl:branchTarget"))) {
-			cls = "DecisionBranch";
-			type = null;
+			cls = "Entity";
+			type = "Entity.DecisionBranch";
 
 		} else
 			cls = "Entity";
 
-		str.append("let ").append(varName).append(" = ").append("new ").append(cls).append("()\n");
+		fnStr.append("let ").append(varName).append(" = ").append("new ").append(cls).append("()\n");
 		if (type != null)
-			str.append(varName).append(".type = ").append(type).append("\n");
+			fnStr.append(varName).append(".type = ").append(type).append("\n");
 
 		String state = getState(r);
-		str.append(varName).append(".isIn = ").append("new State(State.").append(state).append(")\n");
+		fnStr.append(varName).append(".isIn = ").append("new State(State.").append(state).append(")\n");
 
 		if (r.hasProperty(kb.resource("gl:conditional"))) {
 			boolean conditional = r.getPropertyResourceValue(kb.resource("gl:conditional")).asLiteral().getBoolean();
 
-			str.append(varName).append(".conditional = ").append(conditional).append("\n");
+			fnStr.append(varName).append(".conditional = ").append(conditional).append("\n");
 		}
 
 		if (r.hasProperty(kb.resource("gl:involvesAction"))) {
 			boolean conditional = r.getPropertyResourceValue(kb.resource("gl:involvesAction")).asLiteral().getBoolean();
 
-			str.append(varName).append(".involvesAction = ").append(conditional).append("\n");
+			fnStr.append(varName).append(".involvesAction = ").append(conditional).append("\n");
 		}
 
 		if (r.hasProperty(kb.resource("gl:precondition"))) {
 			Resource c = r.getProperty(kb.resource("gl:precondition")).getObject();
 
 			JsObj ret = genCondition(c);
-			str.append(varName).append(".condition = ").append(ret.varName).append("\n");
+			fnStr.append(varName).append(".condition = ").append(ret.varName).append("\n");
 		}
 
 		if (r.isURI())
-			str.append(varName).append(".id = \"").append(r.getLocalName()).append("\"\n");
+			fnStr.append(varName).append(".id = \"").append(r.getLocalName()).append("\"\n");
 
 		String label = null;
 		if (r.hasProperty(RDFS.label))
@@ -161,7 +179,7 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 			label = r.getLocalName();
 
 		if (label != null)
-			str.append(varName).append(".label = \"").append(label).append("\"\n");
+			fnStr.append(varName).append(".label = \"").append(label).append("\"\n");
 
 		return new JsObj(varName);
 	}
@@ -188,29 +206,29 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 			type = "Condition.Disjunction";
 		}
 
-		str.append("let ").append(varName).append(" = ").append("new ").append(cls).append("()\n");
+		fnStr.append("let ").append(varName).append(" = ").append("new ").append(cls).append("()\n");
 		if (type != null)
-			str.append(varName).append(".type = ").append(type).append("\n");
+			fnStr.append(varName).append(".type = ").append(type).append("\n");
 
 		JsObj obj = new JsObj(varName);
 
 		c.listProperties(kb.resource("cond:anyOf")).forEachRemaining(stmt -> {
 			JsObj ret = genCondition(stmt.getObject());
 
-			str.append(obj.varName).append(".anyOf.push(").append(ret.varName).append(")\n");
+			fnStr.append(obj.varName).append(".anyOf.push(").append(ret.varName).append(")\n");
 		});
 
 		c.listProperties(kb.resource("cond:allOf")).forEachRemaining(stmt -> {
 			JsObj ret = genCondition(stmt.getObject());
 
-			str.append(obj.varName).append(".allOf.push(").append(ret.varName).append(")\n");
+			fnStr.append(obj.varName).append(".allOf.push(").append(ret.varName).append(")\n");
 		});
 
 		if (c.hasProperty(kb.resource("cond:premise"))) {
 			CitedFormula premise = c.getPropertyResourceValue(kb.resource("cond:premise")).asCitedFormula();
 
 			String fn = genConditionFn(premise, obj);
-			str.append(obj.varName).append(".check = ").append(fn).append("\n");
+			fnStr.append(obj.varName).append(".check = ").append(fn).append("\n");
 		}
 
 		return obj;
@@ -234,15 +252,15 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 				ParameterTypes.FUNCTION);
 
 		try {
-			ParseModelLogic parser = new ParseModelLogic(codeModel);
-			parser.parse(rules, ontology, Arrays.asList(ann1, ann2), new GenConfig(CodeTypes.JAVASCRIPT));
+			ParseModelLogic parser = new ParseModelLogic(jsCodeModel);
+			parser.parse(rules, jsOntology, Arrays.asList(ann1, ann2), new GenConfig(CodeTypes.JAVASCRIPT));
 
 			GenerateJavaScript genCode = new GenerateJavaScript();
 
 			String body = genCode.generate(parser.getLogic());
 			body = body.replaceAll("\n|\t", " ").replaceAll("  ", " ");
 
-			return "function(obs) {\n" + body + "\n}";
+			return "function (obs) {\n\t" + body + "\n}";
 
 		} catch (Exception e) {
 			e.printStackTrace();

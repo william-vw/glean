@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.jen3.n3.N3ModelSpec;
 import org.apache.jen3.n3.N3ModelSpec.Types;
-import org.apache.jen3.reasoner.rulesys.N3FBRuleInfGraph;
 
 import wvw.glean.workflow.WorkflowModel.EntityState;
 import wvw.glean.workflow.WorkflowModel.InitOptions;
@@ -22,13 +21,13 @@ public class CIGTest {
 //	private static ReasonTypes reason = ReasonTypes.HYBRID;
 	private static ReasonTypes reason = ReasonTypes.FORWARD;
 
-//	private static String cigNs = NS.ckd;
-//	private static String cigPath = "cig/lipid/evaluate_lipid_profile-simple.n3";
-//	private static String workflow = "Evaluate_Lipid_Profile";
-
 	private static String cigNs = NS.ckd;
-	private static String cigPath = "cig/lipid/ckd_dyslipidemia.n3";
-	private static String workflow = "Dyslipidemia_CKD";
+	private static String cigPath = "cig/lipid/evaluate_lipid_profile.n3";
+	private static String workflow = "Evaluate_Lipid_Profile";
+
+//	private static String cigNs = NS.ckd;
+//	private static String cigPath = "cig/lipid/ckd_dyslipidemia.n3";
+//	private static String workflow = "Dyslipidemia_CKD";
 
 //	private static String cigNs = NS.rbc;
 //	private static String cigPath = "cig/btsf/rbc_match.n3";
@@ -38,14 +37,16 @@ public class CIGTest {
 		long start = System.currentTimeMillis();
 
 		CIGModel cig = (CIGModel) new CIGModel(cigNs, spec)
-				.initialize(reason, InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN) // InitOptions.LOGGING)
+				.initialize(reason, InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN) //, InitOptions.LOGGING)
 				.load(CIGModel.class, cigPath, LoadOptions.RECURSIVELY);
 
-		cig.transitAll(workflow);
+		List<EntityState> states = cig.transitAll(workflow);
+		
+//		cig.getKb().printAll();
 
 //		List<EntityState> states = evaluateLipidProfile(cig);
 
-		List<EntityState> states = followupLipidProfileCase(cig);
+//		List<EntityState> states = followupLipidProfileCase(cig);
 
 //		List<EntityState> states = rbcMatchCase1(cig);
 
@@ -57,7 +58,7 @@ public class CIGTest {
 
 //		Log.i("# new graphs: " + BindingStack.nrNewGraphs);
 //		Log.i("# new colls: " + BindingStack.nrNewColls);
-		Log.i("# ctu calls: " + N3FBRuleInfGraph.ctuCnt);
+//		Log.i("# ctu calls: " + N3FBRuleInfGraph.ctuCnt);
 	}
 
 	public static List<EntityState> evaluateLipidProfile(CIGModel cig) throws Exception {
@@ -66,11 +67,11 @@ public class CIGTest {
 		// > Evaluate Lipid Profile
 
 		// measure_lipid_profile
-		cig.loadString(" @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
-				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
-				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n" + "\n"
-				+ "ns:df_1_0 <http://hl7.org/fhir/Observation.code> ns:code_abnormal_lipid_profile;\n"
-				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.");
+//		cig.loadString(" @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"
+//				+ "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"
+//				+ "@prefix ns: <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>.\n" + "\n"
+//				+ "ns:df_1_0 <http://hl7.org/fhir/Observation.code> ns:code_abnormal_lipid_profile;\n"
+//				+ "    <http://hl7.org/fhir/Observation.valueBoolean> true.");
 
 //		// rule_out_secondary_causes
 //		cig.loadString(" @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"

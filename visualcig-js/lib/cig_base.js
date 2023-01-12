@@ -4,10 +4,6 @@ export function CIGBase() {
 
 CIGBase.prototype.constructor = CIGBase;
 
-// - init data source
-
-window.source = new DataServer();
-
 // - start API
 
 // subclasses need to implement:
@@ -18,7 +14,7 @@ window.source = new DataServer();
 // 		operations: [{ source, target, type }] (mandatory; can be empty)
 //		adds: [{ parent, data }] (optional)
 
-CIGBase.prototype.show = function (json, config, callbacks) {
+CIGBase.prototype.load = function (url, config, callbacks) {
 	const cb = () => {
 		if (callbacks && callbacks.beforeRefresh)
 			callbacks.beforeRefresh();
@@ -29,10 +25,7 @@ CIGBase.prototype.show = function (json, config, callbacks) {
 			callbacks.afterRefresh();
 	};
 
-	if ((typeof json) === "string")
-		this._showFromUrl(json, config, cb);
-	else
-		this._showFromData(json, config, cb);
+	this._loadFromUrl(url, config, cb);
 }
 
 CIGBase.prototype.loading_start = function () {
@@ -64,11 +57,18 @@ CIGBase.prototype.onUserInput = function(taskId) {}
 
 // - end API
 
-CIGBase.prototype._showFromUrl = function (jsonUrl, config, callback) {
-	d3.json(jsonUrl).then((data) => this._showFromData(data, config, callback));
+CIGBase.prototype._loadFromUrl = function (url, config, callback) {
+	import(url).then((wf) => this._loadWorkflow(wf, config, callback));
 }
 
-CIGBase.prototype._init = function (data, config) {
+CIGBase.prototype._init = function (wf, config) {
+	// init data source
+	// window.source = new DataServer(wf);
+	window.source = new FSM(wf);
+	source.setup(wf);
+	
+	let data = wf.jsonWorkflow;
+
 	this.id = data.id;
 	this._data = data;
 	this._config = config;

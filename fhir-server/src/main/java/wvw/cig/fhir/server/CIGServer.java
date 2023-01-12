@@ -52,6 +52,8 @@ public class CIGServer extends RestfulServer {
 //		registerInterceptor(new InitCigInterceptor());
 
 		// setup known models
+		models.put("Evaluate_Lipid_Profile", new ModelEntry("lipid/evaluate_lipid_profile", NS.ckd));
+		
 		models.put("Dyslipidemia_CKD", new ModelEntry("lipid/ckd_dyslipidemia", NS.ckd));
 		models.put("RBC_Match", new ModelEntry("rbc/rbc_match", NS.rbc));
 	}

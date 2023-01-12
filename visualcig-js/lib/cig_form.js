@@ -83,13 +83,15 @@ CIGForm.prototype._hideRecursivelyFrom = function (workflow) {
     }
 }
 
-CIGForm.prototype._showFromData = function (data, config, callback) {
-    this._init(data, config);
-
+CIGForm.prototype._loadWorkflow = function (wf, config, callback) {
+    this._init(wf, config);
+    
+    let json = wf.jsonWorkflow;
+    
     this._map = {};
-    this._setupData(data, 0);
+    this._setupData(json, 0);
 
-    this._initForm(data);
+    this._initForm(json);
 
     if (callback)
         callback();

@@ -156,11 +156,11 @@ VisualCIG.prototype.update = function ({ transits, operations, adds }) {
 // -- show CIG
 
 // CIGBase:
-// show
-// showFromUrl
+// load
+// loadFromUrl
 
-VisualCIG.prototype._showFromData = function (data, config, callback) {
-	this._init(data, config);
+VisualCIG.prototype._loadWorkflow = function (wf, config, callback) {
+	this._init(wf, config);
 
 	this._inputs = [];
 

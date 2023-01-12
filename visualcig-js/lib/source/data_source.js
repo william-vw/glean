@@ -6,6 +6,8 @@ DataSource.prototype.constructor = DataSource;
 
 // - start API
 
+DataSource.prototype.setup = function(wf) {}
+
 DataSource.prototype.submitObservation = function(reference, rdf) {}
 
 DataSource.prototype.resetObservations = function(el) {}

@@ -43,7 +43,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 	private UiGen uiGen = new UiGen();
 
-	private String ontologyPath = "cig/ontology.n3";
+	private String ontologyPath = "cig/js_ontology.n3";
 
 	public static void main(String[] args) throws Exception {
 		CIGWorkflowPrinter printer = new CIGWorkflowPrinter();
@@ -57,12 +57,13 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// - print workflow
 
-		String outFolder = "/Users/wvw/git/glean/visualcig-js/json/";
+		String outFolder = "/Users/wvw/git/glean/visualcig-js/wf/";
 
 		// -- lipid
 
+		// TODO change all any/allOf collections to object lists
 //		String name = "lipid/ckd_dyslipidemia";
-		String name = "lipid2/evaluate_lipid_profile";
+		String name = "lipid/evaluate_lipid_profile";
 		String ns = NS.ckd;
 		printer.printWorkflow(name, ns, outFolder);
 
@@ -118,34 +119,30 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// - json
 
-		WorkflowPrinter printer = new WorkflowD3TreePrinter(this);
-		printer.print(wf);
+		WorkflowPrinter jsonPrinter = new WorkflowD3TreePrinter(this);
+		jsonPrinter.print(wf);
 
-		String out = printer.getString();
+		String jsonOut = jsonPrinter.getString();
 //		System.out.println("json:\n" + out);
-
-		String outPath = outFolder + name + ".json";
-		IOUtils.writeFile(outPath, out, false);
-
-		LOG.info("written json to " + outPath);
 
 		// - js
 
 		N3Model ontology = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));
 		ontology.read(IOUtils.getResourceStream(getClass(), ontologyPath), "");
 
-		printer = new WorkflowJsPrinter(ontology);
-		printer.print(wf);
+		WorkflowPrinter jsPrinter = new WorkflowJsPrinter(ontology, jsonOut);
+		jsPrinter.print(wf);
 
-		out = printer.getString();
+		String out = jsPrinter.getString();
 		System.out.println("js:\n" + out);
 
-		outPath = outFolder + name + ".js";
+		String outPath = outFolder + name + ".js";
 		IOUtils.writeFile(outPath, out, false);
 		LOG.info("written js to " + outPath);
 
 		long end = System.currentTimeMillis();
-		LOG.info("total writing: " + (end - start) + "ms");
+		LOG.info("writing: " + (end - start) + "ms");
+
 	}
 
 	// (returns whether json was updated by this hook)
