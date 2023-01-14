@@ -10,7 +10,7 @@ DataSource.prototype.setup = function(wf) {}
 
 DataSource.prototype.submitObservation = function(reference, rdf) {}
 
-DataSource.prototype.resetObservations = function(el) {}
+DataSource.prototype.resetObservations = function(id) {}
 
 DataSource.prototype.resetAllObservations = function() {}
 

@@ -364,7 +364,7 @@ public abstract class WorkflowModel {
 				case ALL:
 					getResetInputsAndConditions(t, toRemove);
 
-					// fallthrough! :-)
+				// fallthrough! :-)
 				case ONLY_STATES:
 					getResetStates(t, toRemove, toAdd);
 					break;

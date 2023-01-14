@@ -9,19 +9,19 @@ export class Observation {
 }
 
 export class Code {
-	static codeExcessiveAlcoholConsumption = 'codeExcessiveAlcoholConsumption';
-	static code13CisRetiniocAcid = 'code13CisRetiniocAcid';
-	static codeCorticosteroids = 'codeCorticosteroids';
-	static codeDiabetes = 'codeDiabetes';
+	static codeAndrogens = 'codeAndrogens';
 	static codeHypothyroidism = 'codeHypothyroidism';
 	static codeLiverDisease = 'codeLiverDisease';
 	static codeHighlyActiveAntiRetroviralTherapy = 'codeHighlyActiveAntiRetroviralTherapy';
-	static codeCyclosporine = 'codeCyclosporine';
-	static codeNephroticSyndrome = 'codeNephroticSyndrome';
 	static codeOralContraceptives = 'codeOralContraceptives';
-	static codeAndrogens = 'codeAndrogens';
-	static codeSirolimus = 'codeSirolimus';
+	static codeNephroticSyndrome = 'codeNephroticSyndrome';
 	static codeAntiConvulsant = 'codeAntiConvulsant';
+	static codeCyclosporine = 'codeCyclosporine';
+	static code13CisRetiniocAcid = 'code13CisRetiniocAcid';
+	static codeSirolimus = 'codeSirolimus';
+	static codeDiabetes = 'codeDiabetes';
+	static codeCorticosteroids = 'codeCorticosteroids';
+	static codeExcessiveAlcoholConsumption = 'codeExcessiveAlcoholConsumption';
 	static codeNoSecondaryCauses = 'codeNoSecondaryCauses';
 	static codeAbnormalLipidProfile = 'codeAbnormalLipidProfile';
 
@@ -32,7 +32,7 @@ export class Code {
 	type;
 }
 
-export var nodeAdtMap = {"http://hl7.org/fhir/Observation":{"name":"Observation","http://hl7.org/fhir/Observation.code":{"name":"Observationdotcode","type":"http://hl7.org/fhir/Code"},"http://hl7.org/fhir/Observation.valueBoolean":{"name":"ObservationdotvalueBoolean"}},"http://hl7.org/fhir/Code":{"name":"Code","http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_excessive_alcohol_consumption":{"name":"codeExcessiveAlcoholConsumption"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_13-cis-retinioc_acid":{"name":"code13CisRetiniocAcid"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_corticosteroids":{"name":"codeCorticosteroids"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_diabetes":{"name":"codeDiabetes"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_hypothyroidism":{"name":"codeHypothyroidism"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_liver_disease":{"name":"codeLiverDisease"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_highly_active_anti-retroviral_therapy":{"name":"codeHighlyActiveAntiRetroviralTherapy"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_cyclosporine":{"name":"codeCyclosporine"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_nephrotic_syndrome":{"name":"codeNephroticSyndrome"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_oral_contraceptives":{"name":"codeOralContraceptives"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_androgens":{"name":"codeAndrogens"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_sirolimus":{"name":"codeSirolimus"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_anti_convulsant":{"name":"codeAntiConvulsant"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_no_secondary_causes":{"name":"codeNoSecondaryCauses"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_abnormal_lipid_profile":{"name":"codeAbnormalLipidProfile"},"http://www.w3.org/1999/02/22-rdf-syntax-ns#type":{"name":"type"}}}
+export var nodeAdtMap = {"http://hl7.org/fhir/Observation":{"name":"Observation","http://hl7.org/fhir/Observation.code":{"name":"Observationdotcode","type":"http://hl7.org/fhir/Code"},"http://hl7.org/fhir/Observation.valueBoolean":{"name":"ObservationdotvalueBoolean"}},"http://hl7.org/fhir/Code":{"name":"Code","http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_androgens":{"name":"codeAndrogens"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_hypothyroidism":{"name":"codeHypothyroidism"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_liver_disease":{"name":"codeLiverDisease"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_highly_active_anti-retroviral_therapy":{"name":"codeHighlyActiveAntiRetroviralTherapy"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_oral_contraceptives":{"name":"codeOralContraceptives"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_nephrotic_syndrome":{"name":"codeNephroticSyndrome"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_anti_convulsant":{"name":"codeAntiConvulsant"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_cyclosporine":{"name":"codeCyclosporine"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_13-cis-retinioc_acid":{"name":"code13CisRetiniocAcid"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_sirolimus":{"name":"codeSirolimus"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_diabetes":{"name":"codeDiabetes"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_corticosteroids":{"name":"codeCorticosteroids"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_excessive_alcohol_consumption":{"name":"codeExcessiveAlcoholConsumption"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_no_secondary_causes":{"name":"codeNoSecondaryCauses"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_abnormal_lipid_profile":{"name":"codeAbnormalLipidProfile"},"http://www.w3.org/1999/02/22-rdf-syntax-ns#type":{"name":"type"}}}
 
 
 export function createWorkflow() {
@@ -55,67 +55,67 @@ export function createWorkflow() {
 	c0.type = Condition.Disjunction
 	let c1 = new Condition()
 	c1.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeExcessiveAlcoholConsumption && obs.ObservationdotvalueBoolean == true) {  c1.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeAndrogens && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c1)
 	let c2 = new Condition()
 	c2.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.code13CisRetiniocAcid && obs.ObservationdotvalueBoolean == true) {  c2.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeHypothyroidism && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c2)
 	let c3 = new Condition()
 	c3.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeCorticosteroids && obs.ObservationdotvalueBoolean == true) {  c3.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeLiverDisease && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c3)
 	let c4 = new Condition()
 	c4.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeDiabetes && obs.ObservationdotvalueBoolean == true) {  c4.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeHighlyActiveAntiRetroviralTherapy && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c4)
 	let c5 = new Condition()
 	c5.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeHypothyroidism && obs.ObservationdotvalueBoolean == true) {  c5.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeOralContraceptives && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c5)
 	let c6 = new Condition()
 	c6.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeLiverDisease && obs.ObservationdotvalueBoolean == true) {  c6.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeNephroticSyndrome && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c6)
 	let c7 = new Condition()
 	c7.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeHighlyActiveAntiRetroviralTherapy && obs.ObservationdotvalueBoolean == true) {  c7.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeAntiConvulsant && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c7)
 	let c8 = new Condition()
 	c8.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeCyclosporine && obs.ObservationdotvalueBoolean == true) {  c8.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeCyclosporine && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c8)
 	let c9 = new Condition()
 	c9.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeNephroticSyndrome && obs.ObservationdotvalueBoolean == true) {  c9.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.code13CisRetiniocAcid && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c9)
 	let c10 = new Condition()
 	c10.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeOralContraceptives && obs.ObservationdotvalueBoolean == true) {  c10.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeSirolimus && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c10)
 	let c11 = new Condition()
 	c11.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeAndrogens && obs.ObservationdotvalueBoolean == true) {  c11.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeDiabetes && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c11)
 	let c12 = new Condition()
 	c12.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeSirolimus && obs.ObservationdotvalueBoolean == true) {  c12.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeCorticosteroids && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c12)
 	let c13 = new Condition()
 	c13.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeAntiConvulsant && obs.ObservationdotvalueBoolean == true) {  c13.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeExcessiveAlcoholConsumption && obs.ObservationdotvalueBoolean == true)
 	}
 	c0.anyOf.push(c13)
 	e2.precondition = c0
@@ -136,7 +136,7 @@ export function createWorkflow() {
 	c14.type = Condition.Conjunction
 	let c15 = new Condition()
 	c15.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeNoSecondaryCauses && obs.ObservationdotvalueBoolean == true) {  c15.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeNoSecondaryCauses && obs.ObservationdotvalueBoolean == true)
 	}
 	c14.allOf.push(c15)
 	e4.precondition = c14
@@ -150,7 +150,12 @@ export function createWorkflow() {
 	e4.next.push(e5)
 	e5.nextOf.push(e4)
 	e1.decisionBranch.push(e4)
+	e1.next.push(e4)
+	e4.nextOf.push(e1)
+	e1.next.push(e2)
+	e2.nextOf.push(e1)
 	e0.subTask.push(e1)
+	e1.subTaskOf = e0
 	let e6 = new Entity()
 	e6.type = Entity.EndPoint
 	e6.isIn = new State(State.Inactive)
@@ -158,7 +163,9 @@ export function createWorkflow() {
 	e6.id = "no_dyslipidemia"
 	e6.label = "No action"
 	e0.subTask.push(e6)
+	e6.subTaskOf = e0
 	e0.subTask.push(e3)
+	e3.subTaskOf = e0
 	let e7 = new Entity()
 	e7.type = Entity.DecisionTask
 	e7.isIn = new State(State.Inactive)
@@ -172,7 +179,7 @@ export function createWorkflow() {
 	c16.type = Condition.Conjunction
 	let c17 = new Condition()
 	c17.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeAbnormalLipidProfile && obs.ObservationdotvalueBoolean == false) {  c17.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeAbnormalLipidProfile && obs.ObservationdotvalueBoolean == false)
 	}
 	c16.allOf.push(c17)
 	e8.precondition = c16
@@ -187,7 +194,7 @@ export function createWorkflow() {
 	c18.type = Condition.Conjunction
 	let c19 = new Condition()
 	c19.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeAbnormalLipidProfile && obs.ObservationdotvalueBoolean == true) {  c19.conditionMet = true; }
+		return (obs.Observationdotcode.type == Code.codeAbnormalLipidProfile && obs.ObservationdotvalueBoolean == true)
 	}
 	c18.allOf.push(c19)
 	e9.precondition = c18
@@ -195,8 +202,14 @@ export function createWorkflow() {
 	e9.next.push(e1)
 	e1.nextOf.push(e9)
 	e7.decisionBranch.push(e9)
+	e7.next.push(e9)
+	e9.nextOf.push(e7)
+	e7.next.push(e8)
+	e8.nextOf.push(e7)
 	e0.subTask.push(e7)
+	e7.subTaskOf = e0
 	e0.subTask.push(e5)
+	e5.subTaskOf = e0
 	
 	return e0
 }

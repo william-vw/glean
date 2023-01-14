@@ -43,7 +43,8 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 
 	private String jsonStr;
 
-	private GenConfig jsGenConfig = new GenConfig(CodeTypes.JAVASCRIPT, GenOptions.GEN_NODE_ADT_MAP);
+	private GenConfig jsGenConfig = new GenConfig(CodeTypes.JAVASCRIPT, GenOptions.GEN_NODE_ADT_MAP,
+			GenOptions.ONLY_IF_COND);
 	private N3Model jsOntology;
 	// populate same code-model for all conditions
 	private CodeModel jsCodeModel = new CodeModel();
@@ -100,6 +101,7 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 			JsObj ret = print(stmt.getObject());
 
 			fnStr.append(obj.varName).append(".subTask.push(").append(ret.varName).append(")\n");
+			fnStr.append(ret.varName).append(".subTaskOf = ").append(obj.varName).append("\n");
 		});
 
 		r.listProperties(kb.resource("gl:decisionBranch")).forEachRemaining(stmt -> {
@@ -115,11 +117,11 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 		}
 
 		r.listProperties(kb.resource("gl:next")).forEachRemaining(stmt -> {
-			if (r.hasProperty(kb.resource("gl:decisionBranch"), stmt.getObject())
+//			if (r.hasProperty(kb.resource("gl:decisionBranch"), stmt.getObject())
 //					|| r.hasProperty(kb.resource("gl:branchTarget"), stmt.getObject())
-				)
-
-				return;
+//			)
+//
+//				return;
 
 			JsObj ret = print(stmt.getObject());
 
@@ -267,8 +269,8 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 			parser.parse(rules, jsOntology, Arrays.asList(ann1, ann2), jsGenConfig);
 
 			GenerateJavaScript genCode = new GenerateJavaScript();
-
 			String body = genCode.generate(parser.getLogic(), jsGenConfig);
+			body = "return " + body;
 			body = body.replaceAll("\n|\t", " ").replaceAll("  ", " ");
 
 			return "function (obs) {\n\t" + body + "\n}";

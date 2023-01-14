@@ -14,11 +14,10 @@ DataServer.prototype.submitObservation = function(reference, rdf) {
     ]);
 }
 
-DataServer.prototype.resetObservations = function(el) {
+DataServer.prototype.resetObservations = function(task) {
     // (cig: global variable set in html code)
     const workflowRef = cig.workflowRef();
 
-    const task = $(el).parents('.infobox').attr('id');
     const taskRef = new TaskReference(workflowRef, task);
     console.log("resetting task:", taskRef);
 
