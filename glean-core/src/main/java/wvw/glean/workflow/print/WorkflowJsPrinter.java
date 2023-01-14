@@ -17,10 +17,14 @@ import org.apache.jen3.rdf.model.Resource;
 import org.apache.jen3.reasoner.rulesys.Node_RuleVariable;
 import org.apache.jen3.vocabulary.RDF;
 import org.apache.jen3.vocabulary.RDFS;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import wvw.glean.workflow.WorkflowModel;
+import wvw.semweb.codegen.CodeGen.GenConfig;
+import wvw.semweb.codegen.CodeGen.GenOptions;
 import wvw.semweb.codegen.gen.GenerateCode.CodeTypes;
-import wvw.semweb.codegen.gen.GenerateCode.GenConfig;
+import wvw.semweb.codegen.gen.GenerateCode.GeneratedCode;
 import wvw.semweb.codegen.gen.GenerateJavaScript;
 import wvw.semweb.codegen.model.adt.CodeModel;
 import wvw.semweb.codegen.parse.ParseModelLogic;
@@ -28,6 +32,8 @@ import wvw.semweb.codegen.parse.rule.ann.ParameterAnnotation;
 import wvw.semweb.codegen.parse.rule.ann.ParameterAnnotation.ParameterTypes;
 
 public class WorkflowJsPrinter extends WorkflowPrinter {
+
+	protected static final Logger log = LogManager.getLogger(WorkflowJsPrinter.class);
 
 	private StringBuffer fnStr = new StringBuffer();
 
@@ -37,7 +43,9 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 
 	private String jsonStr;
 
+	private GenConfig jsGenConfig = new GenConfig(CodeTypes.JAVASCRIPT, GenOptions.GEN_NODE_ADT_MAP);
 	private N3Model jsOntology;
+	// populate same code-model for all conditions
 	private CodeModel jsCodeModel = new CodeModel();
 
 	public WorkflowJsPrinter(N3Model jsOntology, String jsonStr) {
@@ -58,12 +66,14 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 
 		try {
 			jsCodeModel.removeStruct("Entity");
-			
-			GenerateJavaScript codeGen = new GenerateJavaScript();
-			String cls = codeGen.generate(jsCodeModel);
-			cls = cls.replaceAll("(\\s|^)class(\\s)", "$1export class$2");
 
+			GenerateJavaScript codeGen = new GenerateJavaScript();
+			GeneratedCode gen = codeGen.generate(jsCodeModel, jsGenConfig);
+
+			String cls = gen.getAdt().replaceAll("(\\s|^)class(\\s)", "$1export class$2");
 			str.append(cls);
+
+			str.append("\n\nexport var nodeAdtMap = ").append(gen.getNodeAdtMap()).append("\n");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -106,7 +116,8 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 
 		r.listProperties(kb.resource("gl:next")).forEachRemaining(stmt -> {
 			if (r.hasProperty(kb.resource("gl:decisionBranch"), stmt.getObject())
-					|| r.hasProperty(kb.resource("gl:branchTarget"), stmt.getObject()))
+//					|| r.hasProperty(kb.resource("gl:branchTarget"), stmt.getObject())
+				)
 
 				return;
 
@@ -166,7 +177,7 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 			Resource c = r.getProperty(kb.resource("gl:precondition")).getObject();
 
 			JsObj ret = genCondition(c);
-			fnStr.append(varName).append(".condition = ").append(ret.varName).append("\n");
+			fnStr.append(varName).append(".precondition = ").append(ret.varName).append("\n");
 		}
 
 		if (r.isURI())
@@ -253,11 +264,11 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 
 		try {
 			ParseModelLogic parser = new ParseModelLogic(jsCodeModel);
-			parser.parse(rules, jsOntology, Arrays.asList(ann1, ann2), new GenConfig(CodeTypes.JAVASCRIPT));
+			parser.parse(rules, jsOntology, Arrays.asList(ann1, ann2), jsGenConfig);
 
 			GenerateJavaScript genCode = new GenerateJavaScript();
 
-			String body = genCode.generate(parser.getLogic());
+			String body = genCode.generate(parser.getLogic(), jsGenConfig);
 			body = body.replaceAll("\n|\t", " ").replaceAll("  ", " ");
 
 			return "function (obs) {\n\t" + body + "\n}";

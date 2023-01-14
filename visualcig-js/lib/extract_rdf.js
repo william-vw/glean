@@ -73,7 +73,7 @@ async function extractRdfData(el, onQuad, config) {
     return new Promise((resolve, reject) => {
         writer.end((error, result) => {
             if (result)
-                resolve(result);
+                resolve({ str: result, store: store });
             else
                 reject(error);
         });

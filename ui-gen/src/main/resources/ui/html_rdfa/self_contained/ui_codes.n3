@@ -14,8 +14,8 @@
 #:yes_no_input rdf:value """<input type='checkbox' id='_id_' property='_property_' yes-no='true' /> <label for='_id_'>_label_</label>""".
 :yes_no_input rdf:value """<div id='_id_' property='_property_'>_label_: <input type='radio' name='_id_' id='_id_-yes' value='yes' /><label for='_id_-yes'>yes</label>&nbsp;&nbsp;<input type='radio' name='_id_' id='_id_-no' value='no' /><label for='_id_-no'>no</label></div>""".
 
-:lvl_1_struct rdf:value """<tr><td property='_property_' typeof=''>%s</td></tr>""" ; tpl:separator "" .
-:lvl_n_struct rdf:value """<div property='_property_' typeof=''>%s</div>""" ; tpl:separator "" .
+:lvl_1_struct rdf:value """<tr><td property='_property_' typeof='_type_'>%s</td></tr>""" ; tpl:separator "" .
+:lvl_n_struct rdf:value """<div property='_property_' typeof='_type_'>%s</div>""" ; tpl:separator "" .
 
 {	?el a tpl:UiElement ; tpl:level 1
 } => {	?el tpl:lvl_struct :lvl_1_struct } .
@@ -40,7 +40,7 @@
 	tpl:separator "" .
 
 
-{ 	<file:///Users/wvw/git/cig/glean/ui-gen/src/main/resources/ui/html_rdfa/self_contained/header.html> log:content ?header .
+{ 	<file:///Users/wvw/git/glean/ui-gen/src/main/resources/ui/html_rdfa/self_contained/header.html> log:content ?header .
 
 	:container_struct_param rdf:value ?code ; tpl:separator ?sep .
 	( ?code ?header "%s" ) string:format ?code2 .

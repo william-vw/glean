@@ -99,12 +99,15 @@
 	?elements list:length ?len .
 	?outputs!list:length math:equalTo ?len .
 
-	?el tpl:inProperty ?property ; tpl:lvl_struct ?struct .
+	?el tpl:inProperty ?property ;
+		tpl:hasType ?type ;
+		tpl:lvl_struct ?struct .
 	?struct rdf:value ?code ; tpl:separator ?sep .
 
 	( ?outputs ?sep ) string:join ?content .
 
 	( ?code "_property_" ?property ) string:replace ?code2 .
-	( ?code2 ?content ) string:format ?output3 .
+	( ?code2 "_type_" ?type ) string:replace ?code3 .
+	( ?code3 ?content ) string:format ?output3 .
 
 } => {	?el tpl:output ?output3 } .

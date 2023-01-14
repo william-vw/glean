@@ -10,7 +10,7 @@ DataServer.prototype.setup = function(wf) {}
 DataServer.prototype.submitObservation = function(reference, rdf) {
     this._bulkSend([
         () => this._sendToServer('DELETE', this._deleteEntry('Observation', reference)),
-        () => this._sendAndReceiveData('CREATE', this._taskObservationEntry(reference, rdf))
+        () => this._sendAndReceiveData('CREATE', this._taskObservationEntry(reference, rdf.str))
     ]);
 }
 

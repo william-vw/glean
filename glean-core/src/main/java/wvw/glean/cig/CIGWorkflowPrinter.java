@@ -142,7 +142,6 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		long end = System.currentTimeMillis();
 		LOG.info("writing: " + (end - start) + "ms");
-
 	}
 
 	// (returns whether json was updated by this hook)

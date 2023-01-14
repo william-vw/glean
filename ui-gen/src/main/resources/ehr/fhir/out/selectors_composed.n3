@@ -113,13 +113,13 @@
             ?log  math:floor ?size .
             ?range
                 <http://hl7.org/fhir/Range.low>
-                    _:b3 .
-            _:b3  <http://hl7.org/fhir/Quantity.value>
+                    _:b1 .
+            _:b1  <http://hl7.org/fhir/Quantity.value>
                     ?min .
             ?range
                 <http://hl7.org/fhir/Range.high>
-                    _:b4 .
-            _:b4  <http://hl7.org/fhir/Quantity.value>
+                    _:b2 .
+            _:b2  <http://hl7.org/fhir/Quantity.value>
                     ?max .
             ?range
                 rdfs:label ?rangeLabel .

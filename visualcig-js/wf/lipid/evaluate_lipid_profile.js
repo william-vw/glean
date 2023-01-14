@@ -9,19 +9,19 @@ export class Observation {
 }
 
 export class Code {
-	static codeOralContraceptives = 'codeOralContraceptives';
-	static codeCorticosteroids = 'codeCorticosteroids';
-	static codeCyclosporine = 'codeCyclosporine';
 	static codeExcessiveAlcoholConsumption = 'codeExcessiveAlcoholConsumption';
-	static codeAndrogens = 'codeAndrogens';
-	static codeHypothyroidism = 'codeHypothyroidism';
-	static codeNephroticSyndrome = 'codeNephroticSyndrome';
-	static codeAntiConvulsant = 'codeAntiConvulsant';
-	static codeLiverDisease = 'codeLiverDisease';
-	static codeSirolimus = 'codeSirolimus';
-	static codeHighlyActiveAntiRetroviralTherapy = 'codeHighlyActiveAntiRetroviralTherapy';
 	static code13CisRetiniocAcid = 'code13CisRetiniocAcid';
+	static codeCorticosteroids = 'codeCorticosteroids';
 	static codeDiabetes = 'codeDiabetes';
+	static codeHypothyroidism = 'codeHypothyroidism';
+	static codeLiverDisease = 'codeLiverDisease';
+	static codeHighlyActiveAntiRetroviralTherapy = 'codeHighlyActiveAntiRetroviralTherapy';
+	static codeCyclosporine = 'codeCyclosporine';
+	static codeNephroticSyndrome = 'codeNephroticSyndrome';
+	static codeOralContraceptives = 'codeOralContraceptives';
+	static codeAndrogens = 'codeAndrogens';
+	static codeSirolimus = 'codeSirolimus';
+	static codeAntiConvulsant = 'codeAntiConvulsant';
 	static codeNoSecondaryCauses = 'codeNoSecondaryCauses';
 	static codeAbnormalLipidProfile = 'codeAbnormalLipidProfile';
 
@@ -31,6 +31,9 @@ export class Code {
 
 	type;
 }
+
+export var nodeAdtMap = {"http://hl7.org/fhir/Observation":{"name":"Observation","http://hl7.org/fhir/Observation.code":{"name":"Observationdotcode","type":"http://hl7.org/fhir/Code"},"http://hl7.org/fhir/Observation.valueBoolean":{"name":"ObservationdotvalueBoolean"}},"http://hl7.org/fhir/Code":{"name":"Code","http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_excessive_alcohol_consumption":{"name":"codeExcessiveAlcoholConsumption"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_13-cis-retinioc_acid":{"name":"code13CisRetiniocAcid"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_corticosteroids":{"name":"codeCorticosteroids"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_diabetes":{"name":"codeDiabetes"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_hypothyroidism":{"name":"codeHypothyroidism"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_liver_disease":{"name":"codeLiverDisease"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_highly_active_anti-retroviral_therapy":{"name":"codeHighlyActiveAntiRetroviralTherapy"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_cyclosporine":{"name":"codeCyclosporine"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_nephrotic_syndrome":{"name":"codeNephroticSyndrome"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_oral_contraceptives":{"name":"codeOralContraceptives"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_androgens":{"name":"codeAndrogens"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_sirolimus":{"name":"codeSirolimus"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_anti_convulsant":{"name":"codeAntiConvulsant"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_no_secondary_causes":{"name":"codeNoSecondaryCauses"},"http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#code_abnormal_lipid_profile":{"name":"codeAbnormalLipidProfile"},"http://www.w3.org/1999/02/22-rdf-syntax-ns#type":{"name":"type"}}}
+
 
 export function createWorkflow() {
 	let e0 = new Entity()
@@ -52,70 +55,70 @@ export function createWorkflow() {
 	c0.type = Condition.Disjunction
 	let c1 = new Condition()
 	c1.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeOralContraceptives && obs.ObservationdotvalueBoolean == true) {  c1.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeExcessiveAlcoholConsumption && obs.ObservationdotvalueBoolean == true) {  c1.conditionMet = true; }
 	}
 	c0.anyOf.push(c1)
 	let c2 = new Condition()
 	c2.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeCorticosteroids && obs.ObservationdotvalueBoolean == true) {  c2.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.code13CisRetiniocAcid && obs.ObservationdotvalueBoolean == true) {  c2.conditionMet = true; }
 	}
 	c0.anyOf.push(c2)
 	let c3 = new Condition()
 	c3.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeCyclosporine && obs.ObservationdotvalueBoolean == true) {  c3.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeCorticosteroids && obs.ObservationdotvalueBoolean == true) {  c3.conditionMet = true; }
 	}
 	c0.anyOf.push(c3)
 	let c4 = new Condition()
 	c4.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeExcessiveAlcoholConsumption && obs.ObservationdotvalueBoolean == true) {  c4.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeDiabetes && obs.ObservationdotvalueBoolean == true) {  c4.conditionMet = true; }
 	}
 	c0.anyOf.push(c4)
 	let c5 = new Condition()
 	c5.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeAndrogens && obs.ObservationdotvalueBoolean == true) {  c5.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeHypothyroidism && obs.ObservationdotvalueBoolean == true) {  c5.conditionMet = true; }
 	}
 	c0.anyOf.push(c5)
 	let c6 = new Condition()
 	c6.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeHypothyroidism && obs.ObservationdotvalueBoolean == true) {  c6.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeLiverDisease && obs.ObservationdotvalueBoolean == true) {  c6.conditionMet = true; }
 	}
 	c0.anyOf.push(c6)
 	let c7 = new Condition()
 	c7.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeNephroticSyndrome && obs.ObservationdotvalueBoolean == true) {  c7.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeHighlyActiveAntiRetroviralTherapy && obs.ObservationdotvalueBoolean == true) {  c7.conditionMet = true; }
 	}
 	c0.anyOf.push(c7)
 	let c8 = new Condition()
 	c8.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeAntiConvulsant && obs.ObservationdotvalueBoolean == true) {  c8.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeCyclosporine && obs.ObservationdotvalueBoolean == true) {  c8.conditionMet = true; }
 	}
 	c0.anyOf.push(c8)
 	let c9 = new Condition()
 	c9.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeLiverDisease && obs.ObservationdotvalueBoolean == true) {  c9.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeNephroticSyndrome && obs.ObservationdotvalueBoolean == true) {  c9.conditionMet = true; }
 	}
 	c0.anyOf.push(c9)
 	let c10 = new Condition()
 	c10.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeSirolimus && obs.ObservationdotvalueBoolean == true) {  c10.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeOralContraceptives && obs.ObservationdotvalueBoolean == true) {  c10.conditionMet = true; }
 	}
 	c0.anyOf.push(c10)
 	let c11 = new Condition()
 	c11.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeHighlyActiveAntiRetroviralTherapy && obs.ObservationdotvalueBoolean == true) {  c11.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeAndrogens && obs.ObservationdotvalueBoolean == true) {  c11.conditionMet = true; }
 	}
 	c0.anyOf.push(c11)
 	let c12 = new Condition()
 	c12.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.code13CisRetiniocAcid && obs.ObservationdotvalueBoolean == true) {  c12.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeSirolimus && obs.ObservationdotvalueBoolean == true) {  c12.conditionMet = true; }
 	}
 	c0.anyOf.push(c12)
 	let c13 = new Condition()
 	c13.check = function (obs) {
-		if (obs.Observationdotcode.type == Code.codeDiabetes && obs.ObservationdotvalueBoolean == true) {  c13.conditionMet = true; }
+		if (obs.Observationdotcode.type == Code.codeAntiConvulsant && obs.ObservationdotvalueBoolean == true) {  c13.conditionMet = true; }
 	}
 	c0.anyOf.push(c13)
-	e2.condition = c0
+	e2.precondition = c0
 	let e3 = new Entity()
 	e3.type = Entity.EndPoint
 	e3.isIn = new State(State.Inactive)
@@ -123,6 +126,8 @@ export function createWorkflow() {
 	e3.id = "secondary_causes_found"
 	e3.label = "Treatment or referral"
 	e2.branchTarget = e3
+	e2.next.push(e3)
+	e3.nextOf.push(e2)
 	e1.decisionBranch.push(e2)
 	let e4 = new Entity()
 	e4.type = Entity.DecisionBranch
@@ -134,7 +139,7 @@ export function createWorkflow() {
 		if (obs.Observationdotcode.type == Code.codeNoSecondaryCauses && obs.ObservationdotvalueBoolean == true) {  c15.conditionMet = true; }
 	}
 	c14.allOf.push(c15)
-	e4.condition = c14
+	e4.precondition = c14
 	let e5 = new Entity()
 	e5.type = Entity.EndPoint
 	e5.isIn = new State(State.Inactive)
@@ -142,6 +147,8 @@ export function createWorkflow() {
 	e5.id = "no_secondary_causes_found"
 	e5.label = "No secondary causes"
 	e4.branchTarget = e5
+	e4.next.push(e5)
+	e5.nextOf.push(e4)
 	e1.decisionBranch.push(e4)
 	e0.subTask.push(e1)
 	let e6 = new Entity()
@@ -168,8 +175,10 @@ export function createWorkflow() {
 		if (obs.Observationdotcode.type == Code.codeAbnormalLipidProfile && obs.ObservationdotvalueBoolean == false) {  c17.conditionMet = true; }
 	}
 	c16.allOf.push(c17)
-	e8.condition = c16
+	e8.precondition = c16
 	e8.branchTarget = e6
+	e8.next.push(e6)
+	e6.nextOf.push(e8)
 	e7.decisionBranch.push(e8)
 	let e9 = new Entity()
 	e9.type = Entity.DecisionBranch
@@ -181,8 +190,10 @@ export function createWorkflow() {
 		if (obs.Observationdotcode.type == Code.codeAbnormalLipidProfile && obs.ObservationdotvalueBoolean == true) {  c19.conditionMet = true; }
 	}
 	c18.allOf.push(c19)
-	e9.condition = c18
+	e9.precondition = c18
 	e9.branchTarget = e1
+	e9.next.push(e1)
+	e1.nextOf.push(e9)
 	e7.decisionBranch.push(e9)
 	e0.subTask.push(e7)
 	e0.subTask.push(e5)
@@ -190,4 +201,4 @@ export function createWorkflow() {
 	return e0
 }
 
-export var jsonWorkflow = {"id": "Evaluate_Lipid_Profile","name": "Evaluate lipid profile","composed": false,"node_type": "composite_task","workflow_state": "activeState","decisional_state": "chosenState","children": [{"id": "measure_lipid_profile","name": "Measure lipid profile","composed": true,"in_workflow": "Evaluate_Lipid_Profile","node_type": "decision_task","workflow_state": "inactiveState","decisional_state": "chosenState","description": "1.\tTotal cholesterol\n2.\tLDL cholesterol \n3.\tHDL cholesterol \n4.\tTriglycerides","inputForm": "<table><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_abnormal_lipid_profile'><\/span><div id='code_abnormal_lipid_profile' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean'>Abnormal lipid profile?: <label><input type='radio' name='code_abnormal_lipid_profile' id='code_abnormal_lipid_profile-yes' code='code_abnormal_lipid_profile-yes' value='yes' \/>yes<\/label>&nbsp;&nbsp;<label><input type='radio' name='code_abnormal_lipid_profile' id='code_abnormal_lipid_profile-no' code='code_abnormal_lipid_profile-no' value='no' \/>no<\/label><\/div><\/td><\/tr><\/table>\n","children": [{"id": "no_dyslipidemia","name": "No action","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "endpoint","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "normal","description": "No abnormal lipid profile."},"description": "No further measurement of lipid profile."},{"id": "rule_out_secondary_causes","name": "Rule out secondary causes","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "decision_task","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "abnormal","description": "Abnormal lipid profile."},"description": "Investigate and treat remediable secondary causes of dyslipidemia.","inputForm": "<table><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_no_secondary_causes'><\/span><label><input type='checkbox' id='code_no_secondary_causes' code='code_no_secondary_causes' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_nephrotic_syndrome,code_hypothyroidism,code_diabetes,code_excessive_alcohol_consumption,code_liver_disease,code_13-cis-retinioc_acid,code_anti_convulsant,code_highly_active_anti-retroviral_therapy,code_androgens,code_oral_contraceptives,code_corticosteroids,code_cyclosporine,code_sirolimus' mandatory='false' \/>No secondary causes<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_nephrotic_syndrome'><\/span><label><input type='checkbox' id='code_nephrotic_syndrome' code='code_nephrotic_syndrome' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Nephrotic syndrome?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_hypothyroidism'><\/span><label><input type='checkbox' id='code_hypothyroidism' code='code_hypothyroidism' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Hypothyroidism?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_diabetes'><\/span><label><input type='checkbox' id='code_diabetes' code='code_diabetes' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Diabetes?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_excessive_alcohol_consumption'><\/span><label><input type='checkbox' id='code_excessive_alcohol_consumption' code='code_excessive_alcohol_consumption' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Excessive alcohol consumption?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_liver_disease'><\/span><label><input type='checkbox' id='code_liver_disease' code='code_liver_disease' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Liver disease?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_13-cis-retinioc_acid'><\/span><label><input type='checkbox' id='code_13-cis-retinioc_acid' code='code_13-cis-retinioc_acid' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>13-cis-retinioc acid?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_anti_convulsant'><\/span><label><input type='checkbox' id='code_anti_convulsant' code='code_anti_convulsant' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Anti-convulsant?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_highly_active_anti-retroviral_therapy'><\/span><label><input type='checkbox' id='code_highly_active_anti-retroviral_therapy' code='code_highly_active_anti-retroviral_therapy' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Highly active anti-retroviral therapy?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_androgens'><\/span><label><input type='checkbox' id='code_androgens' code='code_androgens' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Androgens?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_oral_contraceptives'><\/span><label><input type='checkbox' id='code_oral_contraceptives' code='code_oral_contraceptives' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Oral contraceptives?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_corticosteroids'><\/span><label><input type='checkbox' id='code_corticosteroids' code='code_corticosteroids' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Corticosteroids?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof=''><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_sirolimus'><\/span><label><input type='checkbox' id='code_sirolimus' code='code_sirolimus' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Sirolimus?<\/label><\/td><\/tr><\/table>\n","children": [{"id": "secondary_causes_found","name": "Treatment or referral","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "endpoint","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "secondary causes","description": "Some secondary causes found."},"description": "Remediable (secondary) causes of dyslipidemia found. Treat secondary causes or refer to specialist."},{"id": "no_secondary_causes_found","name": "No secondary causes","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "endpoint","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "no","description": "No secondary causes found."},"description": "No remediable (secondary) causes of dyslipidemia found."}]}]}]}
+export var jsonWorkflow = {"id": "Evaluate_Lipid_Profile","name": "Evaluate lipid profile","composed": false,"node_type": "composite_task","workflow_state": "activeState","decisional_state": "chosenState","children": [{"id": "measure_lipid_profile","name": "Measure lipid profile","composed": true,"in_workflow": "Evaluate_Lipid_Profile","node_type": "decision_task","workflow_state": "inactiveState","decisional_state": "chosenState","description": "1.\tTotal cholesterol\n2.\tLDL cholesterol \n3.\tHDL cholesterol \n4.\tTriglycerides","inputForm": "<table><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_abnormal_lipid_profile'><\/span><div id='code_abnormal_lipid_profile' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean'>Abnormal lipid profile?: <label><input type='radio' name='code_abnormal_lipid_profile' id='code_abnormal_lipid_profile-yes' code='code_abnormal_lipid_profile-yes' value='yes' \/>yes<\/label>&nbsp;&nbsp;<label><input type='radio' name='code_abnormal_lipid_profile' id='code_abnormal_lipid_profile-no' code='code_abnormal_lipid_profile-no' value='no' \/>no<\/label><\/div><\/td><\/tr><\/table>\n","children": [{"id": "no_dyslipidemia","name": "No action","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "endpoint","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "normal","description": "No abnormal lipid profile."},"description": "No further measurement of lipid profile."},{"id": "rule_out_secondary_causes","name": "Rule out secondary causes","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "decision_task","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "abnormal","description": "Abnormal lipid profile."},"description": "Investigate and treat remediable secondary causes of dyslipidemia.","inputForm": "<table><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_no_secondary_causes'><\/span><label><input type='checkbox' id='code_no_secondary_causes' code='code_no_secondary_causes' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_nephrotic_syndrome,code_hypothyroidism,code_diabetes,code_excessive_alcohol_consumption,code_liver_disease,code_13-cis-retinioc_acid,code_anti_convulsant,code_highly_active_anti-retroviral_therapy,code_androgens,code_oral_contraceptives,code_corticosteroids,code_cyclosporine,code_sirolimus' mandatory='false' \/>No secondary causes<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_nephrotic_syndrome'><\/span><label><input type='checkbox' id='code_nephrotic_syndrome' code='code_nephrotic_syndrome' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Nephrotic syndrome?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_hypothyroidism'><\/span><label><input type='checkbox' id='code_hypothyroidism' code='code_hypothyroidism' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Hypothyroidism?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_diabetes'><\/span><label><input type='checkbox' id='code_diabetes' code='code_diabetes' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Diabetes?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_excessive_alcohol_consumption'><\/span><label><input type='checkbox' id='code_excessive_alcohol_consumption' code='code_excessive_alcohol_consumption' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Excessive alcohol consumption?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_liver_disease'><\/span><label><input type='checkbox' id='code_liver_disease' code='code_liver_disease' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Liver disease?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_13-cis-retinioc_acid'><\/span><label><input type='checkbox' id='code_13-cis-retinioc_acid' code='code_13-cis-retinioc_acid' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>13-cis-retinioc acid?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_anti_convulsant'><\/span><label><input type='checkbox' id='code_anti_convulsant' code='code_anti_convulsant' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Anti-convulsant?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_highly_active_anti-retroviral_therapy'><\/span><label><input type='checkbox' id='code_highly_active_anti-retroviral_therapy' code='code_highly_active_anti-retroviral_therapy' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Highly active anti-retroviral therapy?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_androgens'><\/span><label><input type='checkbox' id='code_androgens' code='code_androgens' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Androgens?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_oral_contraceptives'><\/span><label><input type='checkbox' id='code_oral_contraceptives' code='code_oral_contraceptives' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Oral contraceptives?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_corticosteroids'><\/span><label><input type='checkbox' id='code_corticosteroids' code='code_corticosteroids' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Corticosteroids?<\/label><\/td><\/tr><tr><td property='http:\/\/hl7.org\/fhir\/DiagnosticReport.result' typeof='http:\/\/hl7.org\/fhir\/Observation'><span style='display: none' property='http:\/\/hl7.org\/fhir\/Observation.code' resource='http:\/\/niche.cs.dal.ca\/ns\/cig\/kidney_statins.owl#code_sirolimus'><\/span><label><input type='checkbox' id='code_sirolimus' code='code_sirolimus' property='http:\/\/hl7.org\/fhir\/Observation.valueBoolean' mutex-with='code_no_secondary_causes' mandatory='false' \/>Sirolimus?<\/label><\/td><\/tr><\/table>\n","children": [{"id": "secondary_causes_found","name": "Treatment or referral","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "endpoint","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "secondary causes","description": "Some secondary causes found."},"description": "Remediable (secondary) causes of dyslipidemia found. Treat secondary causes or refer to specialist."},{"id": "no_secondary_causes_found","name": "No secondary causes","composed": false,"in_workflow": "Evaluate_Lipid_Profile","node_type": "endpoint","workflow_state": "inactiveState","decisional_state": "chosenState","condition": {"label": "no","description": "No secondary causes found."},"description": "No remediable (secondary) causes of dyslipidemia found."}]}]}]}

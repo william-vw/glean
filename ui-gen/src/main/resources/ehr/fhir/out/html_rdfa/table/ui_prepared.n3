@@ -20,7 +20,7 @@
 
 <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
     <http://niche.cs.dal.ca/ui_tpl.n3#output>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span>_prefix-label1_ <input type='number' id='_id1_' code='_id1_' min='_min1_' max='_max1_' step='_step1_' size='_size1_' property='http://hl7.org/fhir/Observation.valueInteger' /> _suffix-label1_</td></tr>" ;
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span>_prefix-label1_ <input type='number' id='_id1_' code='_id1_' min='_min1_' max='_max1_' step='_step1_' size='_size1_' property='http://hl7.org/fhir/Observation.valueInteger' /> _suffix-label1_</td></tr>" ;
     <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
         <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
 
@@ -30,13 +30,13 @@
 
 <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-yes_no_input>
     <http://niche.cs.dal.ca/ui_tpl.n3#output>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><div id='_id1_' property='http://hl7.org/fhir/Observation.valueBoolean'>_label1_: <label><input type='radio' name='_id1_' id='_id1_-yes' code='_id1_-yes' value='yes' />yes</label>&nbsp;&nbsp;<label><input type='radio' name='_id1_' id='_id1_-no' code='_id1_-no' value='no' />no</label></div></td></tr>" ;
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><div id='_id1_' property='http://hl7.org/fhir/Observation.valueBoolean'>_label1_: <label><input type='radio' name='_id1_' id='_id1_-yes' code='_id1_-yes' value='yes' />yes</label>&nbsp;&nbsp;<label><input type='radio' name='_id1_' id='_id1_-no' code='_id1_-no' value='no' />no</label></div></td></tr>" ;
     <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
         <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
 
 <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-val_quant>
     <http://niche.cs.dal.ca/ui_tpl.n3#output>
-        "<div property='http://hl7.org/fhir/Observation.valueQuantity' typeof=''><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='_code0_'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>_code1_</span>_prefix-label2_ <input type='number' id='_id2_' code='_id2_' min='_min2_' max='_max2_' step='_step2_' size='_size2_' property='http://hl7.org/fhir/Quantity.value' /> _suffix-label2_</div>" ;
+        "<div property='http://hl7.org/fhir/Observation.valueQuantity' typeof='http://hl7.org/fhir/ValueQuantity'><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='_code0_'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>_code1_</span>_prefix-label2_ <input type='number' id='_id2_' code='_id2_' min='_min2_' max='_max2_' step='_step2_' size='_size2_' property='http://hl7.org/fhir/Quantity.value' /> _suffix-label2_</div>" ;
     <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
         <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_n_struct> .
 
@@ -46,13 +46,13 @@
 
 <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-present_input>
     <http://niche.cs.dal.ca/ui_tpl.n3#output>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><label><input type='checkbox' id='_id1_' code='_id1_' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='_mutex1_' mandatory='false' />_label1_</label></td></tr>" ;
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><label><input type='checkbox' id='_id1_' code='_id1_' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='_mutex1_' mandatory='false' />_label1_</label></td></tr>" ;
     <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
         <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
 
 <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
     <http://niche.cs.dal.ca/ui_tpl.n3#output>
-        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof=''><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><div property='http://hl7.org/fhir/Observation.valueQuantity' typeof=''><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='_code10_'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>_code11_</span>_prefix-label12_ <input type='number' id='_id12_' code='_id12_' min='_min12_' max='_max12_' step='_step12_' size='_size12_' property='http://hl7.org/fhir/Quantity.value' /> _suffix-label12_</div></td></tr>" ;
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='_code0_'></span><div property='http://hl7.org/fhir/Observation.valueQuantity' typeof='http://hl7.org/fhir/ValueQuantity'><span style='display: none' property='http://hl7.org/fhir/Quantity.system' resource='_code10_'></span><span style='display: none' property='http://hl7.org/fhir/Quantity.code'>_code11_</span>_prefix-label12_ <input type='number' id='_id12_' code='_id12_' min='_min12_' max='_max12_' step='_step12_' size='_size12_' property='http://hl7.org/fhir/Quantity.value' /> _suffix-label12_</div></td></tr>" ;
     <http://niche.cs.dal.ca/ui_tpl.n3#lvl_struct>
         <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#lvl_1_struct> .
 

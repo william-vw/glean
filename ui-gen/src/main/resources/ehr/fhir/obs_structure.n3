@@ -22,6 +22,7 @@ _:b0 a tpl:UiElement ; tpl:level 0 ;
  
 :ui-int_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ;
 	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:hasType fhir:Observation ;
 	tpl:elements ( :ui-int_input1 :ui-int_input2 ) .
 	
 :ui-int_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
@@ -33,6 +34,7 @@ _:b0 a tpl:UiElement ; tpl:level 0 ;
 
 :ui-present_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
 	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:hasType fhir:Observation ;
 	tpl:elements ( :ui-present_input1 :ui-present_input2 ) .
 	
 :ui-present_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
@@ -44,6 +46,7 @@ _:b0 a tpl:UiElement ; tpl:level 0 ;
 
 :ui-yes_no_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
 	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:hasType fhir:Observation ;
 	tpl:elements ( :ui-yes_no_input1 :ui-yes_no_input2 ) .
 	
 :ui-yes_no_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
@@ -55,6 +58,7 @@ _:b0 a tpl:UiElement ; tpl:level 0 ;
 
 :ui-quant_input a tpl:UiElement ; tpl:structure true ; tpl:level 1 ; 
 	tpl:inProperty fhir:DiagnosticReport.result ;
+	tpl:hasType fhir:Observation ;
 	tpl:elements ( :ui-quant_input1 :ui-val_quant ) .
 	
 :ui-quant_input1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;
@@ -62,6 +66,7 @@ _:b0 a tpl:UiElement ; tpl:level 0 ;
 	
 :ui-val_quant a tpl:UiElement ; tpl:structure true ; tpl:level 2 ;
 	tpl:inProperty fhir:Observation.valueQuantity ; 
+	tpl:hasType fhir:ValueQuantity ;
 	tpl:elements ( :ui-val_quant1 :ui-val_quant2 :ui-val_quant3 ) .
 	
 :ui-val_quant1 a tpl:UiElement ; tpl:hidden true ; tpl:inputType xsd:anyURI ;

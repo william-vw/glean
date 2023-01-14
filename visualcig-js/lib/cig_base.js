@@ -82,5 +82,5 @@ CIGBase.prototype._init = function (wf, config) {
 }
 
 // subclasses need to implement:
-// _showFromData
+// _loadWorkflow
 // _baseWorkflow

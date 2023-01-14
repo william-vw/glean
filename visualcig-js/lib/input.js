@@ -113,7 +113,7 @@ async function submitInputData(element) {
     }
 
     const taskId = container.closest('.input-form').attr('task-id');
-    cig.onUserInput(taskId);    
+    cig.onUserInput(taskId);
 
     // 'await' not allowed in lambda for each()
     const elements = jQuery.makeArray(container);
@@ -145,7 +145,7 @@ async function submitInputData(element) {
         // console.log("rdf?", rdf);
 
         const node = cig.findNodeById(taskId);
-        node.data.input = rdf;
+        node.data.input = rdf.str;
         // console.log("input (from user)?", node.data.input);
 
         source.submitObservation(reference, rdf);
