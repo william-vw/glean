@@ -12,6 +12,7 @@ import org.apache.jen3.n3.N3ModelSpec;
 import org.apache.jen3.n3.N3ModelSpec.Types;
 import org.apache.jen3.n3.impl.N3Rule;
 import org.apache.jen3.rdf.model.CitedFormula;
+import org.apache.jen3.rdf.model.Collection;
 import org.apache.jen3.rdf.model.ModelFactory;
 import org.apache.jen3.rdf.model.Resource;
 import org.apache.jen3.reasoner.rulesys.Node_RuleVariable;
@@ -225,17 +226,18 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 
 		JsObj obj = new JsObj(varName);
 
-		c.listProperties(kb.resource("cond:anyOf")).forEachRemaining(stmt -> {
-			JsObj ret = genCondition(stmt.getObject());
+		c.listProperties(kb.resource("cond:anyOf")).andThen(c.listProperties(kb.resource("cond:allOf")))
+				.forEachRemaining(stmt -> {
+					String prpName = (stmt.getPredicate().getURI().endsWith("anyOf") ? "anyOf" : "allOf");
 
-			fnStr.append(obj.varName).append(".anyOf.push(").append(ret.varName).append(")\n");
-		});
+					Collection col = stmt.getObject().asCollection();
 
-		c.listProperties(kb.resource("cond:allOf")).forEachRemaining(stmt -> {
-			JsObj ret = genCondition(stmt.getObject());
-
-			fnStr.append(obj.varName).append(".allOf.push(").append(ret.varName).append(")\n");
-		});
+					col.getElements().forEachRemaining(e -> {
+						JsObj ret = genCondition(e);
+						fnStr.append(obj.varName).append(".").append(prpName).append(".push(").append(ret.varName)
+								.append(")\n");
+					});
+				});
 
 		if (c.hasProperty(kb.resource("cond:premise"))) {
 			CitedFormula premise = c.getPropertyResourceValue(kb.resource("cond:premise")).asCitedFormula();
@@ -276,6 +278,7 @@ public class WorkflowJsPrinter extends WorkflowPrinter {
 			return "function (obs) {\n\t" + body + "\n}";
 
 		} catch (Exception e) {
+			log.error("for premise: " + premise);
 			e.printStackTrace();
 			return null;
 		}

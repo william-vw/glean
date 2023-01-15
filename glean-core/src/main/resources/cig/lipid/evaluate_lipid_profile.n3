@@ -8,13 +8,13 @@ prefix fhir: <http://hl7.org/fhir/>
 prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 
 :Evaluate_Lipid_Profile a cig:MedicalWorkflow ;
-	# state:in gl:Inactive ;
+	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "Evaluate lipid profile" ;
 	
-	gl:root true ;
-	state:in gl:Active ;
+	# gl:root true ;
+	# state:in gl:Active ;
 	
 	cig:inputFile "/cig/lipid/input/evaluate_lipid_profile.n3" ;
 	
@@ -43,10 +43,10 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 			rdfs:label "normal" ;
 			rdfs:comment "No abnormal lipid profile." ;
 			
-			cond:allOf [ cond:premise 
+			cond:allOf ( [ cond:premise 
 							{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
 								fhir:Observation.valueBoolean false } 
-						]
+						] )
 		] ;
 		
 		gl:branchTarget :no_dyslipidemia
@@ -59,10 +59,10 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 			rdfs:label "abnormal" ;
 			rdfs:comment "Abnormal lipid profile." ;
 			
-			cond:allOf [ cond:premise 
+			cond:allOf ( [ cond:premise 
 							{ ?obs fhir:Observation.code :code_abnormal_lipid_profile ;
 								fhir:Observation.valueBoolean true } 
-						]
+						] )
 		] ;
 	
 		gl:branchTarget :rule_out_secondary_causes
@@ -103,21 +103,21 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 			rdfs:label "secondary causes" ;
 			rdfs:comment "Some secondary causes found." ;
 			
-			cond:anyOf
-				[ cond:premise { ?obs fhir:Observation.code :code_nephrotic_syndrome ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_hypothyroidism ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_diabetes ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_excessive_alcohol_consumption ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_liver_disease ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_13-cis-retinioc_acid ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_anti_convulsant ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_highly_active_anti-retroviral_therapy ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_androgens ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_oral_contraceptives ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_corticosteroids ; fhir:Observation.valueBoolean true } ] ,
-				[ cond:premise { ?obs fhir:Observation.code :code_cyclosporine ; fhir:Observation.valueBoolean true } ] ,
+			cond:anyOf (
+				[ cond:premise { ?obs fhir:Observation.code :code_nephrotic_syndrome ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_hypothyroidism ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_diabetes ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_excessive_alcohol_consumption ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_liver_disease ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_13-cis-retinioc_acid ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_anti_convulsant ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_highly_active_anti-retroviral_therapy ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_androgens ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_oral_contraceptives ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_corticosteroids ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :code_cyclosporine ; fhir:Observation.valueBoolean true } ]
 				[ cond:premise { ?obs fhir:Observation.code :code_sirolimus ; fhir:Observation.valueBoolean true } ]
-		] ;
+		) ] ;
 		
 		gl:branchTarget :secondary_causes_found
 		
@@ -129,11 +129,11 @@ prefix : <http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#>
 			rdfs:label "no" ;
 			rdfs:comment "No secondary causes found." ;
 			
-			cond:allOf
+			cond:allOf (
 				[ cond:premise 
 					{ ?obs fhir:Observation.code :code_no_secondary_causes ; 
 						fhir:Observation.valueBoolean true }
-				]
+				] )
 		] ;
 		
 		gl:branchTarget :no_secondary_causes_found 

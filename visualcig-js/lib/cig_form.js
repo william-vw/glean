@@ -9,7 +9,7 @@ export function CIGForm() {
     return this;
 }
 
-CIGForm.prototype = CIGBase.prototype;
+CIGForm.prototype = Object.create(CIGBase.prototype);
 CIGForm.prototype.constructor = CIGForm;
 
 CIGForm.prototype._settings = {

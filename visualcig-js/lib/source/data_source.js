@@ -1,3 +1,8 @@
+const SourceTypes = {
+    LOCAL: 'LOCAL', 
+    SERVER: 'SERVER'
+}
+
 function DataSource() {
 	return this;
 }
@@ -16,7 +21,7 @@ DataSource.prototype.resetAllObservations = function() {}
 
 DataSource.prototype.resetSource = function() {}
 
-DataSource.prototype.initFromSource = function() {}
+DataSource.prototype.initFromSource = function(workflowRef) {}
 
 class WorkflowReference {
 

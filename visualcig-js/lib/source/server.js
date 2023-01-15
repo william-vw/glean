@@ -2,10 +2,12 @@ function DataServer() {
 	return this;
 }
 
-DataServer.prototype = DataSource.prototype;
+DataServer.prototype = Object.create(DataSource.prototype);
 DataServer.prototype.constructor = DataServer;
 
-DataServer.prototype.setup = function(wf) {}
+DataServer.prototype.setup = function(wf) {
+    return wf;
+}
 
 DataServer.prototype.submitObservation = function(reference, rdf) {
     this._bulkSend([

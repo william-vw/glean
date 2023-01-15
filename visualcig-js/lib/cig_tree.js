@@ -8,7 +8,7 @@ export function VisualCIG() {
 	return this;
 }
 
-VisualCIG.prototype = CIGBase.prototype;
+VisualCIG.prototype = Object.create(CIGBase.prototype);
 VisualCIG.prototype.constructor = VisualCIG;
 
 
@@ -129,6 +129,7 @@ VisualCIG.prototype.findNodeByName = function (name) {
 }
 
 VisualCIG.prototype.findNodeById = function (id) {
+	// console.log("finding:", id, this._root.descendants());
 	if (id == this._workflow.id)
 		return this._workflow;
 	else
@@ -1234,7 +1235,7 @@ VisualCIG.prototype._openTaskWindow = function (e, d) {
 	taskStack.push(curTask);
 
 	var cig2 = new VisualCIG();
-	cig2.show(data, config, {
+	cig2.load(data, config, {
 		beforeRefresh: () => window.cig = cig2 // point to current cig
 	});
 }

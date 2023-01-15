@@ -4,12 +4,11 @@ prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
 prefix : <http://niche.cs.dal.ca/ns/glean/base.owl#>
 
 
-# - if an entity is ready, marked as conditional, and its precondition was met, 
+# - if an entity is ready, and its precondition was met, 
 # then activate the entry
 
-{	{	?entity :conditional true . # conditional entity
-			# only entities with "preconditions" (see cycle.n3 for dealing with cycles)
-			# entity pre-condition was met (see ../condition/condition.n3)
+{	{	# only entities with "preconditions" (see cycle.n3 for dealing with cycles)
+		# entity pre-condition was met (see ../condition/condition.n3)
 		?entity!:precondition cond:conditionMet true
 	
 	} a state:Guard .

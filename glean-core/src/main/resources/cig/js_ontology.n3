@@ -1,3 +1,4 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> . 
 @prefix owl: <http://www.w3.org/2002/07/owl#> . 
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix math: <http://www.w3.org/2000/10/swap/math#>
@@ -13,7 +14,8 @@ fhir:Observation.code a owl:FunctionalProperty ;
     rdfs:range fhir:Code .
 fhir:Observation.valueQuantity a owl:FunctionalProperty ;
     rdfs:range fhir:ValueQuantity .
-fhir:Quantity.value a owl:FunctionalProperty .
+fhir:Quantity.value a owl:FunctionalProperty ;
+    rdfs:range xsd:double .
 fhir:Observation.valueBoolean a owl:FunctionalProperty .
 
 cond:conditionMet a owl:FunctionalProperty ;

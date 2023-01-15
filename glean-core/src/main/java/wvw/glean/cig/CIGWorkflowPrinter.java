@@ -39,6 +39,10 @@ import wvw.utils.rdf.NS;
 
 public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
+	private enum DataSources {
+		SERVER, LOCAL
+	}
+
 	private final static Logger LOG = Logger.getLogger(CIGWorkflowPrinter.class.getName());
 
 	private UiGen uiGen = new UiGen();
@@ -61,11 +65,11 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// -- lipid
 
-		// TODO change all any/allOf collections to object lists
 //		String name = "lipid/ckd_dyslipidemia";
 		String name = "lipid/evaluate_lipid_profile";
 		String ns = NS.ckd;
-		printer.printWorkflow(name, ns, outFolder);
+		for (DataSources src : DataSources.values())
+			printer.printWorkflow(name, ns, outFolder, src);
 
 		// -- rbc
 
@@ -102,7 +106,9 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		System.out.println("html? " + html);
 	}
 
-	public void printWorkflow(String name, String ns, String outFolder) throws Exception {
+	public void printWorkflow(String name, String ns, String outFolder, DataSources forSource) throws Exception {
+		LOG.info("- printing workflow " + name + " for " + forSource);
+		
 		long start = System.currentTimeMillis();
 
 		WorkflowModel wf = new CIGModel(ns).initialize().load(getClass(), "cig/" + name + ".n3",
@@ -125,23 +131,41 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		String jsonOut = jsonPrinter.getString();
 //		System.out.println("json:\n" + out);
 
-		// - js
+		String outPath = null;
+		switch (forSource) {
 
-		N3Model ontology = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));
-		ontology.read(IOUtils.getResourceStream(getClass(), ontologyPath), "");
+		case LOCAL:
+			// - js
 
-		WorkflowPrinter jsPrinter = new WorkflowJsPrinter(ontology, jsonOut);
-		jsPrinter.print(wf);
+			N3Model ontology = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));
+			ontology.read(IOUtils.getResourceStream(getClass(), ontologyPath), "");
 
-		String out = jsPrinter.getString();
-		System.out.println("js:\n" + out);
+			WorkflowPrinter jsPrinter = new WorkflowJsPrinter(ontology, jsonOut);
+			jsPrinter.print(wf);
 
-		String outPath = outFolder + name + ".js";
-		IOUtils.writeFile(outPath, out, false);
-		LOG.info("written js to " + outPath);
+			String jsOut = jsPrinter.getString();
+//			System.out.println("js:\n" + out);
+
+			outPath = outFolder + name + "_local.js";
+			IOUtils.writeFile(outPath, jsOut, false);
+
+			break;
+
+		case SERVER:
+			outPath = outFolder + name + "_server.json";
+			IOUtils.writeFile(outPath, jsonOut, false);
+
+			break;
+		}
+
+		LOG.info("");
+		
+		LOG.info("written to " + outPath);
 
 		long end = System.currentTimeMillis();
-		LOG.info("writing: " + (end - start) + "ms");
+		LOG.info("writing: " + (end - start) + "ms\n");
+		
+		LOG.info("\n");
 	}
 
 	// (returns whether json was updated by this hook)

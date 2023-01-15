@@ -14,7 +14,7 @@ CIGBase.prototype.constructor = CIGBase;
 // 		operations: [{ source, target, type }] (mandatory; can be empty)
 //		adds: [{ parent, data }] (optional)
 
-CIGBase.prototype.load = function (url, config, callbacks) {
+CIGBase.prototype.load = function (data, config, callbacks) {
 	const cb = () => {
 		if (callbacks && callbacks.beforeRefresh)
 			callbacks.beforeRefresh();
@@ -25,7 +25,10 @@ CIGBase.prototype.load = function (url, config, callbacks) {
 			callbacks.afterRefresh();
 	};
 
-	this._loadFromUrl(url, config, cb);
+	if ((typeof data) === "string")
+		this._loadFromUrl(data, config, cb);	
+	else
+		this._loadWorkflow(data, config, cb);
 }
 
 CIGBase.prototype.loading_start = function () {
@@ -58,16 +61,34 @@ CIGBase.prototype.onUserInput = function(taskId) {}
 // - end API
 
 CIGBase.prototype._loadFromUrl = function (url, config, callback) {
-	import(url).then((wf) => this._loadWorkflow(wf, config, callback));
+	let ctu = (wf) => this._loadWorkflow(wf, config, callback);
+	if (url.endsWith(".js"))
+		import(url).then(ctu);
+	else if (url.endsWith(".json"))
+		d3.json(url).then(ctu);
+	else
+		console.error("unknown extension:", url);
 }
 
-CIGBase.prototype._init = function (wf, config) {
+CIGBase.prototype._init = function (data, config) {
 	// init data source
-	// window.source = new DataServer(wf);
-	window.source = new FSM(wf);
-	source.setup(wf);
-	
-	let data = wf.jsonWorkflow;
+	if (!window.source) {
+		switch (config.source) {
+
+			case SourceTypes.LOCAL:
+				window.source = new FSM();
+				break;
+
+			case SourceTypes.SERVER:
+				window.source = new DataServer();
+				break;
+
+			default:
+				console.error(`unknown source: ${config.source}`);
+		}
+		// (in case of fsm, "data" will include much more initially)
+		data = source.setup(data);
+	}
 
 	this.id = data.id;
 	this._data = data;

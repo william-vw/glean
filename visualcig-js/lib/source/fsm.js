@@ -2,20 +2,20 @@ function FSM() {
 	return this;
 }
 
-FSM.prototype = DataSource.prototype;
+FSM.prototype = Object.create(DataSource.prototype);
 FSM.prototype.constructor = FSM;
 
 FSM.prototype.setup = function (wf) {
 	this._wf = wf;
-
-	let e = wf.createWorkflow();
+	this._root = wf.createWorkflow();
 
 	this._entities = [];
 	this._entityMap = {};
 
-	this._visitWf(e);
-
+	this._visitWf(this._root);
 	// console.log("[FSM] objects:", this._entities);
+
+	return wf.jsonWorkflow;
 }
 
 FSM.prototype._visitWf = function (e) {
@@ -29,8 +29,9 @@ FSM.prototype._visitWf = function (e) {
 	this._forEachNext(e, this._visitWf);
 }
 
-FSM.prototype.initFromSource = function () {
-	this._transitAll();
+FSM.prototype.initFromSource = function (workflowRef) {
+	console.log("[FSM] initFromSource:", workflowRef.workflowId);
+	this._transitAll(workflowRef);
 
 	// let node = cig.findNodeById(cig._data.children[0].id)
 	// let transits = [{ node: node, workflowState: 'activeState', decisionState: undefined }];
@@ -38,8 +39,9 @@ FSM.prototype.initFromSource = function () {
 }
 
 FSM.prototype.submitObservation = function (reference, rdf) {
+	console.log("[FSM] submit for:", reference.taskId);
 	let e = this._entityMap[reference.taskId];
-	
+
 	// in case of prior observation, reset first
 	if (e.hasInputData)
 		this.resetObservations(e.id);
@@ -51,30 +53,34 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 
 	let quad = rdf.store.getQuads(null, "http://niche.cs.dal.ca/ns/glean/base.owl#hasInputData", null)[0];
 	let obs = this._toObject(quad._object.id, nodeAdtMap, rdf.store);
-	console.log("[FSM] obs:", obs);
+	console.log("[FSM] observation:", obs);
 
 	// keep obs for corresponding entity
 	e.hasInputData = obs;
 
-	this._transitAll(obs);
+	this._transitAll(reference.workflowRef, obs);
 }
 
 FSM.prototype.resetObservations = function (id) {
-	console.log("[FSM] reset", id);
+	console.log("[FSM] reset:", id);
+
 	let e = this._entityMap[id];
+	this._reset(e, true, false, State.Inactive, {});
 
-	let transits = {};
-	this._reset(e, true, false, State.Inactive, transits);
-
-	cig.update({ transits: Object.values(transits), operations: [] });
-
-	this._transitAll();
+	const workflowRef = cig.workflowRef();
+	this._transitAll(workflowRef);
 }
 
-FSM.prototype.resetAllObservations = function () { }
+FSM.prototype.resetAllObservations = function () {
+	console.error("NOT IMPLEMENTED YET");
+}
 
-FSM.prototype._reset = function (e, first, upward, newState, transits) {
-	if (e.id && (e.id in transits))
+FSM.prototype.resetSource = function() {
+	console.error("NOT IMPLEMENTED YET");
+}
+
+FSM.prototype._reset = function (e, first, upward, newState, found) {
+	if (e.id && (e.id in found))
 		return;
 
 	// reset
@@ -83,18 +89,17 @@ FSM.prototype._reset = function (e, first, upward, newState, transits) {
 	if (e.isIn)
 		e.isIn.type = newState;
 
-	// new transit
 	if (e.id)
-		transits[e.id] = this._transitFor(e);
+		found[e.id] = e;
 
 	// propagate
 	if (!upward)
 		this._forEachNext(e, (e) =>
-			this._reset(e, false, false, State.Inactive, transits)
+			this._reset(e, false, false, State.Inactive, found)
 		);
 
 	if ((first || upward) && e.subTaskOf)
-		this._reset(e.subTaskOf, false, true, State.Active, transits);
+		this._reset(e.subTaskOf, false, true, State.Active, found);
 }
 
 FSM.prototype.resetSource = function () { }
@@ -177,16 +182,34 @@ class State {
 	type;
 }
 
-FSM.prototype._transitAll = function (obs) {
-	let updates = this._runAll(obs);
-	console.log("[FSM] updates:", updates);
+class StateUpdate {
 
-	let transits = [];
-	for (let id in updates)
-		transits.push(this._transitFor(updates[id].entity));
+	constructor(entity, reason) {
+		this.entity = entity;
+		this.reason = reason;
+	}
 
+	toString = function () {
+		let str = `${this.entity.id ? this.entity.id : this.entity.type}`;
+		if (this.entity.isIn)
+			str += `: ${this.entity.isIn.type}`;
+		if (this.reason)
+			str += ` (${this.reason})`;
+		
+		return str;
+	}
+}
+
+FSM.prototype._transitAll = function (workflowRef, obs) {
+	console.log("[FSM] transit all:", workflowRef.workflowId);
+
+	this._runAll(obs);
+	// console.log("after update:\n", this._print());
+
+	let wf = this._entityMap[workflowRef.workflowId];
+	let transits = [ wf , ... wf.subTask ].map(s => this._transitFor(s));
+	console.log("[FSM] transits:\n", transits.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
 	cig.update({ transits: transits, operations: [] });
-	console.log("after transit:\n", this._print());
 }
 
 FSM.prototype._runAll = function (obs) {
@@ -195,16 +218,15 @@ FSM.prototype._runAll = function (obs) {
 
 	do {
 		this._updated = [];
-
 		for (let entity of this._entities)
 			this._runOn(entity, obs);
 
-		console.log("[FSM] updated:", this._updated);
-		this._updated.forEach(u => { if (u.entity && u.entity.id) allUpdates[u.entity.id] = u });
+		console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
+		this._updated.forEach(u => { if (u.entity.id) allUpdates[u.entity.id] = u.entity.isIn.type });
 
 	} while (this._updated.length > 0);
 
-	return allUpdates;
+	console.log("[FSM] allUpdates:", JSON.stringify(allUpdates, null, 4));
 }
 
 // regex replace:
@@ -220,7 +242,7 @@ FSM.prototype._runOn = function (entity, obs) {
 			&& entity.anyOf.some(x10 => x10.check(obs))) {
 
 			entity.conditionMet = true;
-			this._updated.push(entity);
+			this._updated.push(new StateUpdate(entity));
 		}
 
 		if (!entity.conditionMet
@@ -228,7 +250,7 @@ FSM.prototype._runOn = function (entity, obs) {
 			&& entity.allOf.every(x11 => x11.check(obs))) {
 
 			entity.conditionMet = true;
-			this._updated.push(entity);
+			this._updated.push(new StateUpdate(entity));
 		}
 	}
 
@@ -237,14 +259,14 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.checkIn(State.Ready)) {
 
 		entity.isIn.type = State.Active;
-		this._updated.push({ entity: entity, reason: "preconditionMet" });
+		this._updated.push(new StateUpdate(entity, "preconditionMet"));
 	}
 
 	if (entity.conditional == false
 		&& entity.checkIn(State.Ready)) {
 
 		entity.isIn.type = State.Active;
-		this._updated.push({ entity: entity, reason: "readyUnconditional" });
+		this._updated.push(new StateUpdate(entity, "readyUnconditional"));
 	}
 
 	if (entity.checkIn
@@ -253,7 +275,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.nextOf.some(x0 => x0.checkIn(State.Completed))) {
 
 		entity.isIn.type = State.Ready;
-		this._updated.push({ entity: entity, reason: "inactiveNextOfSomeCompleted" });
+		this._updated.push(new StateUpdate(entity, "inactiveNextOfSomeCompleted"));
 	}
 
 	if (entity.checkIn
@@ -262,21 +284,21 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.nextOf.length > 0) {
 
 		entity.isIn.type = State.Discarded;
-		this._updated.push({ entity: entity, reason: "inactiveNextOfAllDiscarded" });
+		this._updated.push(new StateUpdate(entity, "inactiveNextOfAllDiscarded"));
 	}
 
 	if (entity.type == Entity.EndPoint
 		&& entity.checkIn(State.Active)) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push({ entity: entity, reason: "activeEndPoint" });
+		this._updated.push(new StateUpdate(entity, "activeEndPoint"));
 	}
 
 	if (entity.involvesAction == false
 		&& entity.checkIn(State.Active)) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push({ entity: entity, reason: "activeNoActionInvolved" });
+		this._updated.push(new StateUpdate(entity, "activeNoActionInvolved"));
 	}
 
 	if (entity.type == Entity.CompositeTask
@@ -287,7 +309,7 @@ FSM.prototype._runOn = function (entity, obs) {
 			if (x2.checkIn(State.Inactive)
 				&& x2.nextOf.length == 0) {
 				x2.isIn.type = State.Ready
-				this._updated.push({ entity: entity, reason: "inactiveNoNextOfSubOfActive" });
+				this._updated.push(new StateUpdate(x2, "inactiveNoNextOfSubOfActive"));
 			}
 		});
 	}
@@ -299,7 +321,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		entity.subTask.forEach(x3 => {
 			if (x3.checkIn(State.NotDone)) {
 				x3.isIn.type = State.Discarded
-				this._updated.push({ entity: entity, reason: "notDoneSubOfDiscarded" });
+				this._updated.push(new StateUpdate(x3, "notDoneSubOfDiscarded"));
 			}
 		});
 	}
@@ -311,7 +333,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.subTask.every(x5 => x5.checkIn(State.Done))) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push({ entity: entity, reason: "activeSubAllDone" });
+		this._updated.push(new StateUpdate(entity, "activeSubAllDone"));
 	}
 
 	if (entity.type == Entity.CompositeTask
@@ -320,7 +342,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.subTask.every(x6 => x6.checkIn(State.Discarded))) {
 
 		entity.isIn.type = State.Discarded;
-		this._updated.push({ entity: entity, reason: "notDoneSubAllDiscarded" });
+		this._updated.push(new StateUpdate(entity, "notDoneSubAllDiscarded"));
 	}
 
 	if (entity.type == Entity.DecisionTask
@@ -330,7 +352,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		entity.decisionBranch.forEach(x7 => {
 			if (x7.checkIn(State.Inactive)) {
 				x7.isIn.type = State.Ready
-				this._updated.push({ entity: entity, reason: "inactiveBranchOfActivated" });
+				this._updated.push(new StateUpdate(x7, "inactiveBranchOfActivated"));
 			}
 		});
 	}
@@ -341,7 +363,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.checkIn(State.Active)) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push({ entity: entity, reason: "someActiveBranch" });
+		this._updated.push(new StateUpdate(entity, "someActiveBranch"));
 	}
 
 	if (entity.type == Entity.DecisionTask
@@ -351,7 +373,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		entity.decisionBranch.forEach(x9 => {
 			if (x9.checkIn(State.Ready)) {
 				x9.isIn.type = State.Discarded
-				this._updated.push({ entity: entity, reason: "readyBranchOfCompleted" });
+				this._updated.push(new StateUpdate(x9, "readyBranchOfCompleted"));
 			}
 		});
 	}
@@ -361,7 +383,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.branchTarget.checkIn(State.Inactive)) {
 
 		entity.branchTarget.isIn.type = State.Ready;
-		this._updated.push({ entity: entity, reason: "inactiveTargetOfActive" });
+		this._updated.push(new StateUpdate(entity, "inactiveTargetOfActive"));
 	}
 }
 
