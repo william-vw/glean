@@ -10,8 +10,9 @@
 <script src="lib/extract_rdf.js"></script>
 <script src="lib/jqFhir.js"></script>
 <script src="lib/fhir_client.js"></script>
-<script src="lib/data_source.js"></script>
-<script src="lib/server.js"></script>
+<script src="lib/source/data_source.js"></script>
+<script src="lib/source/server.js"></script>
+<script src="lib/source/fsm.js"></script>
 <script src="lib/input.js"></script>
 <link rel="stylesheet" href="lib/cig.css" />
 </head>
@@ -19,15 +20,18 @@
 
 <div id="main-container" class="main-form" class="container">
 </div>
-<button id="reset_source" style="position: absolute; top: 25px; right: 25px">reset server</button>
 
 <script type="module">
 import { CIGForm } from '/lib/cig_form.js';
 
 window.cig = new CIGForm();
 
-const config = { ns: 'http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#' }
-cig.show("json/lipid/ckd_dyslipidemia.json", config);
+const config = { 
+    ns: 'http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#',
+    source: SourceTypes.LOCAL
+    // source: SourceTypes.SERVER
+};
+cig.load("/wf/lipid/ckd_dyslipidemia_local.js", config);
 
 </script>
 </body>

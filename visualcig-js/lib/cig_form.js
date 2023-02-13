@@ -392,12 +392,12 @@ CIGForm.prototype._update = function (d) {
 
             // only do this if some new input was given
             if (d.newUserInput) {
-                const parentId = d.in_workflow;
+                d.newUserInput = false;
 
+                const parentId = d.in_workflow;
                 const ref = new WorkflowReference(cig.id, parentId);
                 source.initFromSource(ref);
 
-                d.newUserInput = false;
                 return;
             }
         }
@@ -409,7 +409,7 @@ CIGForm.prototype._update = function (d) {
         const done = (d.workflow_state == 'completedState');
         if (this._show(d, done)) {
             // if a composite task is being shown,
-            // ask server for status of its composed tasks
+            // ask for status of its composed tasks
             // (by default, only direct children are given (sub)workflow are sent)
 
             if (d.depth > 0 && d.node_type == 'composite_task') {

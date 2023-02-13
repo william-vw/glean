@@ -20,7 +20,6 @@
 
 <div id="main-container" class="container">
 </div>
-<button id="reset_source" style="position: absolute; top: 25px; right: 25px">reset server</button>
 
 <script type="module">
 import { VisualCIG } from '/lib/cig_tree.js';
@@ -29,13 +28,14 @@ window.cig = new VisualCIG();
 const config = { 
     translate: { x: 0, y: 0 }, 
     ns: 'http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#',
-    // source: SourceTypes.LOCAL
-    source: SourceTypes.SERVER
+    source: SourceTypes.LOCAL
+    // source: SourceTypes.SERVER
 }
 
-// cig.load("/wf/lipid/ckd_dyslipidemia_local.js", config);
+cig.load("/wf/lipid/ckd_dyslipidemia_local.js", config);
 // cig.load("/wf/lipid/evaluate_lipid_profile_local.js", config);
-cig.load("/wf/lipid/ckd_dyslipidemia_server.json", config);
+
+// cig.load("/wf/lipid/ckd_dyslipidemia_server.json", config);
 // cig.load("/wf/lipid/evaluate_lipid_profile_server.json", config);
 
 </script>

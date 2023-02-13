@@ -65,8 +65,8 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// -- lipid
 
-//		String name = "lipid/ckd_dyslipidemia";
-		String name = "lipid/evaluate_lipid_profile";
+		String name = "lipid/ckd_dyslipidemia";
+//		String name = "lipid/evaluate_lipid_profile";
 		String ns = NS.ckd;
 		for (DataSources src : DataSources.values())
 			printer.printWorkflow(name, ns, outFolder, src);
