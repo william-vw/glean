@@ -52,7 +52,7 @@ CIGForm.prototype.update = function ({ transits, operations, adds }) {
     });
 }
 
-CIGForm.prototype.onInputFromServer = function (node, input) {
+CIGForm.prototype.onInputFromSource = function (node, input) {
     node.data.input = input;
     populateInput(node.data);
 }
@@ -65,29 +65,35 @@ CIGForm.prototype.onUserInput = function (taskId) {
 
     // set flag
     if (!workflow.newUserInput) {
+        // two uses:
+        // - as here, only call hide-recursively once
+        // - if workflow state is updated and this flag is set;
+        // get updates for higher-level workflows (_update fn)
         workflow.newUserInput = true;
 
-        this._hideRecursivelyFrom(workflow);
+        this._hideRecursivelyFrom(workflow, node, false);
     }
 }
 
 // new input may change visibility of next elements;
-// server will only update subtasks of the current composite
-CIGForm.prototype._hideRecursivelyFrom = function (workflow) {
-    workflow.children
-        .forEach(child => { if (!child.composed) { this._hide(child); } });
+// source will only update subtasks of the current composite
+CIGForm.prototype._hideRecursivelyFrom = function (workflow, element, upOne) {
+    // let idx = workflow.children.indexOf(element);
+    // for (let i = idx + 1; i < workflow.children.length; i++) {
+    //     this._hide(workflow.children[i]);
+    // }
 
-    if (workflow.in_workflow) {
-        const superWorkflow = this._map[workflow.in_workflow].data;
-        this._hideRecursivelyFrom(superWorkflow);
-    }
+    // if (workflow.in_workflow) {
+    //     const superWorkflow = this._map[workflow.in_workflow].data;
+    //     this._hideRecursivelyFrom(superWorkflow, workflow, true);
+    // }
 }
 
 CIGForm.prototype._loadWorkflow = function (wf, config, callback) {
     this._init(wf, config);
-    
+
     let json = wf.jsonWorkflow;
-    
+
     this._map = {};
     this._setupData(json, 0);
 
@@ -410,7 +416,7 @@ CIGForm.prototype._update = function (d) {
         if (this._show(d, done)) {
             // if a composite task is being shown,
             // ask for status of its composed tasks
-            // (by default, only direct children are given (sub)workflow are sent)
+            // (by default, only direct children are given)
 
             if (d.depth > 0 && d.node_type == 'composite_task') {
                 const ref = new WorkflowReference(cig.id, d.id);
@@ -463,7 +469,7 @@ CIGForm.prototype._hide = function (d) {
     }
 
     // reset input fields
-    // (will be re-set by server if data is available; see #onInputFromServer)
+    // (will be re-set by source if data is available; see #onInputFromSource)
     el.find('input[type=radio]').prop('checked', false);
     el.find('input[type=checkbox]').prop('checked', false);
     el.find('input[type=number]').prop('value', "");

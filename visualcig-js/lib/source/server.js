@@ -154,7 +154,7 @@ DataServer.prototype._processDataResult = function(result, refreshing) {
                     const input = task.resource.description;
                     if (input) {
                         console.log("input (from server)?", task.resource.id, input);
-                        cig.onInputFromServer(node, input);
+                        cig.onInputFromSource(node, input);
                     }
                 }
             }

@@ -52,7 +52,7 @@ CIGBase.prototype.taskRef = function (taskId) {
 	return new TaskReference(workflowRef, taskId);
 }
 
-CIGBase.prototype.onInputFromServer = function (node, input) {
+CIGBase.prototype.onInputFromSource = function (node, input) {
 	node.data.input = input;
 }
 
