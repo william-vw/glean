@@ -71,22 +71,23 @@ CIGForm.prototype.onUserInput = function (taskId) {
         // get updates for higher-level workflows (_update fn)
         workflow.newUserInput = true;
 
-        this._hideRecursivelyFrom(workflow, node, false);
+        this._hideRecursivelyFrom(workflow);
     }
 }
 
 // new input may change visibility of next elements;
 // source will only update subtasks of the current composite
-CIGForm.prototype._hideRecursivelyFrom = function (workflow, element, upOne) {
-    // let idx = workflow.children.indexOf(element);
-    // for (let i = idx + 1; i < workflow.children.length; i++) {
-    //     this._hide(workflow.children[i]);
-    // }
+CIGForm.prototype._hideRecursivelyFrom = function (workflow) {
+    workflow.children.forEach((child) => {
+        // if not composed, means it's 'next' of the workflow
+        if (!child.composed)
+            this._hide(child);
+    })
 
-    // if (workflow.in_workflow) {
-    //     const superWorkflow = this._map[workflow.in_workflow].data;
-    //     this._hideRecursivelyFrom(superWorkflow, workflow, true);
-    // }
+    if (workflow.in_workflow) {
+        const superWorkflow = this._map[workflow.in_workflow].data;
+        this._hideRecursivelyFrom(superWorkflow);
+    }
 }
 
 CIGForm.prototype._loadWorkflow = function (wf, config, callback) {
