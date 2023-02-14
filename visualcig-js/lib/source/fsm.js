@@ -48,18 +48,18 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	}
 
 	let nodeAdtMap = this._wf.nodeAdtMap;
-
 	// console.log(nodeAdtMap);
-	console.log(rdf.str);
+	// console.log(rdf.str);
 
+	let obs = [];
 	for (let quad of rdf.store.getQuads(null, "http://niche.cs.dal.ca/ns/glean/base.owl#hasInputData", null)) {
-		let obs = this._toObject(quad._object.id, nodeAdtMap, rdf.store);
-		console.log("[FSM] observation:", obs);
+		let o = this._toObject(quad._object.id, nodeAdtMap, rdf.store);
 		// keep obs for corresponding entity
-		e.hasInputData = obs;
-
-		this._transitAll(reference.workflowRef, obs);
+		e.hasInputData = o;
+		obs.push(o);
 	}
+	console.log("[FSM] observation:", obs);
+	this._transitAll(reference.workflowRef, obs);
 }
 
 FSM.prototype.resetObservations = function (id) {
@@ -270,7 +270,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		if (!entity.conditionMet
 			&& entity.type == Condition.Disjunction
 			&& entity.anyOf.length > 0
-			&& entity.anyOf.some(x10 => x10.check(obs))) {
+			&& entity.anyOf.some(x10 => obs.some(o => x10.check(o)))) {
 
 			entity.conditionMet = true;
 			this._updated.push(new StateUpdate(entity));
@@ -278,7 +278,7 @@ FSM.prototype._runOn = function (entity, obs) {
 
 		if (!entity.conditionMet
 			&& entity.type == Condition.Conjunction
-			&& entity.allOf.every(x11 => x11.check(obs))) {
+			&& entity.allOf.every(x11 => obs.some(o => x11.check(o)))) {
 
 			entity.conditionMet = true;
 			this._updated.push(new StateUpdate(entity));
