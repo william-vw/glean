@@ -1,6 +1,6 @@
 // TODO
 
-// fhir-server should be able to return *all* (i.e., from all sub-guidelines) and 
+// data source should be able to return *all* (i.e., from all sub-guidelines) and 
 // *updated* (i.e., only those that changed) task states
 
 import { CIGBase } from './cig_base.js';
@@ -65,9 +65,7 @@ CIGForm.prototype.onUserInput = function (taskId) {
 
     // set flag
     if (!workflow.newUserInput) {
-        // two uses:
-        // - as here, only call hide-recursively once
-        // - if workflow state is updated and this flag is set;
+        // if workflow state is updated and this flag is set;
         // get updates for higher-level workflows (_update fn)
         workflow.newUserInput = true;
     }
