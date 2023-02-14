@@ -42,9 +42,10 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	console.log("[FSM] submit for:", reference.taskId);
 	let e = this._entityMap[reference.taskId];
 
-	// in case of prior observation, reset first
-	if (e.hasInputData)
-		this.resetObservations(e.id);
+	// in case of prior observation, reset all nexts of this node
+	if (e.hasInputData) {
+		this._resetAllNexts(e.id);
+	}
 
 	let nodeAdtMap = this._wf.nodeAdtMap;
 
@@ -62,44 +63,72 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 }
 
 FSM.prototype.resetObservations = function (id) {
-	console.log("[FSM] reset:", id);
-
-	let e = this._entityMap[id];
-	this._reset(e, true, false, State.Inactive, {});
+	this._reset(id, []);
 
 	const workflowRef = cig.workflowRef();
 	this._transitAll(workflowRef);
+}
+
+FSM.prototype._resetAllNexts = function (id) {
+	let transits = [];
+	this._reset(id, transits);
+
+	console.log("[FSM] transits (reset):\n", 
+		transits.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
+	cig.update({ transits: transits, operations: [] });
+}
+
+FSM.prototype._reset = function (id, transits) {
+	let e = this._entityMap[id];
+	this._doReset(e, true, false, State.Active, {}, transits);
 }
 
 FSM.prototype.resetAllObservations = function () {
 	console.error("NOT IMPLEMENTED YET");
 }
 
-FSM.prototype.resetSource = function() {
+FSM.prototype.resetSource = function () {
 	console.error("NOT IMPLEMENTED YET");
 }
 
-FSM.prototype._reset = function (e, first, upward, newState, found) {
+FSM.prototype._doReset = function (e, first, upward, newState, found, transits) {
 	if (e.id && (e.id in found))
 		return;
+
+	if (e.id)
+		console.log("[FSM] reset:", e.id, newState);
 
 	// reset
 	if (e.conditionMet)
 		e.conditionMet = false;
-	if (e.isIn)
+	if (e.isIn) {
 		e.isIn.type = newState;
+		transits.push(this._transitFor(e));
+	}
 
 	if (e.id)
 		found[e.id] = e;
 
 	// propagate
-	if (!upward)
-		this._forEachNext(e, (e) =>
-			this._reset(e, false, false, State.Inactive, found)
-		);
 
+	if (upward) {
+		// this is a super-workflow for the element
+		// recursively set each 'next' of this workflow to inactive
+		e.next.forEach((next) => {
+			this._doReset(next, false, false, State.Inactive, found, transits)
+		});
+
+	} else {
+		// recursively set all subs, nexts etc to inactive
+		this._forEachNext(e, (e) =>
+			this._doReset(e, false, false, State.Inactive, found, transits)
+		);
+	}
+
+	// move upward in the hierarchy
 	if ((first || upward) && e.subTaskOf)
-		this._reset(e.subTaskOf, false, true, State.Active, found);
+		// set all super-workflows of this element to active
+		this._doReset(e.subTaskOf, false, true, State.Active, found, transits);
 }
 
 FSM.prototype.resetSource = function () { }
@@ -195,7 +224,7 @@ class StateUpdate {
 			str += `: ${this.entity.isIn.type}`;
 		if (this.reason)
 			str += ` (${this.reason})`;
-		
+
 		return str;
 	}
 }
@@ -207,8 +236,10 @@ FSM.prototype._transitAll = function (workflowRef, obs) {
 	// console.log("after update:\n", this._print());
 
 	let wf = this._entityMap[workflowRef.workflowId];
-	let transits = [ wf , ... wf.subTask ].map(s => this._transitFor(s));
-	console.log("[FSM] transits:\n", transits.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
+	let transits = [wf, ...wf.subTask].map(s => this._transitFor(s));
+	
+	console.log("[FSM] transits (run):\n", 
+		transits.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
 	cig.update({ transits: transits, operations: [] });
 }
 

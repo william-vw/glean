@@ -70,23 +70,6 @@ CIGForm.prototype.onUserInput = function (taskId) {
         // - if workflow state is updated and this flag is set;
         // get updates for higher-level workflows (_update fn)
         workflow.newUserInput = true;
-
-        this._hideRecursivelyFrom(workflow);
-    }
-}
-
-// new input may change visibility of next elements;
-// source will only update subtasks of the current composite
-CIGForm.prototype._hideRecursivelyFrom = function (workflow) {
-    workflow.children.forEach((child) => {
-        // if not composed, means it's 'next' of the workflow
-        if (!child.composed)
-            this._hide(child);
-    })
-
-    if (workflow.in_workflow) {
-        const superWorkflow = this._map[workflow.in_workflow].data;
-        this._hideRecursivelyFrom(superWorkflow);
     }
 }
 
@@ -382,6 +365,8 @@ CIGForm.prototype._updateNode = function (node) {
 }
 
 CIGForm.prototype._update = function (d) {
+    // console.log("update:", d.id);
+
     // root will be the workflow itself
     if (d.depth == 0) {
         this._show(d, false);
@@ -460,14 +445,14 @@ CIGForm.prototype._findElementWithId = function (id) {
 }
 
 CIGForm.prototype._hide = function (d) {
-    // console.log("hiding:", d.id);
-
     var el = $(`#${d.id}`);
+
     // no problem with hiding all duplicate elements
     // (only one should be shown)
     if (el.length == 0) {
         el = $(`[duplicate-id = ${d.id}]`)
     }
+    console.log("hiding:", d.id, el);
 
     // reset input fields
     // (will be re-set by source if data is available; see #onInputFromSource)
