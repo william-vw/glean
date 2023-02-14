@@ -50,16 +50,16 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	let nodeAdtMap = this._wf.nodeAdtMap;
 
 	// console.log(nodeAdtMap);
-	// console.log(rdf.str);
+	console.log(rdf.str);
 
-	let quad = rdf.store.getQuads(null, "http://niche.cs.dal.ca/ns/glean/base.owl#hasInputData", null)[0];
-	let obs = this._toObject(quad._object.id, nodeAdtMap, rdf.store);
-	console.log("[FSM] observation:", obs);
+	for (let quad of rdf.store.getQuads(null, "http://niche.cs.dal.ca/ns/glean/base.owl#hasInputData", null)) {
+		let obs = this._toObject(quad._object.id, nodeAdtMap, rdf.store);
+		console.log("[FSM] observation:", obs);
+		// keep obs for corresponding entity
+		e.hasInputData = obs;
 
-	// keep obs for corresponding entity
-	e.hasInputData = obs;
-
-	this._transitAll(reference.workflowRef, obs);
+		this._transitAll(reference.workflowRef, obs);
+	}
 }
 
 FSM.prototype.resetObservations = function (id) {
