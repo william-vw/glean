@@ -5,7 +5,7 @@ function FSM() {
 FSM.prototype = Object.create(DataSource.prototype);
 FSM.prototype.constructor = FSM;
 
-FSM.prototype.setup = function (wf) {
+FSM.prototype._init = function (wf) {
 	this._wf = wf;
 	this._root = wf.createWorkflow();
 
@@ -29,13 +29,9 @@ FSM.prototype._visitWf = function (e) {
 	this._forEachNext(e, this._visitWf);
 }
 
-FSM.prototype.initFromSource = function (workflowRef) {
-	console.log("[FSM] initFromSource:", workflowRef.workflowId);
+FSM.prototype.initStates = function (workflowRef) {
+	console.log("[FSM] initStates:", workflowRef.workflowId);
 	this._transitAll(workflowRef);
-
-	// let node = cig.findNodeById(cig._data.children[0].id)
-	// let transits = [{ node: node, workflowState: 'activeState', decisionState: undefined }];
-	// cig.update({ transits: transits, operations: [] });
 }
 
 FSM.prototype.submitObservation = function (reference, rdf) {
@@ -65,7 +61,7 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 FSM.prototype.resetObservations = function (id) {
 	this._reset(id, []);
 
-	const workflowRef = cig.workflowRef();
+	const workflowRef = this.workflowRef();
 	this._transitAll(workflowRef);
 }
 
@@ -419,7 +415,7 @@ FSM.prototype._runOn = function (entity, obs) {
 }
 
 FSM.prototype._transitFor = function (e) {
-	let node = cig.findNodeById(e.id);
+	let node = this.findNodeById(e.id);
 	let state = e.isIn.type.toLowerCase() + "State";
 
 	return { node: node, workflowState: state, decisionState: undefined };

@@ -5,7 +5,7 @@ function DataServer() {
 DataServer.prototype = Object.create(DataSource.prototype);
 DataServer.prototype.constructor = DataServer;
 
-DataServer.prototype.setup = function(wf) {
+DataServer.prototype._init = function(wf) {
     return wf;
 }
 

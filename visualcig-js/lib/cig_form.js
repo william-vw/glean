@@ -1,5 +1,3 @@
-// TODO
-
 // data source should be able to return *all* (i.e., from all sub-guidelines) and 
 // *updated* (i.e., only those that changed) task states
 
@@ -16,10 +14,6 @@ CIGForm.prototype._settings = {
     composite: {
         bgcolor: [194, 42, 100] // HSl
     }
-}
-
-CIGForm.prototype.findNodeById = function (id) {
-    return this._map[id];
 }
 
 // transits: [{ node, workflowState, decisionState }] (mandatory; can be empty)
@@ -71,40 +65,9 @@ CIGForm.prototype.onUserInput = function (taskId) {
     }
 }
 
-CIGForm.prototype._loadWorkflow = function (wf, config, callback) {
-    this._init(wf, config);
-
-    let json = wf.jsonWorkflow;
-
-    this._map = {};
-    this._setupData(json, 0);
-
+CIGForm.prototype._init = function () {
+    let json = this._data.jsonWorkflow;
     this._initForm(json);
-
-    if (callback)
-        callback();
-}
-
-CIGForm.prototype._baseWorkflow = function () {
-    return cig.id;
-}
-
-CIGForm.prototype._setupData = function (d, depth) {
-    d.depth = depth;
-    if (d.node_type == 'composite_task')
-        // keeps whether any of the included inputs (direct children)
-        // had new user input since the last refresh (see #_update())
-        d.newUserInput = false;
-
-    // wrap as data field of object cfr. cig_tree.js
-    // need separate method to receive an "external" node (e.g., _updateNode)
-    // since native methods expect the original 'data'
-    this._map[d.id] = { data: d };
-
-    if (d.children) {
-        for (var child of d.children)
-            this._setupData(child, depth + 1);
-    }
 }
 
 CIGForm.prototype._initForm = function (data) {
@@ -386,7 +349,7 @@ CIGForm.prototype._update = function (d) {
 
                 const parentId = d.in_workflow;
                 const ref = new WorkflowReference(cig.id, parentId);
-                source.initFromSource(ref);
+                source.initStates(ref);
 
                 return;
             }
@@ -404,7 +367,7 @@ CIGForm.prototype._update = function (d) {
 
             if (d.depth > 0 && d.node_type == 'composite_task') {
                 const ref = new WorkflowReference(cig.id, d.id);
-                source.initFromSource(ref);
+                source.initStates(ref);
             }
         }
 

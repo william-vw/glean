@@ -22,21 +22,12 @@
 </div>
 
 <script type="module">
-import { VisualCIG } from '/lib/cig_tree.js';
+import { CIGForm } from '/lib/cig_form.js';
 
-window.cig = new VisualCIG();
-const config = { 
-    translate: { x: 0, y: 0 }, 
-    ns: 'http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#',
-    source: SourceTypes.LOCAL
-    // source: SourceTypes.SERVER
-}
+window.cig = new CIGForm();
 
-cig.load("/wf/lipid/ckd_dyslipidemia_local.js", config);
-// cig.load("/wf/lipid/evaluate_lipid_profile_local.js", config);
-
-// cig.load("/wf/lipid/ckd_dyslipidemia_server.json", config);
-// cig.load("/wf/lipid/evaluate_lipid_profile_server.json", config);
+window.source = new FSM();
+source.load("/wf/lipid/ckd_dyslipidemia_local.js");
 
 </script>
 </body>
