@@ -1,4 +1,5 @@
-function FSM() {
+function FSM(data) {
+	this._data = data;
 	return this;
 }
 
@@ -29,9 +30,9 @@ FSM.prototype._visitWf = function (e) {
 	this._forEachNext(e, this._visitWf);
 }
 
-FSM.prototype.initStates = function (workflowRef) {
+FSM.prototype.refresh = function (cig, workflowRef) {
 	console.log("[FSM] initStates:", workflowRef.workflowId);
-	this._transitAll(workflowRef);
+	this._transitAll(cig, workflowRef);
 }
 
 FSM.prototype.submitObservation = function (reference, rdf) {
@@ -225,7 +226,7 @@ class StateUpdate {
 	}
 }
 
-FSM.prototype._transitAll = function (workflowRef, obs) {
+FSM.prototype._transitAll = function (cig, workflowRef, obs) {
 	console.log("[FSM] transit all:", workflowRef.workflowId);
 
 	this._runAll(obs);

@@ -1,9 +1,10 @@
 const SourceTypes = {
-    LOCAL: 'LOCAL', 
+    LOCAL: 'LOCAL',
     SERVER: 'SERVER'
 }
 
-function DataSource(cig) {
+function DataSource(data) {
+    this._data = data;
     return this;
 }
 
@@ -11,39 +12,37 @@ DataSource.prototype.constructor = DataSource;
 
 // - start API
 
-DataSource.prototype.load = function (data) {
-    let cb = () => {
-        cig.show(this._wfView);
-        this.initStates();
-    };
+DataSource.prototype.load = function () {
+    return new Promise((resolve, reject) => {
 
-	if ((typeof data) === "string")
-		this._loadFromUrl(data, cb);	
-	else
-		this._loadWorkflow(data, cb);
+        if ((typeof this._data) === "string")
+            this._loadFromUrl(this._data, resolve, reject);
+        else
+            this._loadWorkflow(this._data, resolve, reject);
+    });
 }
 
-CIGBase.prototype.loading_start = function () {
-	$('.overlay').css('display', 'block');
+DataSource.prototype.loading_start = function () {
+    $('.overlay').css('display', 'block');
 }
 
-CIGBase.prototype.loading_end = function () {
-	$('.overlay').css('display', 'none');
+DataSource.prototype.loading_end = function () {
+    $('.overlay').css('display', 'none');
 }
 
 DataSource.prototype.findNodeById = function (id) {
     return this._map[id];
 }
 
-DataSource.prototype.submitObservation = function(reference, rdf) {}
+DataSource.prototype.submitObservation = function (reference, rdf) { }
 
-DataSource.prototype.resetObservations = function(id) {}
+DataSource.prototype.resetObservations = function (id) { }
 
-DataSource.prototype.resetAllObservations = function() {}
+DataSource.prototype.resetAllObservations = function () { }
 
-DataSource.prototype.resetSource = function() {}
+DataSource.prototype.resetSource = function () { }
 
-DataSource.prototype.initStates = function(workflowRef) {}
+DataSource.prototype.refresh = function (cig, workflowRef) { }
 
 class WorkflowReference {
 
@@ -81,49 +80,53 @@ class TaskReference {
 };
 
 DataSource.prototype.workflowRef = function () {
-	return new WorkflowReference(this._baseWorkflow(), this.id);
+    return new WorkflowReference(this._baseWorkflow(), this.id);
 }
 
 DataSource.prototype.taskRef = function (taskId) {
-	const node = this.findNodeById(taskId);
+    const node = this.findNodeById(taskId);
 
-	const workflowId = node.data.in_workflow;
-	const workflowRef = new WorkflowReference(this._baseWorkflow(), workflowId);
+    const workflowId = node.data.in_workflow;
+    const workflowRef = new WorkflowReference(this._baseWorkflow(), workflowId);
 
-	return new TaskReference(workflowRef, taskId);
+    return new TaskReference(workflowRef, taskId);
 }
 
 // - end API
 
 DataSource.prototype._baseWorkflow = function () {
-    return this._wfView.id;
+    return this.wfView.id;
 }
 
-DataSource.prototype._loadFromUrl = function (url, callback) {
-	let ctu = (wf) => this._loadWorkflow(wf, callback);
-	if (url.endsWith(".js"))
-		import(url).then(ctu);
-	else if (url.endsWith(".json"))
-		d3.json(url).then(ctu);
-	else
-		console.error("unknown extension:", url);
+DataSource.prototype._loadFromUrl = function (url, onSuccess, onError) {
+    let ctu = (wf) => this._loadWorkflow(wf, onSuccess, onError);
+    if (url.endsWith(".js"))
+        import(url).then(ctu);
+    else if (url.endsWith(".json"))
+        d3.json(url).then(ctu);
+    else {
+        console.error("unknown extension:", url);
+        onError();
+    }
 }
 
-DataSource.prototype._loadWorkflow = function (wf, callback) {
-    // (workflow that views will be working with)
-    this._wfView = this._init(wf);
+DataSource.prototype._loadWorkflow = function (wf, onSuccess, onError) {
+    // the subclass will give us the JSON that views (CIG) will be working with
+    // (e.g., for FSM - this will be a property of "wf", and not "wf" itself)
+    this.wfView = this._init(wf);
 
+    // setup a map to support findNodeById
     this._map = {};
-    this._setupData(json, 0);
+    this._setupData(this.wfView, 0);
 
-    callback();
+    onSuccess();
 }
 
 DataSource.prototype._setupData = function (d, depth) {
     d.depth = depth;
     if (d.node_type == 'composite_task')
-        // keeps whether any of the included inputs (direct children)
-        // had new user input since the last refresh
+        // (keeps whether any of the included inputs (direct children)
+        // had new user input since the last refresh; needed by some subclasses)
         d.newUserInput = false;
 
     // wrap as data field of object

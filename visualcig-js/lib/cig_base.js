@@ -14,7 +14,10 @@ CIGBase.prototype.constructor = CIGBase;
 // 		operations: [{ source, target, type }] (mandatory; can be empty)
 //		adds: [{ parent, data }] (optional)
 
-CIGBase.prototype.show = function (wf) {
+CIGBase.prototype.show = function (source) {
+	this._source = source;
+
+	let wf = source.wfView;
 	this._data = wf;
 	this.id = wf.id;
 	this._config = config;
@@ -26,7 +29,9 @@ CIGBase.prototype.show = function (wf) {
 	// ('data' object will be workflow node itself)
 	this._workflow = { id: this._data.id, data: this._data };
 
-	this._init();
+	this._initView();
+
+	this._source.refresh(this, this._source.workflowRef());
 }
 
 CIGBase.prototype.loading_start = function () {

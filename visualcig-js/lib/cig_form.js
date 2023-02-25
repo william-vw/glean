@@ -52,10 +52,10 @@ CIGForm.prototype.onInputFromSource = function (node, input) {
 }
 
 CIGForm.prototype.onUserInput = function (taskId) {
-    const node = this._map[taskId];
+    const node = this._source.findNodeById(taskId);
     const workflowId = node.data.in_workflow;
 
-    const workflow = this._map[workflowId].data;
+    const workflow = this._source.findNodeById(workflowId).data;
 
     // set flag
     if (!workflow.newUserInput) {
@@ -65,8 +65,8 @@ CIGForm.prototype.onUserInput = function (taskId) {
     }
 }
 
-CIGForm.prototype._init = function () {
-    let json = this._data.jsonWorkflow;
+CIGForm.prototype._initView = function () {
+    let json = this._data;
     this._initForm(json);
 }
 
@@ -118,7 +118,7 @@ CIGForm.prototype._fixOrder = function (d, children) {
 
         // if grandchild has other-parent at same level as its parent
         if (grandchild.otherParents && childIds.includes(grandchild.otherParents[0].id)) {
-            const otherParent = this._map[grandchild.otherParents[0].id].data;
+            const otherParent = this._source.findNodeById(grandchild.otherParents[0].id).data;
             const idx = childIds.indexOf(otherParent.id);
 
             // ensure that other-parent is first in array of children
@@ -246,7 +246,7 @@ CIGForm.prototype._getWorkflowNum = function (d, num) {
     if (d.in_workflow === undefined)
         return num;
     else
-        return this._getWorkflowNum(this._map[d.in_workflow].data, num + 1);
+        return this._getWorkflowNum(this._source.findNodeById(d.in_workflow).data, num + 1);
 }
 
 CIGForm.prototype._disambiguateElement = function (d, parentEntry, duplicate, newEl) {
@@ -349,7 +349,7 @@ CIGForm.prototype._update = function (d) {
 
                 const parentId = d.in_workflow;
                 const ref = new WorkflowReference(cig.id, parentId);
-                source.initStates(ref);
+                this._source.initStates(ref);
 
                 return;
             }
@@ -367,7 +367,7 @@ CIGForm.prototype._update = function (d) {
 
             if (d.depth > 0 && d.node_type == 'composite_task') {
                 const ref = new WorkflowReference(cig.id, d.id);
-                source.initStates(ref);
+                this._source.initStates(ref);
             }
         }
 
