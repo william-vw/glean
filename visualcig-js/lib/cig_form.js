@@ -3,7 +3,8 @@
 
 import { CIGBase } from './cig_base.js';
 
-export function CIGForm() {
+export function CIGForm(input) {
+    CIGBase.call(this, input);
     return this;
 }
 
@@ -48,7 +49,7 @@ CIGForm.prototype.update = function ({ transits, operations, adds }) {
 
 CIGForm.prototype.onInputFromSource = function (node, input) {
     node.data.input = input;
-    populateInput(node.data);
+    this._input.populateInput(node.data);
 }
 
 CIGForm.prototype.onUserInput = function (taskId) {
@@ -74,7 +75,7 @@ CIGForm.prototype._initForm = function (data) {
     this._initFormEl(data, { element: $('#main-container') }, false);
 
     // - when radio buttons are clicked, submit the form directly
-    $('input[type=radio]').click(e => submitInputData(e.target));
+    $('input[type=radio]').click(e => this._input.submitInputData(e.target));
 }
 
 CIGForm.prototype._initFormEl = function (d, parentEntry, duplicate) {
@@ -224,7 +225,7 @@ CIGForm.prototype._create = function (d, parentEntry, duplicate) {
                 );
             }
 
-            setupInput(newEl, d);
+            this._input.setupInput(newEl, d);
             break;
     }
 
@@ -349,7 +350,7 @@ CIGForm.prototype._update = function (d) {
 
                 const parentId = d.in_workflow;
                 const ref = new WorkflowReference(cig.id, parentId);
-                this._source.initStates(ref);
+                this._source.refresh(ref);
 
                 return;
             }
@@ -367,7 +368,7 @@ CIGForm.prototype._update = function (d) {
 
             if (d.depth > 0 && d.node_type == 'composite_task') {
                 const ref = new WorkflowReference(cig.id, d.id);
-                this._source.initStates(ref);
+                this._source.refresh(ref);
             }
         }
 

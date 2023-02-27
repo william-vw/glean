@@ -80,7 +80,7 @@ class TaskReference {
 };
 
 DataSource.prototype.workflowRef = function () {
-    return new WorkflowReference(this._baseWorkflow(), this.id);
+    return new WorkflowReference(this._baseWorkflow(), this._baseWorkflow());
 }
 
 DataSource.prototype.taskRef = function (taskId) {
@@ -113,7 +113,7 @@ DataSource.prototype._loadFromUrl = function (url, onSuccess, onError) {
 DataSource.prototype._loadWorkflow = function (wf, onSuccess, onError) {
     // the subclass will give us the JSON that views (CIG) will be working with
     // (e.g., for FSM - this will be a property of "wf", and not "wf" itself)
-    this.wfView = this._init(wf);
+    this.wfView = this._initSource(wf);
 
     // setup a map to support findNodeById
     this._map = {};

@@ -1,3 +1,135 @@
+function RdfInputHandler() {
+	return this;
+}
+
+RdfInputHandler.prototype = Object.create(InputHandler.prototype);
+RdfInputHandler.prototype.constructor = RdfInputHandler;
+
+RdfInputHandler.prototype.populateInput = async function(d) {
+    const store = await parseRdf(d.input);
+
+    const codes = store.getQuads(null, namedNode(prefixes.fhir + 'Observation.code'), null);
+    for (var code of codes) {
+        const id = localName(code.object.value);
+        var value = undefined;
+
+        var values = store.getQuads(code.subject, namedNode(prefixes.fhir + 'Observation.valueBoolean', null));
+        if (values.length > 0)
+            value = (values[0].object.value === 'true');
+
+        if (value === undefined) {
+            var values = store.getQuads(code.subject, namedNode(prefixes.fhir + 'Observation.valueInteger', null));
+            if (values.length > 0)
+                value = values[0].object.value;
+        }
+
+        if (value === undefined) {
+            values = store.getQuads(code.subject, namedNode(prefixes.fhir + 'Observation.valueQuantity', null));
+            if (values.length > 0)
+                value = store.getQuads(values[0].object, namedNode(prefixes.fhir + 'Quantity.value', null))[0]
+                    .object.value;
+        }
+
+        // console.log("server input:", d.id, code, value);
+        if (value !== undefined) {
+            const parent = $(`[task-id = ${d.id}]`);
+            parent.find(`[id$=${id}]`).each((idx, field) => {
+                field = $(field);
+
+                if (!field || field.prop('tagName') != 'INPUT') { // try radio buttons
+                    field = parent.find(`[id$=${id + (value ? "-yes" : "-no")}]`);
+                    field.prop('checked', true);
+
+                    return;
+                }
+
+                if (!field) {
+                    console.error(`cannot find field with id: ${id}`)
+                    return;
+                }
+
+                if (field.prop('type') == 'checkbox')
+                    field[0].checked = value;
+                else
+                    field.val(value);
+            });
+
+        } else
+            console.error("unsupported input type:", code);
+    }
+}
+
+RdfInputHandler.prototype.submitInputData = async function(element) {
+    element = $(element);
+
+    var container = element.closest('table');
+    if (container.length == 0) {
+        container = element.closest('div#main-container');
+        container = container.find('div.input-form:visible');
+    }
+
+    const error = element.closest('.form-node').find('.input-error');
+
+    const check = this._checkInputData(container);
+    if (check !== true) {
+        console.error("submitInputData", check);
+        error.css('display', 'block')
+        error.html(check);
+
+        return;
+    }
+
+    const taskId = container.closest('.input-form').attr('task-id');
+    this._cig.onUserInput(taskId);
+
+    // 'await' not allowed in lambda for each()
+    const elements = jQuery.makeArray(container);
+    for (var el2 of elements) {
+        el2 = $(el2);
+
+        const reference = this._cig._source.taskRef(taskId);
+
+        var rdf = null;
+        try {
+            rdf = await extractRdfData(el2,
+                (stmt, store) => this._onExtractedStmt(reference, stmt, store),
+                { includeOptionalFalses: false }
+            );
+            // console.log("rdf:", rdf);
+
+        } catch (e) {
+            console.error(e); // JSON.stringify(e, null, 4));
+
+            error.css('display', 'block')
+            error.html(e);
+
+            return;
+        }
+
+        error.css('display', 'none');
+
+        // console.log("rdf?", rdf);
+
+        const node = this._cig._source.findNodeById(taskId);
+        node.data.input = rdf.str;
+        // console.log("input (from user)?", node.data.input);
+
+        this._cig.submitObservation(reference, rdf);
+    }
+}
+
+RdfInputHandler.prototype._onExtractedStmt = function(reference, stmt, store) {
+    const taskUri = prefixes.ns + reference.taskId;
+    store.addQuad(
+        namedNode(taskUri),
+        namedNode(prefixes.gl + "hasInputData"),
+        stmt.subject);
+
+    return stmt;
+}
+
+// - helper code
+
 // TODO doesn't work (currently loading from script tags)
 // import { N3 } from './N3.dist.js';
 // import { rdfa } from './rdfa.dist.js';
@@ -18,6 +150,20 @@ function groundNode(node) {
         return { termType: 'NamedNode', value: prefixes.ns + node.value }
     else
         return node;
+}
+
+function find(subject, targetPrp, store) {
+    var stmts = store.getQuads(subject, null, null);
+    for (var i = 0; i < stmts.length; i++) {
+        var stmt = stmts[i];
+        if (stmt._predicate.id == targetPrp)
+            return stmt._subject;
+        else {
+            var found = find(stmt._object, targetPrp, store);
+            if (found)
+                return found;
+        }
+    }
 }
 
 const DataFactory = N3.DataFactory;
@@ -158,18 +304,4 @@ function insertUserInput(el, store, onQuad, config) {
             store.removeQuad(codeStmt);
         }
     });
-}
-
-function find(subject, targetPrp, store) {
-    var stmts = store.getQuads(subject, null, null);
-    for (var i = 0; i < stmts.length; i++) {
-        var stmt = stmts[i];
-        if (stmt._predicate.id == targetPrp)
-            return stmt._subject;
-        else {
-            var found = find(stmt._object, targetPrp, store);
-            if (found)
-                return found;
-        }
-    }
 }

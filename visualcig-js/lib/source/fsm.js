@@ -6,7 +6,7 @@ function FSM(data) {
 FSM.prototype = Object.create(DataSource.prototype);
 FSM.prototype.constructor = FSM;
 
-FSM.prototype._init = function (wf) {
+FSM.prototype._initSource = function (wf) {
 	this._wf = wf;
 	this._root = wf.createWorkflow();
 
@@ -30,18 +30,22 @@ FSM.prototype._visitWf = function (e) {
 	this._forEachNext(e, this._visitWf);
 }
 
-FSM.prototype.refresh = function (cig, workflowRef) {
-	console.log("[FSM] initStates:", workflowRef.workflowId);
-	this._transitAll(cig, workflowRef);
+FSM.prototype.refresh = function (workflowRef) {
+	console.log("[FSM] refresh:", workflowRef.workflowId);
+	
+	return this._transitAll(workflowRef);
 }
 
 FSM.prototype.submitObservation = function (reference, rdf) {
 	console.log("[FSM] submit for:", reference.taskId);
 	let e = this._entityMap[reference.taskId];
 
+	let updates = [];
+
 	// in case of prior observation, reset all nexts of this node
 	if (e.hasInputData) {
-		this._resetAllNexts(e.id);
+		let resets = this._resetAllNexts(e.id);
+		updates.push(...resets);
 	}
 
 	let nodeAdtMap = this._wf.nodeAdtMap;
@@ -56,23 +60,32 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 		obs.push(o);
 	}
 	console.log("[FSM] observation:", obs);
-	this._transitAll(reference.workflowRef, obs);
+	let transits = this._transitAll(reference.workflowRef, obs);
+	updates.push(...transits);
+
+	return updates;
 }
 
 FSM.prototype.resetObservations = function (id) {
-	this._reset(id, []);
+	let updates = [];
+	this._reset(id, updates);
 
 	const workflowRef = this.workflowRef();
-	this._transitAll(workflowRef);
+	
+	let transits = this._transitAll(workflowRef);
+	updates.push(...transits);
+
+	return updates;
 }
 
 FSM.prototype._resetAllNexts = function (id) {
-	let transits = [];
-	this._reset(id, transits);
+	let updates = [];
+	this._reset(id, updates);
 
 	console.log("[FSM] transits (reset):\n", 
-		transits.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
-	cig.update({ transits: transits, operations: [] });
+		updates.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
+	
+	return updates;
 }
 
 FSM.prototype._reset = function (id, transits) {
@@ -226,8 +239,8 @@ class StateUpdate {
 	}
 }
 
-FSM.prototype._transitAll = function (cig, workflowRef, obs) {
-	console.log("[FSM] transit all:", workflowRef.workflowId);
+FSM.prototype._transitAll = function (workflowRef, obs) {
+	console.log("[FSM] transit all:", workflowRef);
 
 	this._runAll(obs);
 	// console.log("after update:\n", this._print());
@@ -237,7 +250,8 @@ FSM.prototype._transitAll = function (cig, workflowRef, obs) {
 	
 	console.log("[FSM] transits (run):\n", 
 		transits.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
-	cig.update({ transits: transits, operations: [] });
+	
+	return transits;
 }
 
 FSM.prototype._runAll = function (obs) {

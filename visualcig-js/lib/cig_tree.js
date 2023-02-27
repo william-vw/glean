@@ -4,7 +4,8 @@
 // (printer code) auto-choose when re-using node or creating new node
 import { CIGBase } from './cig_base.js';
 
-export function VisualCIG() {
+export function VisualCIG(input) {
+	CIGBase.call(this, input);
 	return this;
 }
 
@@ -1080,7 +1081,7 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 			"</td></tr>"
 		).insertAfter(body.find('tr:last-child'));
 
-		body.find("input[value=submit]").on("click", (e) => submitInputData(e.target));
+		body.find("input[value=submit]").on("click", (e) => this._input.submitInputData(e.target));
 		body.find("input[value=reset]").on("click", (e) => { 
 			let id = $(e.target).parents('.infobox').attr('id');
 			source.resetObservations(id);
@@ -1096,7 +1097,7 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 		$("<tr><td colspan='2'><div class='input-error'></td></tr>"
 		).insertBefore(body.find('tr:last-child'));
 
-		setupInput(body, d.data);
+		this._input.setupInput(body, d.data);
 		infoBox.attr('id', d.data.id);
 	}
 

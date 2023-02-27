@@ -1,4 +1,7 @@
-export function CIGBase() {
+export function CIGBase(input) {
+	this._input = input;
+	input._cig = this;
+	
 	return this;
 }
 
@@ -31,7 +34,25 @@ CIGBase.prototype.show = function (source) {
 
 	this._initView();
 
-	this._source.refresh(this, this._source.workflowRef());
+	this.refresh();
+}
+
+CIGBase.prototype.submitObservation = function (reference, rdf) {
+	let updates = this._source.submitObservation(reference, rdf);
+
+	this.update({ transits: updates, operations: [] });
+}
+
+CIGBase.prototype.resetObservations = function (id) {
+	let updates = this._source.resetObservations(id);
+
+	this.update({ transits: updates, operations: [] });
+}
+
+CIGBase.prototype.resetAllObservations = function () {
+	let updates = this._source.resetAllObservations();
+
+	this.update({ transits: updates, operations: [] });
 }
 
 CIGBase.prototype.loading_start = function () {
@@ -47,5 +68,11 @@ CIGBase.prototype.onInputFromSource = function (node, input) {
 }
 
 CIGBase.prototype.onUserInput = function(taskId) {}
+
+CIGBase.prototype.refresh = function() {
+	let updates = this._source.refresh(this._source.workflowRef());
+
+	this.update({ transits: updates, operations: [] });
+}
 
 // - end API
