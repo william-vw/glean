@@ -1,9 +1,4 @@
-// data source should be able to return *all* (i.e., from all sub-guidelines) and 
-// *updated* (i.e., only those that changed) task states
-
-import { CIGBase } from './cig_base.js';
-
-export function CIGForm(input) {
+function CIGForm(input) {
     CIGBase.call(this, input);
     return this;
 }
@@ -19,20 +14,9 @@ CIGForm.prototype._settings = {
 
 // transits: [{ node, workflowState, decisionState }] (mandatory; can be empty)
 CIGForm.prototype.update = function ({ transits, operations, adds }) {
-    const atomTransits = [];
-    transits.forEach((transit) => {
-
-        if (Array.isArray(transit.node))
-            transit.node.forEach((node) => atomTransits.push(
-                { node: node, workflowState: transit.workflowState })
-            );
-        else
-            atomTransits.push(transit);
-    });
-
     // needs to occur in order of the hierarchy
     // (see #_show function: paths need to be made visible step-by-step)
-    atomTransits.sort((t1, t2) => {
+    transits.sort((t1, t2) => {
         if (t1.node.data.depth < t2.node.data.depth)
             return -1;
         else if (t1.node.data.depth > t2.node.data.depth)
@@ -41,10 +25,18 @@ CIGForm.prototype.update = function ({ transits, operations, adds }) {
             return 0;
     });
 
-    atomTransits.forEach((transit) => {
-        transit.node.data.workflow_state = transit.workflowState;
-        this._updateNode(transit.node);
-    });
+    for (let i = 0; i < transits.length; i++) {
+        let transit = transits[i];
+        
+        if (transit.node.data.workflow_state != transit.workflowState || 
+            transit.node.data.depth == 0) {
+            
+            console.log(transit.id, transit.node.data.workflow_state, transit.workflowState);
+
+            transit.node.data.workflow_state = transit.workflowState;
+            this._updateNode(transit.node);
+        }
+    }
 }
 
 CIGForm.prototype.onInputFromSource = function (node, input) {
@@ -219,10 +211,10 @@ CIGForm.prototype._create = function (d, parentEntry, duplicate) {
                     container = container.append('<tr></tr>').find('tr:last-child');
 
                 container.append("<td>" +
-                    "<input type='submit' value='submit' onclick='submitInputData(this)'></input>" +
-                    //"<input type='submit' value='reset' onclick='resetObservations(this)'></input>"
+                    "<input type='submit' value='submit'></input>" +
                     "</td>"
                 );
+                container.find("input[value=submit]").on("click", (e) => this._input.submitInputData(e.target));
             }
 
             this._input.setupInput(newEl, d);
@@ -259,7 +251,6 @@ CIGForm.prototype._disambiguateElement = function (d, parentEntry, duplicate, ne
 
     // element with other-parent is appended to both parents;
     // means its input nodes will have duplicate ids (e.g., 'code_age')
-    // (we care about this as we want to click on labels for checkboxes ..)
     // priorPath includes ids of the specific parents those elements were appended to
     // so, path can thus be used to disambiguate these input ids
 
@@ -304,6 +295,7 @@ CIGForm.prototype._disambiguateElement = function (d, parentEntry, duplicate, ne
 CIGForm.prototype._disambiguateInput = function (newEl, path) {
     newEl.find('input').not('[type = submit]').each((idx, input) => {
         input = $(input);
+        
         input.attr('id', path + "." + input.attr('id'));
         if (input.attr('mutex-with')) {
             var mutexes = input.attr('mutex-with').split(",");
@@ -335,8 +327,8 @@ CIGForm.prototype._update = function (d) {
         return;
     }
 
-    // note: onUserInput will hide all next tasks of composite task
-    // once input is provided; these may change later and clutter screen
+    // note: onUserInput will hide all next tasks of composite task once input is provided;
+    // these may change later and clutter screen
 
     if (d.depth > 0 && d.node_type == 'composite_task') {
         if (d.workflow_state == 'completedState') {
@@ -349,8 +341,8 @@ CIGForm.prototype._update = function (d) {
                 d.newUserInput = false;
 
                 const parentId = d.in_workflow;
-                const ref = new WorkflowReference(cig.id, parentId);
-                this._source.refresh(ref);
+                const ref = new WorkflowReference(this.id, parentId);
+                this.refresh(ref);
 
                 return;
             }
@@ -367,8 +359,8 @@ CIGForm.prototype._update = function (d) {
             // (by default, only direct children are given)
 
             if (d.depth > 0 && d.node_type == 'composite_task') {
-                const ref = new WorkflowReference(cig.id, d.id);
-                this._source.refresh(ref);
+                const ref = new WorkflowReference(this.id, d.id);
+                this.refresh(ref);
             }
         }
 
@@ -377,13 +369,12 @@ CIGForm.prototype._update = function (d) {
 }
 
 CIGForm.prototype._show = function (d, done) {
-    // console.log("showing:", d.id);
-
     const el = this._findElementWithId(d.id);
+    // console.log("showing:", d.id, el.css('display'), el);
+
     if (el.css('display') == 'block')
         return false;
 
-    // console.log("showing:", d.id);
     el.css('display', 'block');
 
     return true;
@@ -399,6 +390,7 @@ CIGForm.prototype._findElementWithId = function (id) {
         var parent = $(`[duplicate-id = ${id}]`).parent().filter(function () {
             return this.style.display == 'block';
         });
+        console.log("parents?", parent);
         // this parent will have only 1 element with this 'id'
         el = parent.find(`[duplicate-id = ${id}]`);
     }
@@ -414,7 +406,7 @@ CIGForm.prototype._hide = function (d) {
     if (el.length == 0) {
         el = $(`[duplicate-id = ${d.id}]`)
     }
-    console.log("hiding:", d.id, el);
+    // console.log("hiding:", d.id, el);
 
     // reset input fields
     // (will be re-set by source if data is available; see #onInputFromSource)

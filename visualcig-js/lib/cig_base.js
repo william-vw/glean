@@ -1,4 +1,4 @@
-export function CIGBase(input) {
+function CIGBase(input) {
 	this._input = input;
 	input._cig = this;
 	
@@ -9,9 +9,57 @@ CIGBase.prototype.constructor = CIGBase;
 
 // - start API
 
+class NodeUpdate {
+
+	constructor(id, node, workflowState, decisionState) {
+		this.id = id;
+		this.node = node;
+		this.workflowState = workflowState;
+		this.decisionState = decisionState;
+	}
+
+	toString() {
+		return this.id + ": " + this.workflowState;
+	}
+}
+
+class NodeUpdates {
+
+    constructor() {
+		this.updates = [];
+        this.sets = [];
+    }
+
+    add(update) {
+        this.updates.push(update);
+    }
+
+	addSet(updates) {
+		this.sets.push(updates);
+	}
+
+	forEach(fn) {
+		fn(this.updates);
+	}
+
+	forEachSet(fn) {
+		if (this.sets.length > 0)
+			this.sets.forEach(set => fn(set.updates));
+		else
+			fn(this.updates);
+	}
+
+	toString() {
+		if (this.sets.length > 0) {
+			return this.sets.map(s => s.toString()).join("\n");
+		
+		} else {
+			return this.updates.filter(s => s.workflowState != "inactiveState").map(s => s.toString()).join(", ");
+		}
+	}
+}
+
 // subclasses need to implement:
-// findNodeByName(name)
-// findNodeById(id)
 // update({ transits, operations, adds })
 //		transits: [{ node, workflowState, decisionState, propagate (optional) }] (mandatory; can be empty)
 // 		operations: [{ source, target, type }] (mandatory; can be empty)
@@ -23,11 +71,7 @@ CIGBase.prototype.show = function (source) {
 	let wf = source.wfView;
 	this._data = wf;
 	this.id = wf.id;
-	this._config = config;
-
-	// console.log("config", config);
-	if (config.ns)
-		prefixes.ns = config.ns;
+	// this._config = config;
 
 	// ('data' object will be workflow node itself)
 	this._workflow = { id: this._data.id, data: this._data };
@@ -38,21 +82,21 @@ CIGBase.prototype.show = function (source) {
 }
 
 CIGBase.prototype.submitObservation = function (reference, rdf) {
-	let updates = this._source.submitObservation(reference, rdf);
+	let allUpdates = this._source.submitObservation(reference, rdf);
 
-	this.update({ transits: updates, operations: [] });
+	this._processUpdates(allUpdates);
 }
 
 CIGBase.prototype.resetObservations = function (id) {
-	let updates = this._source.resetObservations(id);
+	let allUpdates = this._source.resetObservations(id);
 
-	this.update({ transits: updates, operations: [] });
+	this._processUpdates(allUpdates);
 }
 
 CIGBase.prototype.resetAllObservations = function () {
-	let updates = this._source.resetAllObservations();
+	let allUpdates = this._source.resetAllObservations();
 
-	this.update({ transits: updates, operations: [] });
+	this._processUpdates(allUpdates);
 }
 
 CIGBase.prototype.loading_start = function () {
@@ -69,10 +113,16 @@ CIGBase.prototype.onInputFromSource = function (node, input) {
 
 CIGBase.prototype.onUserInput = function(taskId) {}
 
-CIGBase.prototype.refresh = function() {
-	let updates = this._source.refresh(this._source.workflowRef());
+CIGBase.prototype.refresh = function(workflowRef) {
+	if (!workflowRef)
+		workflowRef = this._source.workflowRef();
 
-	this.update({ transits: updates, operations: [] });
+	let allUpdates = this._source.refresh(workflowRef);
+	this._processUpdates(allUpdates);
+}
+
+CIGBase.prototype._processUpdates = function(allUpdates) {
+	allUpdates.forEachSet((updates) => this.update({ transits: updates, operations: [] }));
 }
 
 // - end API

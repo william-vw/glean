@@ -1,4 +1,14 @@
-function RdfInputHandler() {
+// prefixes.ns: set by constructor
+const prefixes = {
+    xsd: 'http://www.w3.org/2001/XMLSchema#',
+    rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    fhir: 'http://hl7.org/fhir/',
+    gl: 'http://niche.cs.dal.ca/ns/glean/base.owl#'
+};
+
+function RdfInputHandler(ns) {
+    prefixes.ns = ns;
+
 	return this;
 }
 
@@ -169,14 +179,6 @@ function find(subject, targetPrp, store) {
 const DataFactory = N3.DataFactory;
 const { namedNode, blankNode, literal, defaultGraph, quad } = N3.DataFactory;
 
-// prefixes.ns: set by client code
-const prefixes = {
-    xsd: 'http://www.w3.org/2001/XMLSchema#',
-    rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-    fhir: 'http://hl7.org/fhir/',
-    gl: 'http://niche.cs.dal.ca/ns/glean/base.owl#'
-};
-
 function parseRdf(rdf) {
     return new Promise((resolve, reject) => {
 
@@ -273,9 +275,9 @@ function insertUserInput(el, store, onQuad, config) {
         console.log("user input:", "code =", code, "prp =", prp, "value = ", value);
 
         // look for relevant code stmt in extracted rdf
-        var codeStmt = store.getQuads(null, null, prefixes.ns + code)[0];
+        var codeStmt = store.getQuads(null, null, (prefixes.ns + code))[0];
         if (!codeStmt) {
-            console.error("could not find rdf statement for code:", code);
+            console.error("could not find rdf statement for code:", (prefixes.ns + code));
             return;
         }
 

@@ -9,11 +9,17 @@
 <script src="lib/rdfa.dist.js"></script>
 <script src="lib/jqFhir.js"></script>
 <script src="lib/fhir_client.js"></script>
+
 <script src="lib/source/data_source.js"></script>
 <script src="lib/source/server.js"></script>
 <script src="lib/source/fsm.js"></script>
+
 <script src="lib/input/input_handler.js"></script>
 <script src="lib/input/rdf_input_handler.js"></script>
+
+<script src="lib/cig_base.js"></script>
+<script src="lib/cig_form.js"></script>
+
 <link rel="stylesheet" href="lib/cig.css" />
 </head>
 <body>
@@ -22,9 +28,9 @@
 </div>
 
 <script type="module">
-import { CIGForm } from '/lib/cig_form.js';
-
-let cig = new CIGForm(new RdfInputHandler());
+let cig = new CIGForm(
+    new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#")
+);
 
 let source = new FSM("/wf/lipid/ckd_dyslipidemia_local.js");
 await source.load();

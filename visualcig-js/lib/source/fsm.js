@@ -31,7 +31,7 @@ FSM.prototype._visitWf = function (e) {
 }
 
 FSM.prototype.refresh = function (workflowRef) {
-	console.log("[FSM] refresh:", workflowRef.workflowId);
+	console.log("[FSM] refresh:", workflowRef);
 	
 	return this._transitAll(workflowRef);
 }
@@ -40,12 +40,12 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	console.log("[FSM] submit for:", reference.taskId);
 	let e = this._entityMap[reference.taskId];
 
-	let updates = [];
+	let updates = new NodeUpdates();
 
 	// in case of prior observation, reset all nexts of this node
 	if (e.hasInputData) {
 		let resets = this._resetAllNexts(e.id);
-		updates.push(...resets);
+		updates.addSet(resets);
 	}
 
 	let nodeAdtMap = this._wf.nodeAdtMap;
@@ -59,31 +59,34 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 		e.hasInputData = o;
 		obs.push(o);
 	}
-	console.log("[FSM] observation:", obs);
+	
+	console.log("[FSM] observation: " + JSON.stringify(obs, null, 4));
 	let transits = this._transitAll(reference.workflowRef, obs);
-	updates.push(...transits);
+	updates.addSet(transits);
 
 	return updates;
 }
 
 FSM.prototype.resetObservations = function (id) {
-	let updates = [];
-	this._reset(id, updates);
+	let updates = new NodeUpdates();
+
+	let resets = new NodeUpdates();
+	this._reset(id, resets);
+	updates.addSet(resets);
 
 	const workflowRef = this.workflowRef();
 	
 	let transits = this._transitAll(workflowRef);
-	updates.push(...transits);
+	updates.addSet(transits);
 
 	return updates;
 }
 
 FSM.prototype._resetAllNexts = function (id) {
-	let updates = [];
+	let updates = new NodeUpdates();
 	this._reset(id, updates);
 
-	console.log("[FSM] transits (reset):\n", 
-		updates.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
+	console.log("[FSM] transits (reset):\n", updates.toString());
 	
 	return updates;
 }
@@ -105,15 +108,15 @@ FSM.prototype._doReset = function (e, first, upward, newState, found, transits) 
 	if (e.id && (e.id in found))
 		return;
 
-	if (e.id)
-		console.log("[FSM] reset:", e.id, newState);
+	// if (e.id)
+	// 	console.log("[FSM] reset:", e.id, newState);
 
 	// reset
 	if (e.conditionMet)
 		e.conditionMet = false;
 	if (e.isIn) {
 		e.isIn.type = newState;
-		transits.push(this._transitFor(e));
+		transits.add(this._newUpdate(e));
 	}
 
 	if (e.id)
@@ -246,12 +249,13 @@ FSM.prototype._transitAll = function (workflowRef, obs) {
 	// console.log("after update:\n", this._print());
 
 	let wf = this._entityMap[workflowRef.workflowId];
-	let transits = [wf, ...wf.subTask].map(s => this._transitFor(s));
 	
-	console.log("[FSM] transits (run):\n", 
-		transits.map(t => `${t.node.data.id}: ${t.workflowState}`).join(", "));
+	let updates = new NodeUpdates();
+	[wf, ...wf.subTask].forEach(s => updates.add(this._newUpdate(s)));
 	
-	return transits;
+	console.log("[FSM] transits (run):", updates.toString());
+	
+	return updates;
 }
 
 FSM.prototype._runAll = function (obs) {
@@ -263,12 +267,12 @@ FSM.prototype._runAll = function (obs) {
 		for (let entity of this._entities)
 			this._runOn(entity, obs);
 
-		console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
+		// console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
 		this._updated.forEach(u => { if (u.entity.id) allUpdates[u.entity.id] = u.entity.isIn.type });
 
 	} while (this._updated.length > 0);
 
-	console.log("[FSM] allUpdates:", JSON.stringify(allUpdates, null, 4));
+	// console.log("[FSM] allUpdates:", JSON.stringify(allUpdates, null, 4));
 }
 
 // regex replace:
@@ -429,11 +433,11 @@ FSM.prototype._runOn = function (entity, obs) {
 	}
 }
 
-FSM.prototype._transitFor = function (e) {
+FSM.prototype._newUpdate = function (e) {
 	let node = this.findNodeById(e.id);
 	let state = e.isIn.type.toLowerCase() + "State";
 
-	return { node: node, workflowState: state, decisionState: undefined };
+	return new NodeUpdate(e.id, node, state);
 }
 
 FSM.prototype._forEachNext = function (e, fn) {
