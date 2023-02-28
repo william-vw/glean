@@ -12,7 +12,7 @@ CIGForm.prototype._settings = {
     }
 }
 
-// transits: [{ node, workflowState, decisionState }] (mandatory; can be empty)
+// transits: [{ node, workflowState, decisionState?, inputData? }]
 CIGForm.prototype.update = function ({ transits, operations, adds }) {
     // needs to occur in order of the hierarchy
     // (see #_show function: paths need to be made visible step-by-step)
@@ -27,21 +27,11 @@ CIGForm.prototype.update = function ({ transits, operations, adds }) {
 
     for (let i = 0; i < transits.length; i++) {
         let transit = transits[i];
-        
-        if (transit.node.data.workflow_state != transit.workflowState || 
-            transit.node.data.depth == 0) {
-            
-            console.log(transit.id, transit.node.data.workflow_state, transit.workflowState);
+        console.log(transit.id, transit.node.data.workflow_state, transit.workflowState, "(" + transit + ")");
 
-            transit.node.data.workflow_state = transit.workflowState;
-            this._updateNode(transit.node);
-        }
+        transit.node.data.workflow_state = transit.workflowState;
+        this._updateNode(transit.node);
     }
-}
-
-CIGForm.prototype.onInputFromSource = function (node, input) {
-    node.data.input = input;
-    this._input.populateInput(node.data);
 }
 
 CIGForm.prototype.onUserInput = function (taskId) {
@@ -295,8 +285,8 @@ CIGForm.prototype._disambiguateElement = function (d, parentEntry, duplicate, ne
 CIGForm.prototype._disambiguateInput = function (newEl, path) {
     newEl.find('input').not('[type = submit]').each((idx, input) => {
         input = $(input);
-        
         input.attr('id', path + "." + input.attr('id'));
+
         if (input.attr('mutex-with')) {
             var mutexes = input.attr('mutex-with').split(",");
             mutexes = mutexes.map(mutex => path + "." + mutex);
@@ -323,53 +313,21 @@ CIGForm.prototype._update = function (d) {
 
     // root will be the workflow itself
     if (d.depth == 0) {
-        this._show(d, false);
+        this._show(d);
         return;
     }
 
     // note: onUserInput will hide all next tasks of composite task once input is provided;
-    // these may change later and clutter screen
+    // since these may change later and clutter screen
 
-    if (d.depth > 0 && d.node_type == 'composite_task') {
-        if (d.workflow_state == 'completedState') {
-            // only updates of children of current workflow are sent
-            // but, if this workflow is complete, will need updates from 
-            // parent workflow (as we will continue from there)
-
-            // only do this if some new input was given
-            if (d.newUserInput) {
-                d.newUserInput = false;
-
-                const parentId = d.in_workflow;
-                const ref = new WorkflowReference(this.id, parentId);
-                this.refresh(ref);
-
-                return;
-            }
-        }
-    }
-
-    if (d.workflow_state == 'activeState' ||
-        d.workflow_state == 'completedState') {
-
-        const done = (d.workflow_state == 'completedState');
-        if (this._show(d, done)) {
-            // if a composite task is being shown,
-            // ask for status of its composed tasks
-            // (by default, only direct children are given)
-
-            if (d.depth > 0 && d.node_type == 'composite_task') {
-                const ref = new WorkflowReference(this.id, d.id);
-                this.refresh(ref);
-            }
-        }
-
-    } else
+    if (d.workflow_state == 'activeState' || d.workflow_state == 'completedState')
+        this._show(d);
+    else
         this._hide(d);
 }
 
-CIGForm.prototype._show = function (d, done) {
-    const el = this._findElementWithId(d.id);
+CIGForm.prototype._show = function (d) {
+    const el = this._findNextElementWithId(d.id);
     // console.log("showing:", d.id, el.css('display'), el);
 
     if (el.css('display') == 'block')
@@ -380,7 +338,7 @@ CIGForm.prototype._show = function (d, done) {
     return true;
 }
 
-CIGForm.prototype._findElementWithId = function (id) {
+CIGForm.prototype._findNextElementWithId = function (id) {
     var el = $(`#${id}`);
     // dealing with duplicate elements (see #_create());
     // (these are identified with 'duplicate-id', not id)
@@ -390,9 +348,13 @@ CIGForm.prototype._findElementWithId = function (id) {
         var parent = $(`[duplicate-id = ${id}]`).parent().filter(function () {
             return this.style.display == 'block';
         });
-        console.log("parents?", parent);
+        // if multiple within the current path:
+        // get the one at deepest level
+        if (parent.length > 1)
+            parent = parent.sort((a, b) => $(a).parents().length > $(b).parents().length ? -1 : 1)[0];
+
         // this parent will have only 1 element with this 'id'
-        el = parent.find(`[duplicate-id = ${id}]`);
+        el = $(parent).find(`[duplicate-id = ${id}]`);
     }
 
     return el;

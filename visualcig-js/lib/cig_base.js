@@ -11,15 +11,16 @@ CIGBase.prototype.constructor = CIGBase;
 
 class NodeUpdate {
 
-	constructor(id, node, workflowState, decisionState) {
+	constructor(id, node, workflowState, decisionState, inputData) {
 		this.id = id;
 		this.node = node;
 		this.workflowState = workflowState;
 		this.decisionState = decisionState;
+		this.inputData = inputData;
 	}
 
 	toString() {
-		return this.id + ": " + this.workflowState;
+		return this.id + ": " + this.workflowState + (this.inputData ? " (data)" : "");
 	}
 }
 
@@ -105,10 +106,6 @@ CIGBase.prototype.loading_start = function () {
 
 CIGBase.prototype.loading_end = function () {
 	$('.overlay').css('display', 'none');
-}
-
-CIGBase.prototype.onInputFromSource = function (node, input) {
-	node.data.input = input;
 }
 
 CIGBase.prototype.onUserInput = function(taskId) {}

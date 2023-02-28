@@ -33,7 +33,15 @@ FSM.prototype._visitWf = function (e) {
 FSM.prototype.refresh = function (workflowRef) {
 	console.log("[FSM] refresh:", workflowRef);
 	
-	return this._transitAll(workflowRef);
+	let updates = this._transitAll();
+
+	// initially show workflow as well
+	let wf = this.findNodeById(workflowRef.workflowId);
+	if (wf.data.depth == 0) {
+		updates.add(new NodeUpdate(wf.data.id, wf, wf.data.workflow_state));
+	}
+
+	return updates;
 }
 
 FSM.prototype.submitObservation = function (reference, rdf) {
@@ -43,7 +51,9 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	let updates = new NodeUpdates();
 
 	// in case of prior observation, reset all nexts of this node
+	// (hasInputData is used as a flag)
 	if (e.hasInputData) {
+		e.hasInputData = false;
 		let resets = this._resetAllNexts(e.id);
 		updates.addSet(resets);
 	}
@@ -55,13 +65,13 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	let obs = [];
 	for (let quad of rdf.store.getQuads(null, "http://niche.cs.dal.ca/ns/glean/base.owl#hasInputData", null)) {
 		let o = this._toObject(quad._object.id, nodeAdtMap, rdf.store);
-		// keep obs for corresponding entity
-		e.hasInputData = o;
 		obs.push(o);
 	}
+	e.hasInputData = obs.length > 0;
 	
 	console.log("[FSM] observation: " + JSON.stringify(obs, null, 4));
-	let transits = this._transitAll(reference.workflowRef, obs);
+	let transits = this._transitAll(obs);
+
 	updates.addSet(transits);
 
 	return updates;
@@ -73,10 +83,8 @@ FSM.prototype.resetObservations = function (id) {
 	let resets = new NodeUpdates();
 	this._reset(id, resets);
 	updates.addSet(resets);
-
-	const workflowRef = this.workflowRef();
 	
-	let transits = this._transitAll(workflowRef);
+	let transits = this._transitAll();
 	updates.addSet(transits);
 
 	return updates;
@@ -242,19 +250,22 @@ class StateUpdate {
 	}
 }
 
-FSM.prototype._transitAll = function (workflowRef, obs) {
-	console.log("[FSM] transit all:", workflowRef);
+FSM.prototype._transitAll = function (obs) {
+	console.log("[FSM] transit all");
 
-	this._runAll(obs);
-	// console.log("after update:\n", this._print());
-
-	let wf = this._entityMap[workflowRef.workflowId];
+	// this._runAll(obs);
+	// let wf = this._entityMap[workflowRef.workflowId];
+	// let updates = new NodeUpdates();
+	// [wf, ...wf.subTask].forEach(s => updates.add(this._newUpdate(s)));
 	
 	let updates = new NodeUpdates();
-	[wf, ...wf.subTask].forEach(s => updates.add(this._newUpdate(s)));
-	
+	let transits = this._runAll(obs);
+	for (let id in transits) {
+		updates.add(this._newUpdate(transits[id]));
+	}
+
 	console.log("[FSM] transits (run):", updates.toString());
-	
+
 	return updates;
 }
 
@@ -268,11 +279,12 @@ FSM.prototype._runAll = function (obs) {
 			this._runOn(entity, obs);
 
 		// console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
-		this._updated.forEach(u => { if (u.entity.id) allUpdates[u.entity.id] = u.entity.isIn.type });
+		this._updated.forEach(u => { if (u.entity.id) allUpdates[u.entity.id] = u.entity });
 
 	} while (this._updated.length > 0);
 
 	// console.log("[FSM] allUpdates:", JSON.stringify(allUpdates, null, 4));
+	return allUpdates;
 }
 
 // regex replace:
