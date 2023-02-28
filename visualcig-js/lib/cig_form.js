@@ -200,11 +200,11 @@ CIGForm.prototype._create = function (d, parentEntry, duplicate) {
                 else
                     container = container.append('<tr></tr>').find('tr:last-child');
 
-                container.append("<td>" +
-                    "<input type='submit' value='submit'></input>" +
+                container.append(
+                    "<td>" +
+                        "<input type='submit' value='submit'></input>" +
                     "</td>"
                 );
-                container.find("input[value=submit]").on("click", (e) => this._input.submitInputData(e.target));
             }
 
             this._input.setupInput(newEl, d);
@@ -260,6 +260,7 @@ CIGForm.prototype._disambiguateElement = function (d, parentEntry, duplicate, ne
     if (d.otherParents) {
         for (var otherParent of d.otherParents) {
             const newEl2 = newEl.clone();
+            this._input.setupInput(newEl2, d);
 
             // append as direct child of other-parent as well
             const otherParentEl = $(`#${otherParent.id}`);

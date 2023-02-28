@@ -12,6 +12,8 @@ InputHandler.prototype.setupInput = async function(el, d) {
     // (other forms can be appended to this el later on; 
     // so need to get submit buttons now)
     const submit = el.find('input[value=submit]');
+    submit.on("click", (e) => this.submitInputData(e.target));
+
     // register listener for enter-key for input-fields
     el.find('input').not('input[type=submit]')
         .keypress((e) => {
