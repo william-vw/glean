@@ -21,6 +21,11 @@ InputHandler.prototype.setupInput = async function(el, d) {
                 submit.trigger("click");
         });
 
+    // el.find("input[value=reset]").on("click", (e) => { 
+    //     let id = $(e.target).parents('.infobox').attr('id');
+    //     this.resetObservations(id);
+    // });
+
     // register listener for ensuring mutex property for checkboxes (if needed)
     el.find('input[type=checkbox]').each((idx, checkbox) => {
         checkbox = $(checkbox);

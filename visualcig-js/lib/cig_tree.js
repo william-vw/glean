@@ -1048,16 +1048,9 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 		// add submit & reset btn
 		$("<tr><td>" +
 			"<input type='submit' value='submit'></input>" +
-			"&nbsp;&nbsp;<input type='submit' value='reset'></input>" +
+			// "&nbsp;&nbsp;<input type='submit' value='reset'></input>" +
 			"</td></tr>"
 		).insertAfter(body.find('tr:last-child'));
-
-		body.find("input[value=submit]").on("click", (e) => 
-			this._input.submitInputData(e.target));
-		body.find("input[value=reset]").on("click", (e) => { 
-			let id = $(e.target).parents('.infobox').attr('id');
-			this.resetObservations(id);
-		});
 
 		if (state == 'inactiveState' || state == 'discardedState') {
 			const name = state.substring(0, state.length - "state".length);

@@ -190,6 +190,28 @@ class Entity {
 					this.isIn.type == State.Completed
 		}
 	}
+
+	toString() {
+		let str = "{";
+		switch (this.type) {
+
+			case Entity.DecisionBranch:
+				str = `${this.type} (tgt: ${this.branchTarget.id})`;
+				break;
+
+			default:
+				str = (this.id ? this.id : this.type);
+				break;
+
+		}
+		
+		if (this.isIn)
+			str += `@${this.isIn.type}`;
+
+		str += "}"
+
+		return str;
+	}
 }
 
 class Condition {
@@ -206,6 +228,22 @@ class Condition {
 	allOf = [];
 
 	check;
+
+	toString() {
+		let str;
+		if (this.check) {
+			str = this.check + "";
+			str = new RegExp("return (.*?)\n").exec(str)[1];
+		
+		} else {
+			let conds = (this.type == Condition.Disjunction ? this.anyOf : this.allOf);
+			str = this.type + " [" + conds.map(c => c.toString()).join(", ") + "]";
+		}
+		if (this.conditionMet)
+			str += ": met";
+		
+		return str;
+	}
 }
 
 class State {
@@ -227,15 +265,16 @@ class State {
 
 class StateUpdate {
 
-	constructor(entity, reason) {
+	constructor(entity, newState, reason) {
 		this.entity = entity;
+		this.newState = newState;
 		this.reason = reason;
 	}
 
 	toString = function () {
-		let str = `${this.entity.id ? this.entity.id : this.entity.type}`;
-		if (this.entity.isIn)
-			str += `: ${this.entity.isIn.type}`;
+		let str = this.entity.toString();
+		if (this.newState)
+			str += ` -> ${this.newState}`;
 		if (this.reason)
 			str += ` (${this.reason})`;
 
@@ -271,7 +310,7 @@ FSM.prototype._runAll = function (obs) {
 		for (let entity of this._entities)
 			this._runOn(entity, obs);
 
-		// console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
+		console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
 		this._updated.forEach(u => { if (u.entity.id) allUpdates[u.entity.id] = u.entity });
 
 	} while (this._updated.length > 0);
@@ -279,11 +318,6 @@ FSM.prototype._runAll = function (obs) {
 	// console.log("[FSM] allUpdates:", JSON.stringify(allUpdates, null, 4));
 	return allUpdates;
 }
-
-// regex replace:
-// isIn.type == ([^\);]+)
-// with:
-// checkIn($1)
 
 FSM.prototype._runOn = function (entity, obs) {
 	if (obs) {
@@ -310,14 +344,14 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.checkIn(State.Ready)) {
 
 		entity.isIn.type = State.Active;
-		this._updated.push(new StateUpdate(entity, "preconditionMet"));
+		this._updated.push(new StateUpdate(entity, State.Active, "preconditionMet"));
 	}
 
 	if (entity.conditional == false
 		&& entity.checkIn(State.Ready)) {
 
 		entity.isIn.type = State.Active;
-		this._updated.push(new StateUpdate(entity, "readyUnconditional"));
+		this._updated.push(new StateUpdate(entity, State.Active, "readyUnconditional"));
 	}
 
 	if (entity.checkIn
@@ -326,7 +360,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.nextOf.some(x0 => x0.checkIn(State.Completed))) {
 
 		entity.isIn.type = State.Ready;
-		this._updated.push(new StateUpdate(entity, "inactiveNextOfSomeCompleted"));
+		this._updated.push(new StateUpdate(entity, State.Ready, "inactiveNextOfSomeCompleted"));
 	}
 
 	if (entity.checkIn
@@ -335,21 +369,21 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.nextOf.length > 0) {
 
 		entity.isIn.type = State.Discarded;
-		this._updated.push(new StateUpdate(entity, "inactiveNextOfAllDiscarded"));
+		this._updated.push(new StateUpdate(entity, State.Discarded, "inactiveNextOfAllDiscarded"));
 	}
 
 	if (entity.type == Entity.EndPoint
 		&& entity.checkIn(State.Active)) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push(new StateUpdate(entity, "activeEndPoint"));
+		this._updated.push(new StateUpdate(entity, State.Completed, "activeEndPoint"));
 	}
 
 	if (entity.involvesAction == false
 		&& entity.checkIn(State.Active)) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push(new StateUpdate(entity, "activeNoActionInvolved"));
+		this._updated.push(new StateUpdate(entity, State.Completed, "activeNoActionInvolved"));
 	}
 
 	if (entity.type == Entity.CompositeTask
@@ -359,8 +393,9 @@ FSM.prototype._runOn = function (entity, obs) {
 		entity.subTask.forEach(x2 => {
 			if (x2.checkIn(State.Inactive)
 				&& x2.nextOf.length == 0) {
+
 				x2.isIn.type = State.Ready
-				this._updated.push(new StateUpdate(x2, "inactiveNoNextOfSubOfActive"));
+				this._updated.push(new StateUpdate(x2, State.Ready, "inactiveNoNextOfSubOfActive"));
 			}
 		});
 	}
@@ -371,8 +406,9 @@ FSM.prototype._runOn = function (entity, obs) {
 
 		entity.subTask.forEach(x3 => {
 			if (x3.checkIn(State.NotDone)) {
+
 				x3.isIn.type = State.Discarded
-				this._updated.push(new StateUpdate(x3, "notDoneSubOfDiscarded"));
+				this._updated.push(new StateUpdate(x3, State.Discarded, "notDoneSubOfDiscarded"));
 			}
 		});
 	}
@@ -384,7 +420,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.subTask.every(x5 => x5.checkIn(State.Done))) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push(new StateUpdate(entity, "activeSubAllDone"));
+		this._updated.push(new StateUpdate(entity, State.Completed, "activeSubAllDone"));
 	}
 
 	if (entity.type == Entity.CompositeTask
@@ -393,7 +429,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.subTask.every(x6 => x6.checkIn(State.Discarded))) {
 
 		entity.isIn.type = State.Discarded;
-		this._updated.push(new StateUpdate(entity, "notDoneSubAllDiscarded"));
+		this._updated.push(new StateUpdate(entity, State.Discarded, "notDoneSubAllDiscarded"));
 	}
 
 	if (entity.type == Entity.DecisionTask
@@ -402,8 +438,9 @@ FSM.prototype._runOn = function (entity, obs) {
 
 		entity.decisionBranch.forEach(x7 => {
 			if (x7.checkIn(State.Inactive)) {
+
 				x7.isIn.type = State.Ready
-				this._updated.push(new StateUpdate(x7, "inactiveBranchOfActivated"));
+				this._updated.push(new StateUpdate(x7, State.Ready, "inactiveBranchOfActivated"));
 			}
 		});
 	}
@@ -414,7 +451,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.checkIn(State.Active)) {
 
 		entity.isIn.type = State.Completed;
-		this._updated.push(new StateUpdate(entity, "someActiveBranch"));
+		this._updated.push(new StateUpdate(entity, State.Completed, "someActiveBranch"));
 	}
 
 	if (entity.type == Entity.DecisionTask
@@ -423,8 +460,9 @@ FSM.prototype._runOn = function (entity, obs) {
 
 		entity.decisionBranch.forEach(x9 => {
 			if (x9.checkIn(State.Ready)) {
+
 				x9.isIn.type = State.Discarded
-				this._updated.push(new StateUpdate(x9, "readyBranchOfCompleted"));
+				this._updated.push(new StateUpdate(x9, State.Discarded, "readyBranchOfCompleted"));
 			}
 		});
 	}
@@ -434,7 +472,7 @@ FSM.prototype._runOn = function (entity, obs) {
 		&& entity.branchTarget.checkIn(State.Inactive)) {
 
 		entity.branchTarget.isIn.type = State.Ready;
-		this._updated.push(new StateUpdate(entity, "inactiveTargetOfActive"));
+		this._updated.push(new StateUpdate(entity.branchTarget, State.Ready, "inactiveTargetOfActive"));
 	}
 }
 

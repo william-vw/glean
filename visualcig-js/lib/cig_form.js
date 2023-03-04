@@ -27,7 +27,7 @@ CIGForm.prototype.update = function ({ transits, operations, adds }) {
 
     for (let i = 0; i < transits.length; i++) {
         let transit = transits[i];
-        console.log(transit.id, transit.node.data.workflow_state, transit.workflowState, "(" + transit + ")");
+        // console.log(transit.id, transit.node.data.workflow_state, transit.workflowState, "(" + transit + ")");
 
         transit.node.data.workflow_state = transit.workflowState;
         this._updateNode(transit.node);
