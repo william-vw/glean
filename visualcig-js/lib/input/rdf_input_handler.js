@@ -90,14 +90,14 @@ RdfInputHandler.prototype.submitInputData = async function(element) {
     }
 
     const taskId = container.closest('.input-form').attr('task-id');
-    this._cig.onUserInput(taskId);
+    this.cig.get().onUserInput(taskId);
 
     // 'await' not allowed in lambda for each()
     const elements = jQuery.makeArray(container);
     for (var el2 of elements) {
         el2 = $(el2);
 
-        const reference = this._cig._source.taskRef(taskId);
+        const reference = this.cig.get()._source.taskRef(taskId);
 
         var rdf = null;
         try {
@@ -120,11 +120,11 @@ RdfInputHandler.prototype.submitInputData = async function(element) {
 
         // console.log("rdf?", rdf);
 
-        const node = this._cig._source.findNodeById(taskId);
+        const node = this.cig.get()._source.findNodeById(taskId);
         node.data.input = rdf.str;
         // console.log("input (from user)?", node.data.input);
 
-        this._cig.submitObservation(reference, rdf);
+        this.cig.get().submitObservation(reference, rdf);
     }
 }
 

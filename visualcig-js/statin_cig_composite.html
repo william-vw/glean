@@ -20,23 +20,35 @@
 <script src="lib/cig/cig_base.js"></script>
 <script src="lib/cig/cig_form.js"></script>
 <script src="lib/cig/cig_tree.js"></script>
+<script src="lib/cig/cig_composite.js"></script>
 
 <link rel="stylesheet" href="lib/cig/cig.css" />
+
+<style>
+    html, body { height: 100% }
+    #main-container-form { height: 50% }
+    #main-container-tree { height: 50% }
+</style>
+
 </head>
 <body>
 
-<div id="main-container" class="container">
-</div>
+<div id="main-container-form" class="container"></div>
+<div id="main-container-tree" class="container"></div>
 
 <script type="module">
-let inputHandler = new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#");
+var inputHandler = new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#");
 
-let source = new FSM("/wf/lipid/ckd_dyslipidemia_local.js");
+var source = new FSM("/wf/lipid/ckd_dyslipidemia_local.js");
 await source.load();
 
-let cig = new VisualCIG({ source: source, input: inputHandler, container: '#main-container' });
+var cig = new CIGComposite({ 
+    source: source, input: inputHandler, 
+    cigs: [
+        new CIGForm({ container: '#main-container-form', composed: true }), 
+        new VisualCIG({ container: '#main-container-tree', composed: true }) 
+    ] });
 cig.show();
-
 </script>
 </body>
 </html>

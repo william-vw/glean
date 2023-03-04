@@ -1,5 +1,5 @@
-function CIGForm(source, input) {
-    CIGBase.call(this, source, input);
+function CIGForm(config) {
+    CIGBase.call(this, config);
     return this;
 }
 
@@ -48,13 +48,13 @@ CIGForm.prototype.onUserInput = function (taskId) {
     }
 }
 
-CIGForm.prototype._initView = function (config) {
+CIGForm.prototype._initView = function () {
     let json = this._data;
     this._initForm(json);
 }
 
 CIGForm.prototype._initForm = function (data) {
-    this._initFormEl(data, { element: $('#main-container') }, false);
+    this._initFormEl(data, { element: $(this._config.container) }, false);
 
     // when radio buttons are clicked, submit the form directly
     $('input[type=radio]').click(e => this._input.submitInputData(e.target));

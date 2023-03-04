@@ -1,19 +1,94 @@
-function CIGBase(source, input) {
-	this._source = source;
+function CIGBase(config) {
+	this._config = config;
+
+	if (config.source)
+		this._source = config.source;
 	
-	this._input = input;
-	this.isCurrent();
+	if (config.input) {
+		this._input = config.input;
+		// if 'input' (inputHandler) is given in config,
+		// and resolver (input.cig property) was not yet set,
+		// setup the inputHandler with this cig's resolver 
+		if (!this._input.cig)
+			this._input.cig = this._createResolver();
+	}
 	
 	return this;
 }
 
 CIGBase.prototype.constructor = CIGBase;
 
-CIGBase.prototype.isCurrent = function() {
-	this._input._cig = this;
+CIGBase.prototype._createResolver = function() {
+	return new DefaultCIGResolver(this);
 }
 
-// - start API
+// subclasses need to implement:
+// update({ transits, operations, adds })
+//		transits: [{ node, workflowState, decisionState, propagate (optional) }] (mandatory; can be empty)
+// 		operations: [{ source, target, type }] (mandatory; can be empty)
+//		adds: [{ parent, data }] (optional)
+
+CIGBase.prototype.show = function () {
+	this.showFromView(this._source.defaultWfView);
+
+	// get states from source
+	this.refresh();
+}
+
+CIGBase.prototype.showFromView = function (wfView) {
+	this._data = wfView;
+	this.id = wfView.id;
+
+	// ('data' object will be main workflow node itself)
+	this._workflow = { id: this._data.id, data: this._data };
+
+	this._initView();
+
+	// show main workflow - will always be active
+	this.update({ transits: [
+		new NodeUpdate(this._workflow.id, this._workflow, this._workflow.data.workflow_state)
+	], operations: [] });
+}
+
+CIGBase.prototype.submitObservation = function (reference, rdf) {
+	let allUpdates = this._source.submitObservation(reference, rdf);
+
+	this._processUpdates(allUpdates);
+}
+
+CIGBase.prototype.resetObservations = function (id) {
+	let allUpdates = this._source.resetObservations(id);
+
+	this._processUpdates(allUpdates);
+}
+
+CIGBase.prototype.resetAllObservations = function () {
+	let allUpdates = this._source.resetAllObservations();
+
+	this._processUpdates(allUpdates);
+}
+
+CIGBase.prototype.loading_start = function () {
+	$('.overlay').css('display', 'block');
+}
+
+CIGBase.prototype.loading_end = function () {
+	$('.overlay').css('display', 'none');
+}
+
+CIGBase.prototype.onUserInput = function(taskId) {}
+
+CIGBase.prototype.refresh = function() {
+	let allUpdates = this._source.refresh();
+	this._processUpdates(allUpdates);
+}
+
+CIGBase.prototype._processUpdates = function(allUpdates) {
+	allUpdates.forEachSet((updates) => this.update({ transits: updates, operations: [] }));
+}
+
+
+// - NodeUpdate
 
 class NodeUpdate {
 
@@ -66,73 +141,28 @@ class NodeUpdates {
 	}
 }
 
-// subclasses need to implement:
-// update({ transits, operations, adds })
-//		transits: [{ node, workflowState, decisionState, propagate (optional) }] (mandatory; can be empty)
-// 		operations: [{ source, target, type }] (mandatory; can be empty)
-//		adds: [{ parent, data }] (optional)
 
-CIGBase.prototype.show = function (config) {
-	this.showFromView(this._source.defaultWfView, config);
+// CIG Resolver
 
-	// get states from source
-	this.refresh();
+function CIGResolver() {
+	return
 }
 
-CIGBase.prototype.showFromView = function (wfView, config) {
-	if (!config)
-		config = {};
+CIGResolver.prototype.constructor = CIGResolver;
 
-	this._data = wfView;
-	this.id = wfView.id;
-	// this._config = config;
+CIGResolver.prototype.get = function() {}
 
-	// ('data' object will be main workflow node itself)
-	this._workflow = { id: this._data.id, data: this._data };
 
-	this._initView(config);
+function DefaultCIGResolver(defaultCig) {
+	CIGResolver.call(this);
 
-	// show main workflow - will always be active
-	this.update({ transits: [
-		new NodeUpdate(this._workflow.id, this._workflow, this._workflow.data.workflow_state)
-	], operations: [] });
+	this._defaultCig = defaultCig;
+
+	return this;
 }
 
-CIGBase.prototype.submitObservation = function (reference, rdf) {
-	let allUpdates = this._source.submitObservation(reference, rdf);
+DefaultCIGResolver.prototype = Object.create(CIGResolver.prototype);
 
-	this._processUpdates(allUpdates);
+DefaultCIGResolver.prototype.get = function() {
+	return this._defaultCig;
 }
-
-CIGBase.prototype.resetObservations = function (id) {
-	let allUpdates = this._source.resetObservations(id);
-
-	this._processUpdates(allUpdates);
-}
-
-CIGBase.prototype.resetAllObservations = function () {
-	let allUpdates = this._source.resetAllObservations();
-
-	this._processUpdates(allUpdates);
-}
-
-CIGBase.prototype.loading_start = function () {
-	$('.overlay').css('display', 'block');
-}
-
-CIGBase.prototype.loading_end = function () {
-	$('.overlay').css('display', 'none');
-}
-
-CIGBase.prototype.onUserInput = function(taskId) {}
-
-CIGBase.prototype.refresh = function() {
-	let allUpdates = this._source.refresh();
-	this._processUpdates(allUpdates);
-}
-
-CIGBase.prototype._processUpdates = function(allUpdates) {
-	allUpdates.forEachSet((updates) => this.update({ transits: updates, operations: [] }));
-}
-
-// - end API

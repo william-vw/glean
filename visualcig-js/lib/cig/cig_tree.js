@@ -1,11 +1,14 @@
-function VisualCIG(source, input) {
-	CIGBase.call(this, source, input);
-
+function VisualCIG(config) {
+	CIGBase.call(this, config);
 	return this;
 }
 
 VisualCIG.prototype = Object.create(CIGBase.prototype);
 VisualCIG.prototype.constructor = VisualCIG;
+
+VisualCIG.prototype._createResolver = function() {
+	return new CIGStackResolver();
+}
 
 
 // - fields
@@ -137,12 +140,14 @@ VisualCIG.prototype._backFromHiding = function() {
 	this._refreshTree();
 }
 
-VisualCIG.prototype._initView = function (config) {
+VisualCIG.prototype._initView = function () {
+	let config = this._config;
+
 	this._inputs = [];
 
 	// - initialize
 
-	this._container = (config.container ? config.container : d3.select('div#main-container'));
+	this._container = d3.select(config.container);
 	if (!config.inTaskWindow) {
 		// this._showHints(config);
 	}
@@ -154,6 +159,7 @@ VisualCIG.prototype._initView = function (config) {
 	if (!config.inTaskWindow) {
 		// (hide composite nodes in entire workflow)
 		this._initComposedChildren(this._data);
+		console.log("after init", this._data);
 	}
 
 	// (propagate "not-chosen" state, "source" property to descendants)
@@ -249,7 +255,6 @@ VisualCIG.prototype._initView = function (config) {
 }
 
 VisualCIG.prototype.shown = function() {
-	this.isCurrent();
 	this._refreshTree();	
 }
 
@@ -347,10 +352,6 @@ VisualCIG.prototype._showHideComposed = function (node, show) {
 	const selection = node._children.filter((d2) => (show ? d2.composed : !d2.composed));
 	node.children = selection;
 }
-
-// - end API 
-
-// modify CIG
 
 VisualCIG.prototype._transitTo = function (node, workflowState, decisionState, propagateDown, propagateUp) {
 	if (workflowState)
@@ -751,6 +752,9 @@ VisualCIG.prototype._formatHierLinks = function (hierLinks) {
 // - main header
 
 VisualCIG.prototype._setupHeader = function (config) {
+	if (config.composed && !config.inTaskWindow)
+		return;
+
 	const header = this._container.append("div")
 		.classed('header', true);
 
@@ -768,7 +772,6 @@ VisualCIG.prototype._setupHeader = function (config) {
 
 	} else
 		header.classed('main-header', true);
-
 
 	header.append('div')
 		.classed('title', true)
@@ -1265,10 +1268,11 @@ VisualCIG.prototype._setupResetBtn = function (config) {
 		.on("click", this._source.resetAllObservations);
 }
 
-// - Task stack
+
+// - TaskStack
 
 function TaskStack(initCig) {
-	this._stack.push({ id: initCig._workflow.id, data: initCig._workflow.data, nr: -1 });
+	this._stack.push({ data: initCig._data, nr: -1, cig: initCig });
 
 	this._setupListeners();
 
@@ -1276,6 +1280,10 @@ function TaskStack(initCig) {
 }
 
 TaskStack.prototype.constructor = TaskStack;
+
+TaskStack.prototype.current = function() {
+	return this._stack[this._stack.length - 1];
+}
 
 TaskStack.prototype._stack = [];
 
@@ -1334,25 +1342,26 @@ TaskStack.prototype.openTaskWindow = function (e, d) {
 
 	// - cig
 
-	const config = {
-		container: container,
-		inTaskWindow: true
-	};
-	// Object.assign(config, cig._config);
-
 	const newWfView = d.data;
 	// will be initially hidden
 	cig._showComposedChildren(newWfView);
 
-	this._stack.push({ id: id, data: newWfView, nr: nr, cig: cig, config: config });
+	var cig2 = new VisualCIG({
+		source: cig._source,
+		input: cig._input,
+		container: `#${id}`,
+		inTaskWindow: true
+	});
+	cig2.showFromView(newWfView);
 
-	var cig2 = new VisualCIG(cig._source, cig._input);
-	cig2.showFromView(newWfView, config);
+	this._stack.push({ data: newWfView, nr: nr, cig: cig2 });
 }
 
 TaskStack.prototype.closeTaskWindow = function (e) {
-	const { data, nr, cig } = this._stack.pop();
-	
+	this._stack.pop();
+	const { data, nr, cig } = this.current();
+	console.log("?", { data, nr, cig });
+
 	cig.shown();
 
 	// - remove current cig
@@ -1367,10 +1376,6 @@ TaskStack.prototype.closeTaskWindow = function (e) {
 
 	// override prior cig attributes
 	cig._root.descendants().forEach((d) => d.cig = cig);
-
-	// in case of any new transitions to be shown
-	// (based on interactions with the sub-CIG!)
-	// this.refresh();
 }
 
 TaskStack.prototype.breadcrumbs = function (d) {
@@ -1387,4 +1392,19 @@ TaskStack.prototype._getPriorCIG = function (nr) {
 			.select('svg');
 	else
 		return d3.select('div#sub-container' + (nr - 1));
+}
+
+
+// - CIGStackResolver
+
+function CIGStackResolver() {
+	CIGResolver.call(this);
+	return this;
+}
+
+CIGStackResolver.prototype = Object.create(CIGResolver.prototype);
+
+CIGStackResolver.prototype.get = function() {
+	// console.log("??", taskStack._stack);
+	return taskStack.current().cig;
 }

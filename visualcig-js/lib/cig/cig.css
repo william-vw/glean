@@ -15,9 +15,11 @@ a { color: lightgrey }
 
 #operations div { margin-top: 15px; }
 
-#main-container { position: relative; }
-
-.container { padding-bottom: 15px; }
+.container { 
+  padding-bottom: 15px; 
+  position: relative; 
+  overflow-y: scroll;
+}
 
 .window { 
   position: absolute;
