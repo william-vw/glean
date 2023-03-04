@@ -1,0 +1,44 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="lib/jquery-3.5.1-min.js"></script>
+<script src="lib/d3.v6.min.js"></script>
+<script src="lib/d3_utils.js"></script>
+<script src="lib/N3.dist.js"></script>
+<script src="lib/rdfa.dist.js"></script>
+<script src="lib/jqFhir.js"></script>
+<script src="lib/fhir_client.js"></script>
+
+<script src="lib/source/data_source.js"></script>
+<script src="lib/source/server.js"></script>
+<script src="lib/source/fsm.js"></script>
+
+<script src="lib/input/input_handler.js"></script>
+<script src="lib/input/rdf_input_handler.js"></script>
+
+<script src="lib/cig_base.js"></script>
+<script src="lib/cig_form.js"></script>
+<script src="lib/cig_tree.js"></script>
+
+<link rel="stylesheet" href="lib/cig.css" />
+</head>
+<body>
+
+<div id="main-container" class="container">
+</div>
+
+<script type="module">
+let source = new FSM("/wf/lipid/ckd_dyslipidemia_local.js");
+await source.load();
+
+let cig = new CIGForm(
+    source,
+    new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#")
+);
+
+cig.show();
+
+</script>
+</body>
+</html>
