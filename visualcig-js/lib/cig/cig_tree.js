@@ -1076,6 +1076,7 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 		.css('top', (bbox.top + (bbox.height / 2) - 75) + "px");
 
 	infoBox.css('display', "block");
+	this._input.inputShown(body);
 }
 
 VisualCIG.prototype._infoBox_onClose = function (e) {

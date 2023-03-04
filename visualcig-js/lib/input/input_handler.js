@@ -46,6 +46,14 @@ InputHandler.prototype.setupInput = async function(el, d) {
         this.populateInput(d);
 }
 
+InputHandler.prototype.inputShown = async function(el) {
+    console.log("input?", el, el.find('input').length);
+    // put focus on first input element
+    let inputs = el.find('input');
+    if (inputs.length > 0)
+        inputs.get(0).focus();
+}
+
 InputHandler.prototype.populateInput = async function(d) { }
 
 InputHandler.prototype.submitInputData = async function(element) { }

@@ -56,7 +56,7 @@ CIGForm.prototype._initView = function (config) {
 CIGForm.prototype._initForm = function (data) {
     this._initFormEl(data, { element: $('#main-container') }, false);
 
-    // - when radio buttons are clicked, submit the form directly
+    // when radio buttons are clicked, submit the form directly
     $('input[type=radio]').click(e => this._input.submitInputData(e.target));
 }
 
@@ -335,6 +335,7 @@ CIGForm.prototype._show = function (d) {
         return false;
 
     el.css('display', 'block');
+    this._input.inputShown(el);
 
     return true;
 }
