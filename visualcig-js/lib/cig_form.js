@@ -1,5 +1,5 @@
-function CIGForm(input) {
-    CIGBase.call(this, input);
+function CIGForm(source, input) {
+    CIGBase.call(this, source, input);
     return this;
 }
 
@@ -48,7 +48,7 @@ CIGForm.prototype.onUserInput = function (taskId) {
     }
 }
 
-CIGForm.prototype._initView = function () {
+CIGForm.prototype._initView = function (config) {
     let json = this._data;
     this._initForm(json);
 }

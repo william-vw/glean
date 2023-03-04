@@ -1,11 +1,17 @@
-function CIGBase(input) {
+function CIGBase(source, input) {
+	this._source = source;
+	
 	this._input = input;
-	input._cig = this;
+	this.isCurrent();
 	
 	return this;
 }
 
 CIGBase.prototype.constructor = CIGBase;
+
+CIGBase.prototype.isCurrent = function() {
+	this._input._cig = this;
+}
 
 // - start API
 
@@ -66,20 +72,30 @@ class NodeUpdates {
 // 		operations: [{ source, target, type }] (mandatory; can be empty)
 //		adds: [{ parent, data }] (optional)
 
-CIGBase.prototype.show = function (source) {
-	this._source = source;
+CIGBase.prototype.show = function (config) {
+	this.showFromView(this._source.defaultWfView, config);
 
-	let wf = source.wfView;
-	this._data = wf;
-	this.id = wf.id;
+	// get states from source
+	this.refresh();
+}
+
+CIGBase.prototype.showFromView = function (wfView, config) {
+	if (!config)
+		config = {};
+
+	this._data = wfView;
+	this.id = wfView.id;
 	// this._config = config;
 
-	// ('data' object will be workflow node itself)
+	// ('data' object will be main workflow node itself)
 	this._workflow = { id: this._data.id, data: this._data };
 
-	this._initView();
+	this._initView(config);
 
-	this.refresh();
+	// show main workflow - will always be active
+	this.update({ transits: [
+		new NodeUpdate(this._workflow.id, this._workflow, this._workflow.data.workflow_state)
+	], operations: [] });
 }
 
 CIGBase.prototype.submitObservation = function (reference, rdf) {
@@ -110,11 +126,8 @@ CIGBase.prototype.loading_end = function () {
 
 CIGBase.prototype.onUserInput = function(taskId) {}
 
-CIGBase.prototype.refresh = function(workflowRef) {
-	if (!workflowRef)
-		workflowRef = this._source.workflowRef();
-
-	let allUpdates = this._source.refresh(workflowRef);
+CIGBase.prototype.refresh = function() {
+	let allUpdates = this._source.refresh();
 	this._processUpdates(allUpdates);
 }
 

@@ -1,5 +1,6 @@
-function VisualCIG(input) {
-	CIGBase.call(this, input);
+function VisualCIG(source, input) {
+	CIGBase.call(this, source, input);
+
 	return this;
 }
 
@@ -113,25 +114,6 @@ function findOption(name, options) {
 	return (options[name] ? options[name] : options['other']);
 }
 
-// - start API
-
-// CIGBase:
-// loading_start
-// loading_end
-
-VisualCIG.prototype.findNodeByName = function (name) {
-	return this._root.descendants().find((d) => d.data.name == name);
-}
-
-VisualCIG.prototype.findNodeById = function (id) {
-	// console.log("finding:", id, this._root.descendants());
-	if (id == this._workflow.id)
-		return this._workflow;
-	else
-		return [this._root, ... this._root.descendants()].find((d) => d.data.id == id);
-	// return this._root.descendants().find((d) => d.data.id == id);
-}
-
 // transits: [{ node, workflowState, decisionState, propagate (optional) }] (mandatory; can be empty)
 // operations: [{ source, target, type }] (mandatory; can be empty)
 // adds: [{ parent, data }] (optional)
@@ -144,26 +126,24 @@ VisualCIG.prototype.update = function ({ transits, operations, adds }) {
 		));
 	});
 	if (adds) this._addNodes(adds);
-	this._refresh();
+	
+	this._refreshTree();
 
 	this._simulateOperations(operations);
 }
 
-// -- show CIG
+VisualCIG.prototype._backFromHiding = function() {
+	this._input._cig = this;
+	this._refreshTree();
+}
 
-// CIGBase:
-// load
-// loadFromUrl
-
-VisualCIG.prototype._loadWorkflow = function (wf, config, callback) {
-	this._init(wf, config);
-
+VisualCIG.prototype._initView = function (config) {
 	this._inputs = [];
 
 	// - initialize
 
 	this._container = (config.container ? config.container : d3.select('div#main-container'));
-	if (!config.isTaskWindow) {
+	if (!config.inTaskWindow) {
 		// this._showHints(config);
 	}
 
@@ -171,7 +151,7 @@ VisualCIG.prototype._loadWorkflow = function (wf, config, callback) {
 
 	// - prep data object
 
-	if (!config.isTaskWindow) {
+	if (!config.inTaskWindow) {
 		// (hide composite nodes in entire workflow)
 		this._initComposedChildren(this._data);
 	}
@@ -216,7 +196,7 @@ VisualCIG.prototype._loadWorkflow = function (wf, config, callback) {
 		.attr('class', (d) => d);
 
 	// - show legend
-	this._showLegend(config);
+	this._showLegend();
 
 	// - adjust tree position, e.g., based on legend
 	const treeTr = this._adjustTreePos(config);
@@ -225,7 +205,7 @@ VisualCIG.prototype._loadWorkflow = function (wf, config, callback) {
 
 	this._showAndFormatTree();
 
-	if (!config.isTaskWindow) {
+	if (!config.inTaskWindow) {
 		this._setupTooltip();
 		this._setupInfoBox();
 	}
@@ -250,7 +230,7 @@ VisualCIG.prototype._loadWorkflow = function (wf, config, callback) {
 		.attr("width", g.node().getBBox().x + actualSize.width + padding)
 		.attr("height", g.node().getBBox().y + actualSize.height + padding);
 
-	if (!config.isTaskWindow) {
+	if (!config.inTaskWindow) {
 		const svgTr = this._settings.dim.svg.translate;
 		this._svg.attr("transform", 'translate(' + svgTr.x + "," + svgTr.y + ")");
 	}
@@ -264,15 +244,13 @@ VisualCIG.prototype._loadWorkflow = function (wf, config, callback) {
 	// - reset button
 	this._setupResetBtn(config);
 
-	if (callback)
-		callback();
+	if (!window.taskStack)
+		window.taskStack = new TaskStack(this);
 }
 
-VisualCIG.prototype._baseWorkflow = function () {
-	if (taskStack == null)
-		return cig.id;
-	else
-		return taskStack[0].id;
+VisualCIG.prototype.shown = function() {
+	this.isCurrent();
+	this._refreshTree();	
 }
 
 VisualCIG.prototype._treeStats = function (node) {
@@ -355,7 +333,7 @@ VisualCIG.prototype._initComposedChildren = function (node) {
 }
 
 // methods below assume that initComposedChildren was called first
-// (see _showFromData, line 191)
+// (see _initView, line 191)
 
 VisualCIG.prototype._showComposedChildren = function (node) {
 	this._showHideComposed(node, true);
@@ -410,7 +388,7 @@ VisualCIG.prototype._simulateOperations = function (operations) {
 
 // - refresh
 
-VisualCIG.prototype._refresh = function () {
+VisualCIG.prototype._refreshTree = function () {
 	if (this._treeChanged) {
 		this._root = d3.hierarchy(this._data);
 		this._tree(this._root);
@@ -422,7 +400,7 @@ VisualCIG.prototype._refresh = function () {
 	this._formatTree();
 	this._refreshHeader();
 
-	this._infoBox_onClose({}, cig);
+	this._infoBox_onClose({});
 }
 
 // - hints
@@ -438,7 +416,7 @@ VisualCIG.prototype._showHints = function (config) {
 
 // - legend
 
-VisualCIG.prototype._showLegend = function (config) {
+VisualCIG.prototype._showLegend = function () {
 	var legend = this._svg
 		.selectAll('g g.legend');
 
@@ -718,14 +696,13 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 		.on("dblclick", function (e, d) {
 			// unsure why this is needed ..
 			self._nodeTooltip_onMouseOut.call(this, e, d);
-			// self._toggleCompositeChildren.call(this, e, d);
-			self._openTaskWindow.call(this, e, d);
+			
+			taskStack.openTaskWindow(e, d);
 		})
 		.style('cursor', "pointer");
 	// .call(cc);
 
 	// cc.on("click", this._nodeInfoBox_onClick);
-	// cc.on("dblclick", this._showHideCompositeChildren);
 }
 
 // - formatting
@@ -777,8 +754,8 @@ VisualCIG.prototype._setupHeader = function (config) {
 	const header = this._container.append("div")
 		.classed('header', true);
 
-	if (config.isTaskWindow) {
-		const breadcrumbs = cig._breadcrumbs();
+	if (config.inTaskWindow) {
+		const breadcrumbs = taskStack.breadcrumbs();
 
 		header.append('div')
 			.classed('breadcrumbs', true)
@@ -787,7 +764,7 @@ VisualCIG.prototype._setupHeader = function (config) {
 		header.append("span")
 			.classed("close taskwindow-close", true)
 			.html("&times;")
-			.on('click', (e) => { cig._closeTaskWindow(e, taskStack.pop()); e.stopPropagation(); });
+			.on('click', (e) => { taskStack.closeTaskWindow(e); e.stopPropagation(); });
 
 	} else
 		header.classed('main-header', true);
@@ -1108,7 +1085,7 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 	infoBox.css('display', "block");
 }
 
-VisualCIG.prototype._infoBox_onClose = function (e, cig) {
+VisualCIG.prototype._infoBox_onClose = function (e) {
 	const infoBox = $('.infobox');
 	if (infoBox.css('display') == 'block') {
 		infoBox.css('display', "none");
@@ -1116,163 +1093,6 @@ VisualCIG.prototype._infoBox_onClose = function (e, cig) {
 		e.handled = true; // yes
 		infoBoxOpen = false;
 	}
-}
-
-// - composite tasks
-
-// will need to be updated
-/* VisualCIG.prototype._toggleCompositeChildren = function (e, d) {
-	const cig = d.cig;
-
-	d = d.data;
-	this._showHideChildren(d);
-
-	cig._treeChanged = true;
-
-	cig._refresh();
-}
-
-VisualCIG.prototype._showHideChildren = function (d) {
-	if (d.children)
-		this._hideChildren(d);
-	else
-		this._showChildren(d);
-}
-
-VisualCIG.prototype._showChildren = function (d) {
-	d.children = d._children;
-	d._children = null;
-}
-
-VisualCIG.prototype._hideChildren = function (d) {
-	const subTasks = d.children.filter((d2) => d2.composed);
-
-	// support for non-subtask "children"
-	// (these would be "next's" in reality)
-	d._children = subTasks;
-	d.children = d.children.filter((d2) => !d2.composed);
-} */
-
-// global
-var taskStack = null;
-
-VisualCIG.prototype._openTaskWindow = function (e, d) {
-	const cig = d.cig;
-
-	// - set listeners
-
-	// means this is the main CIG
-	if (taskStack === null) {
-		taskStack = [{ id: cig._workflow.id, data: cig._workflow.data, nr: -1 }];
-
-		// (new listener will override former one)
-		$(document).on('keyup', (e) => {
-			if (infoBoxOpen || e.handled) return; // let infobox deal with the key
-			if (taskStack.length == 1) return;
-			if (e.key == "Escape") cig._closeTaskWindow(e, taskStack.pop());
-		});
-		// (needs to be updated so clicking on window header also doesn't close it)
-		// (currently leaving it out cause it's difficult)
-		/* $(document).on('click', (e) => {
-			if (infoBoxOpen || e.handled) return; // let infobox deal with the click
-			if (taskStack.length == 1) return;
-
-			if (e.target.nodeName == 'HTML' || e.target.nodeName == 'BODY') {
-				cig._closeTaskWindow(e, taskStack.pop());
-
-			} else {
-				const task = taskStack[taskStack.length - 1];
-				const targetId = e.target.parentNode.getAttribute("id");
-				const targetName = e.target.parentNode.nodeName;
-
-				if (targetName != 'g' // clicked a node or link
-					&& targetId != task.id) {
-
-					cig._closeTaskWindow(e, taskStack.pop());
-				}
-			}
-		}); */
-	}
-
-	const nr = taskStack.length - 1;
-
-	// - style prior cig
-
-	cig._getPriorCIG(nr)
-		.style('opacity', (nr == 0 ? "25%" : "50%"));
-
-	// - create container
-
-	var incr = cig._settings.taskWindow.incr * (nr + 1);
-	var top = cig._settings.taskWindow.top + incr;
-	var left = cig._settings.taskWindow.left + incr;
-
-	const id = "sub-container" + nr;
-	const container = d3.select('body')
-		.append("div")
-		.attr("id", id)
-		.classed('container window', true)
-		.style('top', top + "px").style('left', left + "px");
-
-
-	// - cig
-
-	const config = {
-		container: container,
-		isTaskWindow: true
-	};
-	// Object.assign(config, cig._config);
-
-	const data = d.data;
-	// will be initially hidden
-	cig._showComposedChildren(data);
-
-	var curTask = { id: id, data: data, nr: nr, cig: cig, config: config };
-	taskStack.push(curTask);
-
-	var cig2 = new VisualCIG();
-	cig2.load(data, config, {
-		beforeRefresh: () => window.cig = cig2 // point to current cig
-	});
-}
-
-VisualCIG.prototype._breadcrumbs = function (d) {
-	var breadcrumbs = "";
-	for (const task of taskStack)
-		breadcrumbs += task.data.name + " > ";
-
-	return breadcrumbs;
-}
-
-VisualCIG.prototype._getPriorCIG = function (nr) {
-	if (nr == 0)
-		return d3.select('div#main-container')
-			.select('svg');
-	else
-		return d3.select('div#sub-container' + (nr - 1));
-}
-
-VisualCIG.prototype._closeTaskWindow = function (e, task) {
-	const { data, nr, cig } = task;
-
-	// - remove current cig
-	d3.select("div#sub-container" + nr).remove();
-
-	// - reset prior cig
-	this._getPriorCIG(nr)
-		.style('opacity', "100%");
-
-	// hide composed children again
-	this._hideComposedChildren(data);
-
-	// override prior cig attributes
-	this._root.descendants().forEach((d) => d.cig = cig);
-
-	window.cig = cig; // point to current cig
-
-	// in case of any new transitions to be shown
-	// (based on interactions with the sub-CIG!)
-	source.initFromSource(cig.workflowRef());
 }
 
 // - operations
@@ -1438,7 +1258,7 @@ VisualCIG.prototype._setupLoadingIcon = function () {
 
 VisualCIG.prototype._setupResetBtn = function (config) {
 	var offset = { x: 0, y: 0 };
-	if (!config.isTaskWindow) {
+	if (!config.inTaskWindow) {
 		offset = this._settings.dim.svg.translate;
 	}
 
@@ -1448,5 +1268,129 @@ VisualCIG.prototype._setupResetBtn = function (config) {
 		.style('position', 'absolute')
 		.style('left', offset.x + 25 + "px")
 		.style('bottom', -offset.y + 10 + "px")
-		.on("click", source.resetAllObservations);
+		.on("click", this._source.resetAllObservations);
+}
+
+// - Task stack
+
+function TaskStack(initCig) {
+	this._stack.push({ id: initCig._workflow.id, data: initCig._workflow.data, nr: -1 });
+
+	this._setupListeners();
+
+	return this;
+}
+
+TaskStack.prototype.constructor = TaskStack;
+
+TaskStack.prototype._stack = [];
+
+TaskStack.prototype._setupListeners = function() {
+	// (new listener will override former one)
+	$(document).on('keyup', (e) => {
+		if (infoBoxOpen || e.handled) return; // let infobox deal with the key
+		if (this._stack.length == 1) return;
+		if (e.key == "Escape") this.closeTaskWindow(e);
+	});
+	// (needs to be updated so clicking on window header also doesn't close it)
+	// (currently leaving it out cause it's difficult)
+	/* $(document).on('click', (e) => {
+		if (infoBoxOpen || e.handled) return; // let infobox deal with the click
+		if (this._stack.length == 1) return;
+
+		if (e.target.nodeName == 'HTML' || e.target.nodeName == 'BODY') {
+			this.closeTaskWindow(e);
+
+		} else {
+			const task = this._stack[this._stack.length - 1];
+			const targetId = e.target.parentNode.getAttribute("id");
+			const targetName = e.target.parentNode.nodeName;
+
+			if (targetName != 'g' // clicked a node or link
+				&& targetId != task.id) {
+
+				this.closeTaskWindow(e);
+			}
+		}
+	}); */
+}
+
+TaskStack.prototype.openTaskWindow = function (e, d) {
+	const cig = d.cig;
+
+	const nr = this._stack.length - 1;
+
+	// - style prior cig
+
+	this._getPriorCIG(nr)
+		.style('opacity', (nr == 0 ? "25%" : "50%"));
+
+	// - create container
+
+	var incr = cig._settings.taskWindow.incr * (nr + 1);
+	var top = cig._settings.taskWindow.top + incr;
+	var left = cig._settings.taskWindow.left + incr;
+
+	const id = "sub-container" + nr;
+	const container = d3.select('body')
+		.append("div")
+		.attr("id", id)
+		.classed('container window', true)
+		.style('top', top + "px").style('left', left + "px");
+
+	// - cig
+
+	const config = {
+		container: container,
+		inTaskWindow: true
+	};
+	// Object.assign(config, cig._config);
+
+	const newWfView = d.data;
+	// will be initially hidden
+	cig._showComposedChildren(newWfView);
+
+	this._stack.push({ id: id, data: newWfView, nr: nr, cig: cig, config: config });
+
+	var cig2 = new VisualCIG(cig._source, cig._input);
+	cig2.showFromView(newWfView, config);
+}
+
+TaskStack.prototype.closeTaskWindow = function (e) {
+	const { data, nr, cig } = this._stack.pop();
+	
+	cig.shown();
+
+	// - remove current cig
+	d3.select("div#sub-container" + nr).remove();
+
+	// - reset prior cig
+	this._getPriorCIG(nr)
+		.style('opacity', "100%");
+
+	// hide composed children again
+	cig._hideComposedChildren(data);
+
+	// override prior cig attributes
+	cig._root.descendants().forEach((d) => d.cig = cig);
+
+	// in case of any new transitions to be shown
+	// (based on interactions with the sub-CIG!)
+	// this.refresh();
+}
+
+TaskStack.prototype.breadcrumbs = function (d) {
+	var breadcrumbs = "";
+	for (const task of this._stack)
+		breadcrumbs += task.data.name + " > ";
+
+	return breadcrumbs;
+}
+
+TaskStack.prototype._getPriorCIG = function (nr) {
+	if (nr == 0)
+		return d3.select('div#main-container')
+			.select('svg');
+	else
+		return d3.select('div#sub-container' + (nr - 1));
 }

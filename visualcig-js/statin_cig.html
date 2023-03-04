@@ -19,6 +19,7 @@
 
 <script src="lib/cig_base.js"></script>
 <script src="lib/cig_form.js"></script>
+<script src="lib/cig_tree.js"></script>
 
 <link rel="stylesheet" href="lib/cig.css" />
 </head>
@@ -28,14 +29,16 @@
 </div>
 
 <script type="module">
-let cig = new CIGForm(
-    new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#")
-);
-
 let source = new FSM("/wf/lipid/ckd_dyslipidemia_local.js");
 await source.load();
 
-cig.show(source);
+// let cig = new CIGForm(
+let cig = new VisualCIG(
+    source,
+    new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#")
+);
+
+cig.show();
 
 </script>
 </body>

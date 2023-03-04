@@ -42,7 +42,7 @@ DataSource.prototype.resetAllObservations = function () { }
 
 DataSource.prototype.resetSource = function () { }
 
-DataSource.prototype.refresh = function (cig, workflowRef) { }
+DataSource.prototype.refresh = function () { }
 
 class WorkflowReference {
 
@@ -79,10 +79,6 @@ class TaskReference {
     }
 };
 
-DataSource.prototype.workflowRef = function () {
-    return new WorkflowReference(this._baseWorkflow(), this._baseWorkflow());
-}
-
 DataSource.prototype.taskRef = function (taskId) {
     const node = this.findNodeById(taskId);
 
@@ -95,7 +91,7 @@ DataSource.prototype.taskRef = function (taskId) {
 // - end API
 
 DataSource.prototype._baseWorkflow = function () {
-    return this.wfView.id;
+    return this.defaultWfView.id;
 }
 
 DataSource.prototype._loadFromUrl = function (url, onSuccess, onError) {
@@ -113,11 +109,11 @@ DataSource.prototype._loadFromUrl = function (url, onSuccess, onError) {
 DataSource.prototype._loadWorkflow = function (wf, onSuccess, onError) {
     // the subclass will give us the JSON that views (CIG) will be working with
     // (e.g., for FSM - this will be a property of "wf", and not "wf" itself)
-    this.wfView = this._initSource(wf);
+    this.defaultWfView = this._initSource(wf);
 
     // setup a map to support findNodeById
     this._map = {};
-    this._setupData(this.wfView, 0);
+    this._setupData(this.defaultWfView, 0);
 
     onSuccess();
 }
@@ -130,8 +126,6 @@ DataSource.prototype._setupData = function (d, depth) {
         d.newUserInput = false;
 
     // wrap as data field of object
-    // need separate method to receive an "external" node (e.g., _updateNode)
-    // since native methods expect the original 'data'
     this._map[d.id] = { data: d };
 
     if (d.children) {

@@ -30,17 +30,10 @@ FSM.prototype._visitWf = function (e) {
 	this._forEachNext(e, this._visitWf);
 }
 
-FSM.prototype.refresh = function (workflowRef) {
-	console.log("[FSM] refresh:", workflowRef);
+FSM.prototype.refresh = function () {
+	console.log("[FSM] refresh");
 	
 	let updates = this._transitAll();
-
-	// initially show workflow as well
-	let wf = this.findNodeById(workflowRef.workflowId);
-	if (wf.data.depth == 0) {
-		updates.add(new NodeUpdate(wf.data.id, wf, wf.data.workflow_state));
-	}
-
 	return updates;
 }
 
