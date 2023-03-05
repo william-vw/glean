@@ -319,10 +319,10 @@ CIGForm.prototype._show = function (d) {
 
     el.css('display', 'block');
 
-    // only when actual form is shown
+    // only when input form element is shown
     if (el.hasClass('input-form')) {
-        // only consider inputs under  current form-node
-        // (many other form-nodes will be nested here)
+        // many other form-nodes will be nested here'
+        // so only consider direct child table
         let form = el.children('table');
 
         this._input.inputShown(form);
