@@ -83,6 +83,8 @@ RdfInputHandler.prototype._onExtractedStmt = function (reference, stmt, store) {
     return stmt;
 }
 
+// keep user input; store under its associated code
+
 RdfInputHandler.prototype._onNewInput = function (id, rdf) {
     const stmts = rdf.store.getQuads(null, namedNode(prefixes.fhir + 'Observation.code'), null);
 
@@ -90,6 +92,8 @@ RdfInputHandler.prototype._onNewInput = function (id, rdf) {
     for (let stmt of stmts) {
         let code = stmt.object.id;
         var value = undefined;
+
+        // value depends on type
 
         var values = rdf.store.getQuads(stmt.subject, namedNode(prefixes.fhir + 'Observation.valueBoolean', null));
         if (values.length > 0)
@@ -113,6 +117,8 @@ RdfInputHandler.prototype._onNewInput = function (id, rdf) {
 
     // console.log("_newInput:", id, this._inputMap);
 }
+
+// try populate input field with prior user input, based on its associated code
 
 RdfInputHandler.prototype._tryPopulateInput = async function (el) {
     // extract annotations of input element
