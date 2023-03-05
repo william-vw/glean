@@ -10,7 +10,7 @@ function CIGBase(config) {
 		// and resolver (input.cig property) was not yet set,
 		// setup the inputHandler with this cig's resolver 
 		if (!this._input.cig)
-			this._input.cig = this._createResolver();
+			this._input.cig = this._cigResolver();
 	}
 	
 	return this;
@@ -18,7 +18,7 @@ function CIGBase(config) {
 
 CIGBase.prototype.constructor = CIGBase;
 
-CIGBase.prototype._createResolver = function() {
+CIGBase.prototype._cigResolver = function() {
 	return new DefaultCIGResolver(this);
 }
 
@@ -143,6 +143,10 @@ class NodeUpdates {
 
 
 // CIG Resolver
+// returns a "current" CIG for invoking methods on
+// (e.g., submitting observations, issuing updates)
+// the default implementation simply returns a preset CIG
+// for cig_tree, the resolver will return the currently shown CIG
 
 function CIGResolver() {
 	return

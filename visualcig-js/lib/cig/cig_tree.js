@@ -1,12 +1,16 @@
 function VisualCIG(config) {
 	CIGBase.call(this, config);
+
+	if (!window.taskStack)
+		window.taskStack = new TaskStack(this);
+
 	return this;
 }
 
 VisualCIG.prototype = Object.create(CIGBase.prototype);
 VisualCIG.prototype.constructor = VisualCIG;
 
-VisualCIG.prototype._createResolver = function() {
+VisualCIG.prototype._cigResolver = function() {
 	return new CIGStackResolver();
 }
 
@@ -142,6 +146,7 @@ VisualCIG.prototype._backFromHiding = function() {
 
 VisualCIG.prototype._initView = function () {
 	let config = this._config;
+	let settings = VisualCIG.prototype._settings;
 
 	this._inputs = [];
 
@@ -174,8 +179,8 @@ VisualCIG.prototype._initView = function () {
 	// calculate tree dimensions
 
 	const stats = this._treeStats();
-	const treeWidth = this._settings.dim.tree.branchWidth * stats.numBranches;
-	const treeHeight = this._settings.dim.tree.levelHeight * stats.numLevels;
+	const treeWidth = settings.dim.tree.branchWidth * stats.numBranches;
+	const treeHeight = settings.dim.tree.levelHeight * stats.numLevels;
 
 	this._tree = d3.tree();
 	this._tree.size([treeWidth, treeHeight]);
@@ -231,13 +236,13 @@ VisualCIG.prototype._initView = function () {
 
 	const actualSize = g.node().getBoundingClientRect();
 
-	const padding = this._settings.dim.svg.padding;
+	const padding = settings.dim.svg.padding;
 	this._svg
 		.attr("width", g.node().getBBox().x + actualSize.width + padding)
 		.attr("height", g.node().getBBox().y + actualSize.height + padding);
 
 	if (!config.inTaskWindow) {
-		const svgTr = this._settings.dim.svg.translate;
+		const svgTr = settings.dim.svg.translate;
 		this._svg.attr("transform", 'translate(' + svgTr.x + "," + svgTr.y + ")");
 	}
 
@@ -249,9 +254,6 @@ VisualCIG.prototype._initView = function () {
 
 	// - reset button
 	this._setupResetBtn(config);
-
-	if (!window.taskStack)
-		window.taskStack = new TaskStack(this);
 }
 
 VisualCIG.prototype.shown = function() {
@@ -273,12 +275,13 @@ VisualCIG.prototype._treeStatsNode = function (node, stats) {
 }
 
 VisualCIG.prototype._adjustTreePos = function (config) {
+	let settings = VisualCIG.prototype._settings;
 	const legendDim = this._legend.node().getBoundingClientRect();
 
 	const minTreePos = this._minTreePos(this._root, legendDim);
 
-	var treeTr = [this._settings.dim.tree.translate.x,
-	this._settings.dim.tree.translate.y];
+	var treeTr = [settings.dim.tree.translate.x,
+	settings.dim.tree.translate.y];
 
 	// console.log("treeTr?", treeTr);
 	// console.log("adjust? minX = ", minTreePos, "vs.", legendDim.width);
@@ -407,9 +410,11 @@ VisualCIG.prototype._refreshTree = function () {
 // - hints
 
 VisualCIG.prototype._showHints = function (config) {
+	let settings = VisualCIG.prototype._settings;
+	
 	const hints = $("<div class='hints'></div>");
 	$(this._container.node()).append(hints);
-	hints.css('padding-left', this._settings.dim.legend.x + "px");
+	hints.css('padding-left', settings.dim.legend.x + "px");
 	hints.append("<div><b>Hint</b>: double-click on a composite node (circle) to expand it.</div>");
 	hints.append("<div><b>Hint</b>: hover over a task to see its current state.</div>");
 	hints.append("<div><b>Hint</b>: click on a task to see its description, if available.</div>");
@@ -418,12 +423,14 @@ VisualCIG.prototype._showHints = function (config) {
 // - legend
 
 VisualCIG.prototype._showLegend = function () {
+	let settings = VisualCIG.prototype._settings;
+
 	var legend = this._svg
 		.selectAll('g g.legend');
 
 	legend.attr("transform", "translate(0,-50)");
 
-	var x = this._settings.dim.legend.x; var xTextIncr = 22;
+	var x = settings.dim.legend.x; var xTextIncr = 22;
 	var y = 65; var yTextIncr = 5;
 	legend.append('path').attr('d', downTriangle(15, 15, x + 8, y)).style('fill', 'white').style('stroke', 'black');
 	legend.append('text').attr('x', x + xTextIncr).attr('y', y + yTextIncr).text('decision node');
@@ -442,9 +449,9 @@ VisualCIG.prototype._showLegend = function () {
 
 	y += 35; yTextIncr = 12; var yNextIncr = 20;
 	var states = [
-		{ label: "discarded", fill: this._settings.workflowState.node.fill.discardedState, stroke: "black", "stroke-dasharray": ("3, 3") }
-		//{ label: "delayed", fill: this._settings.workflowState.node.fill.delayedState, stroke: "none", "stroke-dasharray": ("0, 0") },
-		//{ label: "adjusted", fill: this._settings.workflowState.node.fill.adjustedState, stroke: "none", "stroke-dasharray": ("0, 0") }
+		{ label: "discarded", fill: settings.workflowState.node.fill.discardedState, stroke: "black", "stroke-dasharray": ("3, 3") }
+		//{ label: "delayed", fill: settings.workflowState.node.fill.delayedState, stroke: "none", "stroke-dasharray": ("0, 0") },
+		//{ label: "adjusted", fill: settings.workflowState.node.fill.adjustedState, stroke: "none", "stroke-dasharray": ("0, 0") }
 	];
 
 	var transitEntries = legend.selectAll('transit').data(states).enter();
@@ -458,25 +465,20 @@ VisualCIG.prototype._showLegend = function () {
 	yNextIncr = 20; yTextIncr = 12;
 	states = [{ label: "inactive", state: 'inactiveState' },
 	{ label: "active", state: 'activeState' },
-	// { label: "started", fill: this._settings.workflowState.node.fill.startedState },
+	// { label: "started", fill: settings.workflowState.node.fill.startedState },
 	{ label: "completed", state: 'completedState' }];
 
 	var colorEntries = legend.selectAll('colors').data(states).enter();
 	colorEntries.append('rect').attr('x', x).attr('y', (d, i) => y + i * yNextIncr).attr('width', 15).attr('height', 15)
-		.style('fill', (d) => findOption(d.state, this._settings.workflowState.node.fill))
+		.style('fill', (d) => findOption(d.state, settings.workflowState.node.fill))
 		.style('stroke', 'black')
-		.style('stroke-width', (d) => findOption(d.state, this._settings.workflowState.node.stroke_width))
+		.style('stroke-width', (d) => findOption(d.state, settings.workflowState.node.stroke_width))
 	colorEntries.append('text').attr('x', x + xTextIncr).attr('y', (d, i) => y + i * yNextIncr + yTextIncr).text((d) => d.label);
 
 	this._legend = legend;
 }
 
 // - tree hierarchy
-
-// (testing)
-var cnt = 0;
-var cnt2 = 0;
-
 
 VisualCIG.prototype._showAndFormatTree = function () {
 	this._showTree();
@@ -602,6 +604,8 @@ VisualCIG.prototype._showTreeLinks = function (hierLinksData) {
 }
 
 VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
+	let settings = VisualCIG.prototype._settings;
+
 	this._svg
 		.select('g g.tree g.nodes')
 		.data([])
@@ -616,7 +620,7 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 		.append('g')
 		.classed('nodes', true)
 		.selectAll(null)
-		.data(nodesData); //, (d) => { return d.id || (d.id = cnt++); });
+		.data(nodesData);
 
 	this._nodes = nodes0.enter();
 
@@ -627,25 +631,25 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 		.classed('node', true)
 		.attr('cx', (d) => d.x)
 		.attr('cy', (d) => d.y)
-		.attr('r', this._settings.nodeStyle.circle.radius);
+		.attr('r', settings.nodeStyle.circle.radius);
 
 	// -- task nodes (leafs)
 
 	this._nodes.filter((d) => (d.data.node_type == 'atomic_task'))
 		.append('rect')
 		.classed('node', true)
-		.attr('x', (d) => d.x + this._settings.nodeStyle.rect.xIncr)
-		.attr('y', (d) => d.y + this._settings.nodeStyle.rect.yIncr)
-		.attr('width', this._settings.nodeStyle.rect.width)
-		.attr('height', this._settings.nodeStyle.rect.height);
+		.attr('x', (d) => d.x + settings.nodeStyle.rect.xIncr)
+		.attr('y', (d) => d.y + settings.nodeStyle.rect.yIncr)
+		.attr('width', settings.nodeStyle.rect.width)
+		.attr('height', settings.nodeStyle.rect.height);
 
 	// -- endpoints
 
 	this._nodes.filter((d) => (d.data.node_type == 'endpoint'))
 		.append("path")
 		.classed('node', true)
-		.attr('d', (d) => diamond(this._settings.nodeStyle.diamond.width,
-			this._settings.nodeStyle.diamond.height, d.x, d.y))
+		.attr('d', (d) => diamond(settings.nodeStyle.diamond.width,
+			settings.nodeStyle.diamond.height, d.x, d.y))
 		.style("stroke-width", 1)
 		.style("stroke-dasharray", "1,0")
 		.style("stroke", "black");
@@ -655,8 +659,8 @@ VisualCIG.prototype._showTreeNodes = function (nodesData, update) {
 	this._nodes.filter((d) => d.data.node_type == 'decision_task')
 		.append('path')
 		.classed('node', true)
-		.attr('d', (d) => downTriangle(this._settings.nodeStyle.triangle.width,
-			this._settings.nodeStyle.triangle.height, d.x, d.y));
+		.attr('d', (d) => downTriangle(settings.nodeStyle.triangle.width,
+			settings.nodeStyle.triangle.height, d.x, d.y));
 
 	// -- captions
 
@@ -715,38 +719,42 @@ VisualCIG.prototype._formatTree = function () {
 }
 
 VisualCIG.prototype._formatNodes = function (nodes) {
+	let settings = VisualCIG.prototype._settings;
+
 	nodes.selectAll('circle.node,rect.node,path.node')
 		.filter((d) => (d && d.data.node_type))
 		.style('stroke', 'black')
 		.style('stroke-width', (d) => findOption(d.data.workflow_state,
-			this._settings.workflowState.node.stroke_width))
+			settings.workflowState.node.stroke_width))
 		.style('fill', (d) => {
 			switch (d.data.decisional_state) {
 				case 'notChosenState':
 					return findOption(d.data.decisional_state,
-						this._settings.decisionalState.node.fill);
+						settings.decisionalState.node.fill);
 				default:
 					return findOption(d.data.workflow_state,
-						this._settings.workflowState.node.fill);
+						settings.workflowState.node.fill);
 			}
 		})
 		.style("stroke-dasharray", (d) => {
 			switch (d.data.decisional_state) {
 				case 'notChosenState':
 					return findOption(d.data.decisional_state,
-						this._settings.decisionalState.node.stroke_dasharray);
+						settings.decisionalState.node.stroke_dasharray);
 				default:
 					return findOption(d.data.workflow_state,
-						this._settings.workflowState.node.stroke_dasharray);
+						settings.workflowState.node.stroke_dasharray);
 			}
 		});
 }
 
 VisualCIG.prototype._formatHierLinks = function (hierLinks) {
+	let settings = VisualCIG.prototype._settings;
+
 	hierLinks.selectAll('line')
 		.style('stroke', (d) => "black")
 		.style("stroke-dasharray", (d) => findOption(d.target.data.decisional_state,
-			this._settings.decisionalState.link.stroke_dasharray));
+			settings.decisionalState.link.stroke_dasharray));
 }
 
 // - main header
@@ -807,15 +815,15 @@ VisualCIG.prototype._setupTooltip = function () {
 }
 
 VisualCIG.prototype._nodeTooltip_onMouseOver = function (e, d, config) {
-	var cig = d.cig;
+	let settings = VisualCIG.prototype._settings;
 
 	var node = d3.select(e.target);
 
 	var text = undefined;
 	if (d.data.node_type == 'composite_task')
-		text = cig._settings.labels.expandComposite;
+		text = settings.labels.expandComposite;
 	else // if (d.data.description || d.data.source)
-		text = cig._settings.labels.showDescription;
+		text = settings.labels.showDescription;
 
 	/*const wfState = cig._stateLabel(d.data.workflow_state);
 	const dcState = cig._stateLabel(d.data.decisional_state);
@@ -838,18 +846,18 @@ VisualCIG.prototype._nodeTooltip_onMouseOver = function (e, d, config) {
 	switch (d.node_type) {
 
 		case 'composite_task':
-			node.attr('r', cig._settings.nodeStyle.circle.radius * factor)
+			node.attr('r', settings.nodeStyle.circle.radius * factor)
 			break;
 
 		case 'decision_task':
-			var newWidth = cig._settings.nodeStyle.triangle.width * factor;
-			var newHeight = cig._settings.nodeStyle.triangle.height * factor;
+			var newWidth = settings.nodeStyle.triangle.width * factor;
+			var newHeight = settings.nodeStyle.triangle.height * factor;
 			node.attr('d', (d) => downTriangle(newWidth, newHeight, d.x, d.y));
 			break;
 
 		case 'atomic_task':
-			var newWidth = cig._settings.nodeStyle.rect.width * factor;
-			var newHeight = cig._settings.nodeStyle.rect.height * factor;
+			var newWidth = settings.nodeStyle.rect.width * factor;
+			var newHeight = settings.nodeStyle.rect.height * factor;
 			node.attr('x', (d) => d.x - newWidth / 2)
 				.attr('y', (d) => d.y - newHeight / 2)
 				.attr('width', newWidth)
@@ -857,15 +865,15 @@ VisualCIG.prototype._nodeTooltip_onMouseOver = function (e, d, config) {
 			break;
 
 		case 'endpoint':
-			var newWidth = cig._settings.nodeStyle.diamond.width * factor;
-			var newHeight = cig._settings.nodeStyle.diamond.height * factor;
+			var newWidth = settings.nodeStyle.diamond.width * factor;
+			var newHeight = settings.nodeStyle.diamond.height * factor;
 			node.attr('d', (d) => diamond(newWidth, newHeight, d.x, d.y));
 			break;
 	}
 }
 
 VisualCIG.prototype._nodeTooltip_onMouseOut = function (e, d) {
-	var cig = d.cig;
+	let settings = VisualCIG.prototype._settings;
 
 	var node = d3.select(this);
 	// node.style("fill", node.attr("priorFill"));
@@ -875,22 +883,22 @@ VisualCIG.prototype._nodeTooltip_onMouseOut = function (e, d) {
 		.style('top', "0px");
 
 	node.style('stroke-width', (d) => findOption(d.data.workflow_state,
-		cig._settings.workflowState.node.stroke_width));
+		settings.workflowState.node.stroke_width));
 
 	switch (d.node_type) {
 		case 'composite_task':
-			node.attr("r", cig._settings.nodeStyle.circle.radius);
+			node.attr("r", settings.nodeStyle.circle.radius);
 			break;
 
 		case 'decision_task':
-			var newWidth = cig._settings.nodeStyle.triangle.width;
-			var newHeight = cig._settings.nodeStyle.triangle.height;
+			var newWidth = settings.nodeStyle.triangle.width;
+			var newHeight = settings.nodeStyle.triangle.height;
 			node.attr('d', (d) => downTriangle(newWidth, newHeight, d.x, d.y));
 			break;
 
 		case 'atomic_task':
-			var priorWidth = cig._settings.nodeStyle.rect.width;
-			var priorHeight = cig._settings.nodeStyle.rect.height;
+			var priorWidth = settings.nodeStyle.rect.width;
+			var priorHeight = settings.nodeStyle.rect.height;
 			node.attr('x', (d) => d.x - priorWidth / 2)
 				.attr('y', (d) => d.y - priorHeight / 2)
 				.attr('width', priorWidth)
@@ -898,14 +906,16 @@ VisualCIG.prototype._nodeTooltip_onMouseOut = function (e, d) {
 			break;
 
 		case 'endpoint':
-			var newWidth = cig._settings.nodeStyle.diamond.width;
-			var newHeight = cig._settings.nodeStyle.diamond.height;
+			var newWidth = settings.nodeStyle.diamond.width;
+			var newHeight = settings.nodeStyle.diamond.height;
 			node.attr('d', (d) => diamond(newWidth, newHeight, d.x, d.y));
 			break;
 	}
 }
 
 VisualCIG.prototype._linkTooltip_onMouseOver = function (e, d, config) {
+	let settings = VisualCIG.prototype._settings;
+
 	var text = d3.select(e.target);
 	var link = d3.select(e.target.parentNode.childNodes[0]);
 
@@ -919,7 +929,7 @@ VisualCIG.prototype._linkTooltip_onMouseOver = function (e, d, config) {
 
 	const bbox = getAbsoluteBoundingBox(text);
 	// const bbox = $(text.node()).offset();
-	const html = cig._settings.labels.showDescription;
+	const html = settings.labels.showDescription;
 	d3.select('.tooltip').html(html)
 		.style('opacity', 1)
 		.style('left', (bbox.left * 1) + "px")
@@ -1254,9 +1264,11 @@ VisualCIG.prototype._setupLoadingIcon = function () {
 }
 
 VisualCIG.prototype._setupResetBtn = function (config) {
+	let settings = VisualCIG.prototype._settings;
+
 	var offset = { x: 0, y: 0 };
 	if (!config.inTaskWindow) {
-		offset = this._settings.dim.svg.translate;
+		offset = settings.dim.svg.translate;
 	}
 
 	this._container
@@ -1272,7 +1284,7 @@ VisualCIG.prototype._setupResetBtn = function (config) {
 // - TaskStack
 
 function TaskStack(initCig) {
-	this._stack.push({ data: initCig._data, nr: -1, cig: initCig });
+	this._stack.push({ nr: 0, cig: initCig });
 
 	this._setupListeners();
 
@@ -1281,11 +1293,11 @@ function TaskStack(initCig) {
 
 TaskStack.prototype.constructor = TaskStack;
 
+TaskStack.prototype._stack = [];
+
 TaskStack.prototype.current = function() {
 	return this._stack[this._stack.length - 1];
 }
-
-TaskStack.prototype._stack = [];
 
 TaskStack.prototype._setupListeners = function() {
 	// (new listener will override former one)
@@ -1318,80 +1330,91 @@ TaskStack.prototype._setupListeners = function() {
 }
 
 TaskStack.prototype.openTaskWindow = function (e, d) {
-	const cig = d.cig;
-
-	const nr = this._stack.length - 1;
+	let currentTask = this.current();
+	let currentCig = currentTask.cig;
+	
+	let newWfView = d.data;
+	const newNr = this._stack.length;
 
 	// - style prior cig
+	
+	this._getTaskContainer(currentTask)
+		.style('opacity', (newNr == 1 ? "25%" : "50%"));
 
-	this._getPriorCIG(nr)
-		.style('opacity', (nr == 0 ? "25%" : "50%"));
+	// (will be initially hidden)
+	currentCig._showComposedChildren(newWfView);
 
-	// - create container
+	// - new cig
 
-	var incr = cig._settings.taskWindow.incr * (nr + 1);
-	var top = cig._settings.taskWindow.top + incr;
-	var left = cig._settings.taskWindow.left + incr;
+	let newId = this._createTaskContainer(newNr);
 
-	const id = "sub-container" + nr;
-	const container = d3.select('body')
-		.append("div")
-		.attr("id", id)
-		.classed('container window', true)
-		.style('top', top + "px").style('left', left + "px");
-
-	// - cig
-
-	const newWfView = d.data;
-	// will be initially hidden
-	cig._showComposedChildren(newWfView);
-
-	var cig2 = new VisualCIG({
-		source: cig._source,
-		input: cig._input,
-		container: `#${id}`,
+	var newCig = new VisualCIG({
+		source: currentCig._source,
+		input: currentCig._input,
+		container: `#${newId}`,
 		inTaskWindow: true
 	});
-	cig2.showFromView(newWfView);
 
-	this._stack.push({ data: newWfView, nr: nr, cig: cig2 });
+	let newTask = { nr: newNr, cig: newCig };
+	this._stack.push(newTask);
+
+	newCig.showFromView(newWfView);
 }
 
 TaskStack.prototype.closeTaskWindow = function (e) {
-	this._stack.pop();
-	const { data, nr, cig } = this.current();
-	console.log("?", { data, nr, cig });
+	const priorTask = this._stack.pop();
+	const currentTask = this.current();
 
-	cig.shown();
+	// - remove prior cig
 
-	// - remove current cig
-	d3.select("div#sub-container" + nr).remove();
+	this._getTaskContainer(priorTask)
+		.remove();
 
-	// - reset prior cig
-	this._getPriorCIG(nr)
-		.style('opacity', "100%");
+	// - reset current cig
 
 	// hide composed children again
-	cig._hideComposedChildren(data);
+	currentTask.cig._hideComposedChildren(priorTask.cig._data);
 
 	// override prior cig attributes
-	cig._root.descendants().forEach((d) => d.cig = cig);
+	currentTask.cig._root.descendants().forEach((d) => d.cig = currentTask.cig);
+
+	this._getTaskContainer(currentTask)
+		.style('opacity', "100%");
+
+	currentTask.cig.shown();
 }
 
 TaskStack.prototype.breadcrumbs = function (d) {
 	var breadcrumbs = "";
 	for (const task of this._stack)
-		breadcrumbs += task.data.name + " > ";
+		breadcrumbs += task.cig._data.name + " > ";
 
 	return breadcrumbs;
 }
 
-TaskStack.prototype._getPriorCIG = function (nr) {
-	if (nr == 0)
+TaskStack.prototype._createTaskContainer = function(nr) {
+	let settings = VisualCIG.prototype._settings;
+
+	var incr = settings.taskWindow.incr * nr;
+	var top = settings.taskWindow.top + incr;
+	var left = settings.taskWindow.left + incr;
+
+	const id = "sub-container" + nr;
+	d3.select('body')
+		.append("div")
+		.attr("id", id)
+		.classed('container window', true)
+		.style('top', top + "px").style('left', left + "px");
+
+	return id;
+}
+
+TaskStack.prototype._getTaskContainer = function (task) {
+	if (task.nr == 0)
 		return d3.select('div#main-container')
 			.select('svg');
 	else
-		return d3.select('div#sub-container' + (nr - 1));
+		return d3.select('div#sub-container' + task.nr);
 }
 
 
@@ -1405,6 +1428,6 @@ function CIGStackResolver() {
 CIGStackResolver.prototype = Object.create(CIGResolver.prototype);
 
 CIGStackResolver.prototype.get = function() {
-	// console.log("??", taskStack._stack);
+	console.log("current?", taskStack.current());
 	return taskStack.current().cig;
 }
