@@ -34,20 +34,6 @@ CIGForm.prototype.update = function ({ transits, operations, adds }) {
     }
 }
 
-CIGForm.prototype.onUserInput = function (taskId) {
-    const node = this._source.findNodeById(taskId);
-    const workflowId = node.data.in_workflow;
-
-    const workflow = this._source.findNodeById(workflowId).data;
-
-    // set flag
-    if (!workflow.newUserInput) {
-        // if workflow state is updated and this flag is set;
-        // get updates for higher-level workflows (_update fn)
-        workflow.newUserInput = true;
-    }
-}
-
 CIGForm.prototype._initView = function () {
     let json = this._data;
     this._initForm(json);
@@ -202,12 +188,12 @@ CIGForm.prototype._create = function (d, parentEntry, duplicate) {
 
                 container.append(
                     "<td>" +
-                        "<input type='submit' value='submit'></input>" +
+                    "<input type='submit' value='submit'></input>" +
                     "</td>"
                 );
             }
 
-            this._input.setupInput(newEl, d);
+            this._input.setupInput(newEl, d, 'form');
             break;
     }
 
@@ -318,9 +304,6 @@ CIGForm.prototype._update = function (d) {
         return;
     }
 
-    // note: onUserInput will hide all next tasks of composite task once input is provided;
-    // since these may change later and clutter screen
-
     if (d.workflow_state == 'activeState' || d.workflow_state == 'completedState')
         this._show(d);
     else
@@ -335,7 +318,15 @@ CIGForm.prototype._show = function (d) {
         return false;
 
     el.css('display', 'block');
-    this._input.inputShown(el);
+
+    // only when actual form is shown
+    if (el.hasClass('input-form')) {
+        // only consider inputs under  current form-node
+        // (many other form-nodes will be nested here)
+        let form = el.children('table');
+
+        this._input.inputShown(form);
+    }
 
     return true;
 }
@@ -373,7 +364,6 @@ CIGForm.prototype._hide = function (d) {
     // console.log("hiding:", d.id, el);
 
     // reset input fields
-    // (will be re-set by source if data is available; see #onInputFromSource)
     el.find('input[type=radio]').prop('checked', false);
     el.find('input[type=checkbox]').prop('checked', false);
     el.find('input[type=number]').prop('value', "");

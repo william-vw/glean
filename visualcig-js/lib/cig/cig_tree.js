@@ -164,7 +164,6 @@ VisualCIG.prototype._initView = function () {
 	if (!config.inTaskWindow) {
 		// (hide composite nodes in entire workflow)
 		this._initComposedChildren(this._data);
-		console.log("after init", this._data);
 	}
 
 	// (propagate "not-chosen" state, "source" property to descendants)
@@ -1075,7 +1074,7 @@ VisualCIG.prototype._showInfoBox = function (e, d, title, content, cig) {
 		$("<tr><td colspan='2'><div class='input-error'></td></tr>"
 		).insertBefore(body.find('tr:last-child'));
 
-		this._input.setupInput(body, d.data);
+		this._input.setupInput(body, d.data, 'tree');
 		infoBox.attr('id', d.data.id);
 	}
 
@@ -1428,6 +1427,5 @@ function CIGStackResolver() {
 CIGStackResolver.prototype = Object.create(CIGResolver.prototype);
 
 CIGStackResolver.prototype.get = function() {
-	console.log("current?", taskStack.current());
 	return taskStack.current().cig;
 }

@@ -1,4 +1,4 @@
-// prefixes.ns: set by constructor
+// (prefixes.ns: set by constructor)
 const prefixes = {
     xsd: 'http://www.w3.org/2001/XMLSchema#',
     rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
@@ -9,67 +9,15 @@ const prefixes = {
 function RdfInputHandler(ns) {
     prefixes.ns = ns;
 
-	return this;
+    this._inputMap = {};
+
+    return this;
 }
 
 RdfInputHandler.prototype = Object.create(InputHandler.prototype);
 RdfInputHandler.prototype.constructor = RdfInputHandler;
 
-RdfInputHandler.prototype.populateInput = async function(d) {
-    const store = await parseRdf(d.input);
-
-    const codes = store.getQuads(null, namedNode(prefixes.fhir + 'Observation.code'), null);
-    for (var code of codes) {
-        const id = localName(code.object.value);
-        var value = undefined;
-
-        var values = store.getQuads(code.subject, namedNode(prefixes.fhir + 'Observation.valueBoolean', null));
-        if (values.length > 0)
-            value = (values[0].object.value === 'true');
-
-        if (value === undefined) {
-            var values = store.getQuads(code.subject, namedNode(prefixes.fhir + 'Observation.valueInteger', null));
-            if (values.length > 0)
-                value = values[0].object.value;
-        }
-
-        if (value === undefined) {
-            values = store.getQuads(code.subject, namedNode(prefixes.fhir + 'Observation.valueQuantity', null));
-            if (values.length > 0)
-                value = store.getQuads(values[0].object, namedNode(prefixes.fhir + 'Quantity.value', null))[0]
-                    .object.value;
-        }
-
-        // console.log("server input:", d.id, code, value);
-        if (value !== undefined) {
-            const parent = $(`[task-id = ${d.id}]`);
-            parent.find(`[id$=${id}]`).each((idx, field) => {
-                field = $(field);
-
-                if (!field || field.prop('tagName') != 'INPUT') { // try radio buttons
-                    field = parent.find(`[id$=${id + (value ? "-yes" : "-no")}]`);
-                    field.prop('checked', true);
-
-                    return;
-                }
-
-                if (!field) {
-                    console.error(`cannot find field with id: ${id}`)
-                    return;
-                }
-
-                if (field.prop('type') == 'checkbox')
-                    field[0].checked = value;
-                else
-                    field.val(value);
-            });
-
-        } else
-            console.error("unsupported input type:", code);
-    }
-}
-
-RdfInputHandler.prototype.submitInputData = async function(element) {
+RdfInputHandler.prototype.submitInputData = async function (element) {
     element = $(element);
 
     var container = element.closest('table');
@@ -103,7 +51,7 @@ RdfInputHandler.prototype.submitInputData = async function(element) {
         try {
             rdf = await extractRdfData(el2,
                 (stmt, store) => this._onExtractedStmt(reference, stmt, store),
-                { includeOptionalFalses: false }
+                { insertUserInput: true, includeOptionalFalses: false }
             );
             // console.log("rdf:", rdf);
 
@@ -118,17 +66,14 @@ RdfInputHandler.prototype.submitInputData = async function(element) {
 
         error.css('display', 'none');
 
+        this._onNewInput(taskId, rdf);
+
         // console.log("rdf?", rdf);
-
-        const node = this.cig.get()._source.findNodeById(taskId);
-        node.data.input = rdf.str;
-        // console.log("input (from user)?", node.data.input);
-
         this.cig.get().submitObservation(reference, rdf);
     }
 }
 
-RdfInputHandler.prototype._onExtractedStmt = function(reference, stmt, store) {
+RdfInputHandler.prototype._onExtractedStmt = function (reference, stmt, store) {
     const taskUri = prefixes.ns + reference.taskId;
     store.addQuad(
         namedNode(taskUri),
@@ -136,6 +81,78 @@ RdfInputHandler.prototype._onExtractedStmt = function(reference, stmt, store) {
         stmt.subject);
 
     return stmt;
+}
+
+RdfInputHandler.prototype._onNewInput = function (id, rdf) {
+    const stmts = rdf.store.getQuads(null, namedNode(prefixes.fhir + 'Observation.code'), null);
+
+    // per code, insert associated user value into inputMap
+    for (let stmt of stmts) {
+        let code = stmt.object.id;
+        var value = undefined;
+
+        var values = rdf.store.getQuads(stmt.subject, namedNode(prefixes.fhir + 'Observation.valueBoolean', null));
+        if (values.length > 0)
+            value = (values[0].object.value === 'true');
+
+        if (value === undefined) {
+            var values = rdf.store.getQuads(stmt.subject, namedNode(prefixes.fhir + 'Observation.valueInteger', null));
+            if (values.length > 0)
+                value = values[0].object.value;
+        }
+
+        if (value === undefined) {
+            values = rdf.store.getQuads(stmt.subject, namedNode(prefixes.fhir + 'Observation.valueQuantity', null));
+            if (values.length > 0)
+                value = rdf.store.getQuads(values[0].object, namedNode(prefixes.fhir + 'Quantity.value', null))[0]
+                    .object.value;
+        }
+
+        this._inputMap[code] = value;
+    }
+
+    // console.log("_newInput:", id, this._inputMap);
+}
+
+RdfInputHandler.prototype._tryPopulateInput = async function (el) {
+    // extract annotations of input element
+    let rdf = await extractRdfData(el, (quad) => quad, { insertUserInput: false });
+    const stmts = rdf.store.getQuads(null, namedNode(prefixes.fhir + 'Observation.code'), null);
+
+    // console.log("_tryPopulateInput:", el, rdf);
+
+    // for each code, see if value was previously entered
+    for (let stmt of stmts) {
+        let code = stmt.object.id;
+        const id = localName(code);
+
+        let value = this._inputMap[code];
+        // console.log("populate:", code, id, this._inputMap);
+        if (value === undefined)
+            continue;
+
+        // if so, update input element
+        el.find(`[id$=${id}]`).each((idx, field) => {
+            field = $(field);
+
+            if (!field || field.prop('tagName') != 'INPUT') { // try radio buttons
+                field = el.find(`[id$=${id + (value ? "-yes" : "-no")}]`);
+                field.prop('checked', true);
+
+                return;
+            }
+
+            if (!field) {
+                console.error(`cannot find field with id: ${id}`)
+                return;
+            }
+
+            if (field.prop('type') == 'checkbox')
+                field[0].checked = value;
+            else
+                field.val(value);
+        });
+    }
 }
 
 // - helper code
@@ -205,7 +222,8 @@ async function extractRdfData(el, onQuad, config) {
             .on('data', (quad, etc) => store.addQuad(quad))
             .on('error', reject)
             .on('end', () => {
-                insertUserInput(el, store, onQuad, config);
+                if (config.insertUserInput)
+                    insertUserInput(el, store, onQuad, config);
                 resolve();
             });
 
@@ -261,12 +279,12 @@ function insertUserInput(el, store, onQuad, config) {
                     else
                         code = code.substring(0, code.indexOf("-no"));
                     prp = input.parent().closest('div').attr("property");
-                
+
                 } else
                     return;
-                    
+
                 break;
-            
+
             default:
                 // only interested in input types listed above
                 return;

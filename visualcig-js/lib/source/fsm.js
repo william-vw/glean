@@ -44,7 +44,6 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	let updates = new NodeUpdates();
 
 	// in case of prior observation, reset all nexts of this node
-	// (hasInputData is used as a flag)
 	if (e.hasInputData) {
 		e.hasInputData = false;
 		let resets = this._resetAllNexts(e.id);
@@ -283,7 +282,7 @@ class StateUpdate {
 }
 
 FSM.prototype._transitAll = function (obs) {
-	console.log("[FSM] transit all");
+	// console.log("[FSM] transit all");
 
 	// this._runAll(obs);
 	// let wf = this._entityMap[workflowRef.workflowId];
@@ -296,7 +295,7 @@ FSM.prototype._transitAll = function (obs) {
 		updates.add(this._newUpdate(transits[id]));
 	}
 
-	console.log("[FSM] transits (run):", updates.toString());
+	// console.log("[FSM] transits (run):", updates.toString());
 
 	return updates;
 }
@@ -310,7 +309,7 @@ FSM.prototype._runAll = function (obs) {
 		for (let entity of this._entities)
 			this._runOn(entity, obs);
 
-		console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
+		// console.log("[FSM] updated:\n", this._updated.map(u => u.toString()).join("\n"));
 		this._updated.forEach(u => { if (u.entity.id) allUpdates[u.entity.id] = u.entity });
 
 	} while (this._updated.length > 0);

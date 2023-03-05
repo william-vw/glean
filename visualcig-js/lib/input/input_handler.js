@@ -1,10 +1,10 @@
 function InputHandler() {
-	return this;
+    return this;
 }
 
 InputHandler.prototype.constructor = InputHandler;
 
-InputHandler.prototype.setupInput = async function(el, d) {
+InputHandler.prototype.setupInput = async function (el, d, prefix) {
     // set task-id on parent input-form as common way to get, well, task-id
     // (some elements can have id, others duplicate-id)
     el.closest('.input-form').attr('task-id', d.id);
@@ -41,24 +41,33 @@ InputHandler.prototype.setupInput = async function(el, d) {
         });
     });
 
-    // populate UI elements if needed
-    if (d.input)
-        this.populateInput(d);
+    if (prefix) {
+        el.find('input[type=radio]').each((idx, radio) => {
+            radio = $(radio);
+            // for cig_composite: make sure name attr is unique per type of cig
+            // (else, auto-populating input of other cig can mess up prior selection)
+            radio.attr('name', prefix + ":" + radio.attr('name'));
+        });
+    }
 }
 
-InputHandler.prototype.inputShown = async function(el) {
-    // put focus on first input element
+InputHandler.prototype.inputShown = async function (el) {
     let inputs = el.find('input');
-    if (inputs.length > 0)
+    if (inputs.length > 0) {
+        // put focus on first input element
         inputs.get(0).focus();
+
+        // try populating the input elements
+        this._tryPopulateInput(el);
+    }
 }
 
-InputHandler.prototype.populateInput = async function(d) { }
+InputHandler.prototype._tryPopulateInput = function (el) { }
 
-InputHandler.prototype.submitInputData = async function(element) { }
+InputHandler.prototype.submitInputData = async function (element) { }
 
 // NOTE: currently assumes only 1 type of input element per info-box
-InputHandler.prototype._checkInputData = function(el) {
+InputHandler.prototype._checkInputData = function (el) {
     var inputs = el.find('input[type=number]');
     if (inputs.length > 0) {
         const array = inputs.toArray();
