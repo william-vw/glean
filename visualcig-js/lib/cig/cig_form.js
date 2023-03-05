@@ -323,7 +323,7 @@ CIGForm.prototype._show = function (d) {
     if (el.hasClass('input-form')) {
         // many other form-nodes will be nested here'
         // so only consider direct child table
-        let form = el.children('table');
+        let form = el.find('table').first();
 
         this._input.inputShown(form);
     }
