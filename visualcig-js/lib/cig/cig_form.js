@@ -12,26 +12,8 @@ CIGForm.prototype._settings = {
     }
 }
 
-// transits: [{ node, workflowState, decisionState?, inputData? }]
-CIGForm.prototype.update = function ({ transits, operations, adds }) {
-    // needs to occur in order of the hierarchy
-    // (see #_show function: paths need to be made visible step-by-step)
-    transits.sort((t1, t2) => {
-        if (t1.node.data.depth < t2.node.data.depth)
-            return -1;
-        else if (t1.node.data.depth > t2.node.data.depth)
-            return 1;
-        else
-            return 0;
-    });
-
-    for (let i = 0; i < transits.length; i++) {
-        let transit = transits[i];
-        // console.log(transit.id, transit.node.data.workflow_state, transit.workflowState, "(" + transit + ")");
-
-        transit.node.data.workflow_state = transit.workflowState;
-        this._updateNode(transit.node);
-    }
+CIGForm.prototype._updateView = function (transits) {
+    transits.forEach(t => this._updateNode(t.node));
 }
 
 CIGForm.prototype._initView = function () {

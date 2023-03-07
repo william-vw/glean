@@ -477,9 +477,11 @@ FSM.prototype._runOn = function (entity, obs) {
 
 FSM.prototype._newUpdate = function (e) {
 	let node = this.findNodeById(e.id);
-	let state = e.isIn.type.toLowerCase() + "State";
+	
+	let from = node.data.workflow_state;
+	let to = e.isIn.type.toLowerCase() + "State";
 
-	return new NodeUpdate(e.id, node, state);
+	return new NodeUpdate(e.id, node, from, to);
 }
 
 FSM.prototype._forEachNext = function (e, fn) {

@@ -53,7 +53,8 @@ InputHandler.prototype.setupInput = async function (el, d, prefix) {
 
 InputHandler.prototype.inputShown = async function (el) {
     let inputs = el.find('input');
-    console.log("shown:", el, inputs);
+    // console.log("shown:", el, inputs);
+    
     if (inputs.length > 0) {
         // put focus on first input element
         inputs.get(0).focus();

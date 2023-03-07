@@ -46,7 +46,8 @@ var cig = new CIGComposite({
     source: source, input: inputHandler, 
     cigs: [
         new CIGForm({ container: '#main-container-form', composed: true }), 
-        new VisualCIG({ container: '#main-container-tree', composed: true }) 
+        new VisualCIG({ container: '#main-container-tree', 
+            composed: true, autoOpenCloseComposite: true }) 
     ] });
 cig.show();
 </script>

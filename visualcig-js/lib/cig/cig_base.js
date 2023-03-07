@@ -3,7 +3,7 @@ function CIGBase(config) {
 
 	if (config.source)
 		this._source = config.source;
-	
+
 	if (config.input) {
 		this._input = config.input;
 		// if 'input' (inputHandler) is given in config,
@@ -12,21 +12,15 @@ function CIGBase(config) {
 		if (!this._input.cig)
 			this._input.cig = this._cigResolver();
 	}
-	
+
 	return this;
 }
 
 CIGBase.prototype.constructor = CIGBase;
 
-CIGBase.prototype._cigResolver = function() {
+CIGBase.prototype._cigResolver = function () {
 	return new DefaultCIGResolver(this);
 }
-
-// subclasses need to implement:
-// update({ transits, operations, adds })
-//		transits: [{ node, workflowState, decisionState, propagate (optional) }] (mandatory; can be empty)
-// 		operations: [{ source, target, type }] (mandatory; can be empty)
-//		adds: [{ parent, data }] (optional)
 
 CIGBase.prototype.show = function () {
 	this.showFromView(this._source.defaultWfView);
@@ -45,9 +39,13 @@ CIGBase.prototype.showFromView = function (wfView) {
 	this._initView();
 
 	// show main workflow - will always be active
-	this.update({ transits: [
-		new NodeUpdate(this._workflow.id, this._workflow, this._workflow.data.workflow_state)
-	], operations: [] });
+	this._processUpdates(
+		new NodeUpdates().add(
+			new NodeUpdate(this._workflow.id, this._workflow,
+				this._workflow.data.workflow_state,
+				this._workflow.data.workflow_state)
+		)
+	);
 }
 
 CIGBase.prototype.submitObservation = function (reference, rdf) {
@@ -76,48 +74,78 @@ CIGBase.prototype.loading_end = function () {
 	$('.overlay').css('display', 'none');
 }
 
-CIGBase.prototype.onUserInput = function(taskId) {}
+CIGBase.prototype.onUserInput = function (taskId) { }
 
-CIGBase.prototype.refresh = function() {
+CIGBase.prototype.refresh = function () {
 	let allUpdates = this._source.refresh();
 	this._processUpdates(allUpdates);
 }
 
-CIGBase.prototype._processUpdates = function(allUpdates) {
-	allUpdates.forEachSet((updates) => this.update({ transits: updates, operations: [] }));
+CIGBase.prototype._processUpdates = function (allUpdates) {
+	allUpdates.forEachSet(transits => {
+		// let's sort these transits to be in hierarchical order
+		// (see cig_form#_show: paths need to be made visible step-by-step)
+		// (see cig_form#_transitTo: windows need to be stacked hierarchically)
+
+		transits.sort((t1, t2) => {
+			if (t1.node.data.depth < t2.node.data.depth)
+				return -1;
+			else if (t1.node.data.depth > t2.node.data.depth)
+				return 1;
+			else
+				return 0;
+		});
+
+		// console.log("transits (sorted):", transits);
+
+		// update individual nodes
+		transits.forEach((t) => { 
+			// console.log(transit.id, transit.node.data.workflow_state, 
+			//		transit.workflowState, "(" + transit + ")");
+
+			t.node.data.workflow_state = t.to; 
+		});
+
+		// update view
+		this._updateView(transits);
+	});
 }
+
+CIGBase.prototype._updateView = function (transits) { }
 
 
 // - NodeUpdate
 
 class NodeUpdate {
 
-	constructor(id, node, workflowState, decisionState, inputData) {
+	constructor(id, node, from, to, inputData) {
 		this.id = id;
 		this.node = node;
-		this.workflowState = workflowState;
-		this.decisionState = decisionState;
+		this.from = from;
+		this.to = to;
 		this.inputData = inputData;
 	}
 
 	toString() {
-		return this.id + ": " + this.workflowState + (this.inputData ? " (data)" : "");
+		return this.id + ": " + this.from + "->" + this.to + (this.inputData ? " (data)" : "");
 	}
 }
 
 class NodeUpdates {
 
-    constructor() {
+	constructor() {
 		this.updates = [];
-        this.sets = [];
-    }
+		this.sets = [];
+	}
 
-    add(update) {
-        this.updates.push(update);
-    }
+	add(update) {
+		this.updates.push(update);
+		return this;
+	}
 
 	addSet(updates) {
 		this.sets.push(updates);
+		return this;
 	}
 
 	forEach(fn) {
@@ -134,9 +162,9 @@ class NodeUpdates {
 	toString() {
 		if (this.sets.length > 0) {
 			return this.sets.map(s => s.toString()).join("\n");
-		
+
 		} else {
-			return this.updates.filter(s => s.workflowState != "inactiveState").map(s => s.toString()).join(", ");
+			return this.updates.filter(s => s.to != "inactiveState").map(s => s.toString()).join(", ");
 		}
 	}
 }
@@ -154,7 +182,7 @@ function CIGResolver() {
 
 CIGResolver.prototype.constructor = CIGResolver;
 
-CIGResolver.prototype.get = function() {}
+CIGResolver.prototype.get = function () { }
 
 
 function DefaultCIGResolver(defaultCig) {
@@ -167,6 +195,6 @@ function DefaultCIGResolver(defaultCig) {
 
 DefaultCIGResolver.prototype = Object.create(CIGResolver.prototype);
 
-DefaultCIGResolver.prototype.get = function() {
+DefaultCIGResolver.prototype.get = function () {
 	return this._defaultCig;
 }

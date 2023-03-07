@@ -29,8 +29,8 @@ CIGComposite.prototype.show = function () {
     this.refresh();
 }
 
-CIGComposite.prototype._processUpdates = function (allUpdates) {
+CIGComposite.prototype._updateView = function (transits) {
     // apply updates to all composed cig's
     for (let cig of this._cigs)
-        allUpdates.forEachSet((updates) => cig.get().update({ transits: updates, operations: [] }));
+        cig.get()._updateView(transits);
 }
