@@ -342,7 +342,7 @@ VisualCIG.prototype._initSubAsAtomic = function (node) {
 	if (!node.children)
 		return;
 
-	console.log("initSubAsAtomic:", node.id);
+	// console.log("initSubAsAtomic:", node.id);
 	node.children.forEach((childNode) => {
 		this._initSubAsAtomic(childNode);
 
@@ -351,8 +351,6 @@ VisualCIG.prototype._initSubAsAtomic = function (node) {
 
 			childNode._children = childNode.children;
 			childNode.children = nexts;
-
-			console.log("init?", node);
 		}
 	});
 }
@@ -369,8 +367,7 @@ VisualCIG.prototype._showAsComposite = function (node) {
 		return;
 
 	const selection = children.filter(d2 => d2.composed);
-	// console.log("_showAsComposite:", node.id);
-	// console.log("selection?", node, selection);
+	// console.log("_showAsComposite:", node.id, node, selection);
 	node.children = selection;
 }
 
@@ -384,7 +381,6 @@ VisualCIG.prototype._showAllSubAsAtomic = function (node) {
 		return;
 
 	// console.log("showAllSubAsAtomic:", node.id);
-
 	children.forEach((childNode) => {
 		this._showAllSubAsAtomic(childNode);
 
