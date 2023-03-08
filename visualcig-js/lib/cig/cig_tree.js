@@ -172,9 +172,15 @@ VisualCIG.prototype._initView = function () {
 
 	// - prep data object
 
-	if (!config.inTaskWindow) {
-		// (hide composite nodes in entire workflow)
-		this._initComposedChildren(this._data);
+	if (this._data.depth == 0 && !this._data.initialized) {
+		this._data.initialized = true;
+
+		// (hide contents of composite nodes in entire workflow)
+		this._initSubAsAtomic();
+
+	} else if (config.inTaskWindow) {
+		// (show this as a composite task)
+		this._showAsComposite();
 	}
 
 	// (propagate "not-chosen" state, "source" property to descendants)
@@ -328,45 +334,66 @@ VisualCIG.prototype._minTreePos = function (node, overlap, minX) {
 	return minX;
 }
 
-// initializes composite tasks (sets internal attribute)
-// and hides their composed sub-tasks
-VisualCIG.prototype._initComposedChildren = function (node) {
+// initializes composite tasks; hides their composed sub-tasks
+VisualCIG.prototype._initSubAsAtomic = function (node) {
+	if (!node)
+		node = this._data;
+
 	if (!node.children)
 		return;
 
+	console.log("initSubAsAtomic:", node.id);
 	node.children.forEach((childNode) => {
-		this._initComposedChildren(childNode);
+		this._initSubAsAtomic(childNode);
 
-		// (let's not call this for the root node; only do this for child nodes)
 		if (childNode.children && childNode.node_type == 'composite_task') {
-			const nexts = childNode.children.filter((d2) => !d2.composed);
+			const nexts = childNode.children.filter(d2 => !d2.composed);
 
 			childNode._children = childNode.children;
 			childNode.children = nexts;
+
+			console.log("init?", node);
 		}
 	});
 }
 
-// methods below assume that initComposedChildren was called first
-// (see _initView, line 191)
+// methods below assume that _initSubAsAtomic was called first
 
-VisualCIG.prototype._showComposedChildren = function (node) {
-	this._showHideComposed(node, true);
-}
+// show current CIG as composite (un-hide composed tasks)
+VisualCIG.prototype._showAsComposite = function (node) {
+	if (!node)
+		node = this._data;
 
-VisualCIG.prototype._hideComposedChildren = function (node) {
-	this._showHideComposed(node, false);
-}
-
-VisualCIG.prototype._showHideComposed = function (node, show) {
 	const children = (node.depth == 0 ? node.children : node._children);
 	if (!children)
 		return;
 
-	const selection = children.filter((d2) => (show ? d2.composed : !d2.composed));
+	const selection = children.filter(d2 => d2.composed);
+	// console.log("_showAsComposite:", node.id);
+	// console.log("selection?", node, selection);
 	node.children = selection;
-	
-	children.forEach(child => this._showHideComposed(child, show));
+}
+
+// recursively show all subtasks of this CIG as atomic (hide their composed tasks)
+VisualCIG.prototype._showAllSubAsAtomic = function (node) {
+	if (!node)
+		node = this._data;
+
+	const children = (node.depth == 0 ? node.children : node._children);
+	if (!children)
+		return;
+
+	// console.log("showAllSubAsAtomic:", node.id);
+
+	children.forEach((childNode) => {
+		this._showAllSubAsAtomic(childNode);
+
+		if (childNode.children && childNode.node_type == 'composite_task') {
+			const selection = childNode._children.filter(d2 => !d2.composed);
+
+			childNode.children = selection;
+		}
+	});
 }
 
 VisualCIG.prototype._transitTo = function (t) {
@@ -821,6 +848,10 @@ VisualCIG.prototype._setupHeader = function (config) {
 }
 
 VisualCIG.prototype._refreshHeader = function () {
+	let config = this._config;
+	if (config.composed && !config.inTaskWindow)
+		return;
+
 	const header = this._container.select("div.header");
 	const state = header.select('div.workflow-status');
 
@@ -1355,9 +1386,6 @@ TaskStack.prototype.openTaskWindow = function (e, d) {
 		.select('svg')
 		.style('opacity', (newNr == 1 ? "25%" : "50%"));
 
-	// (will be initially hidden)
-	currentCig._showComposedChildren(newWfView);
-
 	// - new cig
 
 	let newId = this._createTaskContainer(currentCig, newNr);
@@ -1408,7 +1436,7 @@ TaskStack.prototype.closeCurrentTaskWindow = function (e) {
 	// - reset super cig
 
 	// hide all composed children
-	superTask.cig._hideComposedChildren(superTask.cig._data);
+	superTask.cig._showAllSubAsAtomic();
 
 	// override all cig attributes
 	superTask.cig._root.descendants().forEach((d) => d.cig = superTask.cig);

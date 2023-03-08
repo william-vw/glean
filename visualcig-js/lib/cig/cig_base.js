@@ -33,7 +33,7 @@ CIGBase.prototype.showFromView = function (wfView) {
 	this._data = wfView;
 	this.id = wfView.id;
 
-	// ('data' object will be main workflow node itself)
+	// (workflow node)
 	this._workflow = { id: this._data.id, data: this._data };
 
 	this._initView();
