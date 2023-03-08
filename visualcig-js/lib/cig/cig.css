@@ -54,7 +54,7 @@ a { color: lightgrey }
   font-size: 20px;
   font-weight: bold;
   font-variant: small-caps;
-  background: transparent url(../img/Eo_circle_green_checkmark.svg) no-repeat 3px 0;
+  background: transparent url(../../img/Eo_circle_green_checkmark.svg) no-repeat 3px 0;
 }
 
 .main-header .workflow-status {

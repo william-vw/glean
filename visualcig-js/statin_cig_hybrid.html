@@ -39,7 +39,7 @@
 <script type="module">
 var inputHandler = new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#");
 
-var source = new FSM("/wf/lipid/ckd_dyslipidemia_local.js");
+var source = new FSM("/niche/lipid/wf/lipid/ckd_dyslipidemia_local.js");
 await source.load();
 
 var cig = new CIGComposite({ 
