@@ -1,6 +1,4 @@
-/* TODO divide into CIG base, tree and form parts */
-
-body { padding: 0; margin: 0 }
+html, body { padding: 0; margin: 0; height: 100% }
 
 .node { stroke: none; }
 .link { stroke: red; stroke-dasharray: 5 }
@@ -19,6 +17,10 @@ a { color: lightgrey }
   padding-bottom: 15px; 
   position: relative; 
   overflow-y: scroll;
+}
+
+#main-container {
+  height: 100%;
 }
 
 .window { 

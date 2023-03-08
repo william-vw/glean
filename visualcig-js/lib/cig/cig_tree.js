@@ -41,7 +41,7 @@ VisualCIG.prototype._settings = {
 		smallIndent: {
 			top: 15,
 			left: 7,
-			incr: 0
+			incr: 25
 		}
 	},
 	labels: {
@@ -1335,6 +1335,10 @@ TaskStack.prototype.constructor = TaskStack;
 
 TaskStack.prototype._stack = [];
 
+TaskStack.prototype.bottom = function () {
+	return this._stack[0];
+}
+
 TaskStack.prototype.current = function () {
 	return this._stack[this._stack.length - 1];
 }
@@ -1464,7 +1468,7 @@ TaskStack.prototype._createTaskContainer = function (cig, nr) {
 	var top = indent.top + incr;
 	var left = indent.left + incr;
 
-	let parent = d3.select(cig._config.container);
+	let parent = d3.select(this.bottom().cig._config.container);
 
 	const id = "sub-container" + nr;
 	parent
