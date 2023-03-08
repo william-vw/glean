@@ -1450,8 +1450,11 @@ TaskStack.prototype.closeCurrentTaskWindow = function (e) {
 
 TaskStack.prototype.breadcrumbs = function (d) {
 	var breadcrumbs = "";
-	for (const task of this._stack)
-		breadcrumbs += task.cig._data.name + " > ";
+	for (let i = 0; i < this._stack.length - 1; i++) {
+		if (breadcrumbs.length != 0)
+			breadcrumbs += " > ";
+		breadcrumbs += this._stack[i].cig._data.name;
+	}
 
 	return breadcrumbs;
 }
