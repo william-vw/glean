@@ -39,10 +39,10 @@ CIGForm.prototype._initFormEl = function (d, parentEntry, duplicate) {
         const duplicate2 = (duplicate ? true : newEntries.length > 1);
 
         for (var newEntry of newEntries) {
-            this._fixOrder(d, d.children);
+            let children = this._fixOrder(d, d.children);
             // first show composed's, then next's
             [true, false].forEach(isComposed => {
-                d.children
+                children
                     .filter(child => child.composed === isComposed)
                     .forEach(child => this._initFormEl(child, newEntry, duplicate2));
             });
@@ -58,7 +58,7 @@ CIGForm.prototype._initFormEl = function (d, parentEntry, duplicate) {
 
 CIGForm.prototype._fixOrder = function (d, children) {
     if (children.length == 0)
-        return;
+        return children;
 
     const childIds = children.map(c => c.id);
 
@@ -75,11 +75,16 @@ CIGForm.prototype._fixOrder = function (d, children) {
             // ensure that other-parent is first in array of children
             // (i.e., will be printed first)
             if (idx !== 0) {
-                children.splice(idx, 1);
-                children.splice(0, 0, otherParent);
+                let copy = children.slice();
+                copy.splice(idx, 1);
+                copy.splice(0, 0, otherParent);
+
+                return copy;
             }
         }
     }
+
+    return children;
 }
 
 CIGForm.prototype._create = function (d, parentEntry, duplicate) {
