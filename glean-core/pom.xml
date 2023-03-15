@@ -34,12 +34,7 @@
 			<artifactId>ui-gen</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>wvw.semweb</groupId>
-			<artifactId>code-gen</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+
 	</dependencies>
 
 	<properties>
