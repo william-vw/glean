@@ -52,12 +52,13 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 	public static void main(String[] args) throws Exception {
 		CIGWorkflowPrinter printer = new CIGWorkflowPrinter();
 
+		// NOTE: after editing any ui-gen source file, need to re-run UiGen
+		// make sure to remove out/html contents (so html is re-generated)
+		
 		// - print html separately
 
-		// (NOTE: when editing ui_codes, need to re-run UiGen!)
-
-//		printer.printUi("/cig/rbc/input/rbc_match.n3",
-//				"http://niche.cs.dal.ca/ns/cig/rbc_match.owl#check_female_childbearing_age_report");
+//		printer.printUi("/cig/test/input/example1.n3",
+//				"http://example.org/decision3_report");
 
 		// - print workflow
 
@@ -65,17 +66,23 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// -- lipid
 
-		String name = "lipid/ckd_dyslipidemia";
-//		String name = "lipid/evaluate_lipid_profile";
-		String ns = NS.ckd;
-		for (DataSources src : DataSources.values())
-			printer.printWorkflow(name, ns, outFolder, src);
+//		String name = "lipid/ckd_dyslipidemia";
+////		String name = "lipid/evaluate_lipid_profile";
+//		String ns = NS.ckd;
+//		for (DataSources src : DataSources.values())
+//			printer.printWorkflow(name, ns, outFolder, src);
 
 		// -- rbc
 
 //		String name = "rbc/rbc_match";
 //		String ns = NS.rbc;
 //		printer.printWorkflow(name, ns, outFolder);
+		
+		
+		// -- test
+		String name = "test/example1";
+		String ns = NS.ex;
+		printer.printWorkflow(name, ns, outFolder, DataSources.LOCAL);
 	}
 
 	private N3Model inputDef = null;
