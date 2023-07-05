@@ -31,7 +31,7 @@
 <script type="module">
 let inputHandler = new RdfInputHandler("http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#");
 
-let source = new FSM("/niche/lipid/wf/lipid/ckd_dyslipidemia_local.js");
+let source = new FSM("/wf/lipid/ckd_dyslipidemia_local.js");
 await source.load();
 
 let cig = new CIGForm({ source: source, input: inputHandler, container: '#main-container' });

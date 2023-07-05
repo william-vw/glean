@@ -138,11 +138,11 @@ RdfInputHandler.prototype._tryPopulateInput = async function (el) {
             continue;
 
         // if so, update input element
-        el.find(`[id$=${id}]`).each((idx, field) => {
+        el.find(`[id=${id}]`).each((idx, field) => {
             field = $(field);
 
             if (!field || field.prop('tagName') != 'INPUT') { // try radio buttons
-                field = el.find(`[id$=${id + (value ? "-yes" : "-no")}]`);
+                field = el.find(`[id=${id + (value ? "-yes" : "-no")}]`);
                 field.prop('checked', true);
 
                 return;
@@ -168,7 +168,11 @@ RdfInputHandler.prototype._tryPopulateInput = async function (el) {
 // import { rdfa } from './rdfa.dist.js';
 
 function localName(uri) {
-    return uri.substring(uri.indexOf("#") + 1);
+    let idx = uri.indexOf("#");
+    if (idx === -1)
+        idx = uri.lastIndexOf("/");
+
+    return uri.substring(idx + 1);
 }
 
 function ground(stmt) {
