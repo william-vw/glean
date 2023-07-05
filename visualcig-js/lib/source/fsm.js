@@ -116,7 +116,9 @@ FSM.prototype._doReset = function (e, first, upward, newState, found, transits) 
 		e.conditionMet = false;
 	if (e.isIn) {
 		e.isIn.type = newState;
-		transits.add(this._newUpdate(e));
+		let update = this._newUpdate(e);
+		if (update)
+			transits.add(update);
 	}
 
 	if (e.id)
@@ -478,10 +480,14 @@ FSM.prototype._runOn = function (entity, obs) {
 FSM.prototype._newUpdate = function (e) {
 	let node = this.findNodeById(e.id);
 	
-	let from = node.data.workflow_state;
-	let to = e.isIn.type.toLowerCase() + "State";
+	if (node) {
+		let from = node.data.workflow_state;
+		let to = e.isIn.type.toLowerCase() + "State";
 
-	return new NodeUpdate(e.id, node, from, to);
+		return new NodeUpdate(e.id, node, from, to);
+	
+	} else
+		return false;
 }
 
 FSM.prototype._forEachNext = function (e, fn) {
@@ -532,42 +538,51 @@ FSM.prototype._toObject = function (r, nodeAdtMap, store) {
 	let obj = Object.create(eval(`this._wf.${clsObj.name}`))
 
 	for (let prpQuad of store.getQuads(r, null, null)) {
-		if (prpQuad._predicate.id in clsObj) {
-			// console.log("quad:", prpQuad);
-			let prpObj = clsObj[prpQuad._predicate.id];
-			// console.log("prpObj", prpObj);
+		// console.log("quad:", prpQuad);
 
-			let value = null;
+		let prpId = prpQuad._predicate.id;
+		if (!(prpId in clsObj))
+			continue;
 
-			// - object
-			if (prpObj.type) {
+		let prpObj = clsObj[prpId];
+		// console.log("prpObj", prpObj);
 
-				// - nested object
-				if (prpQuad._object.termType == "BlankNode") {
-					value = this._toObject(prpQuad._object.id, nodeAdtMap, store);
+		let value = null;
 
-					// - constant
-				} else {
-					let typeObj = nodeAdtMap[prpObj.type];
-					let cnstObj = typeObj[prpQuad._object.id];
+		// - object
+		if (prpObj.type) {
+			let objId = prpQuad._object.id;
 
+			// - nested object
+			if (prpQuad._object.termType == "BlankNode") {
+				value = this._toObject(objId, nodeAdtMap, store);
+
+			// - constant
+			} else {
+				let typeObj = nodeAdtMap[prpObj.type];
+				if (!(objId in typeObj))
+					throw `Data constant not in ADT "${typeObj['name']}": ${objId}`;
+
+				else {
+					let cnstObj = typeObj[objId];
 					value = eval(`new this._wf.${typeObj.name}(this._wf.${typeObj.name}.${cnstObj.name})`);
 				}
-
-				// - literal
-			} else {
-				let rdfObj = prpQuad._object;
-				let jsonObj = rdfObj.toJSON();
-
-				if (rdfObj.id.endsWith("boolean"))
-					value = (jsonObj.value == "true");
-				else
-					value = Number(jsonObj.value);
-				// throw `[toObject] unsupported literal: ${rdfObj.id}`;
 			}
 
-			obj[prpObj.name] = value;
+			// - literal
+		} else {
+			let rdfObj = prpQuad._object;
+			let jsonObj = rdfObj.toJSON();
+
+			if (rdfObj.id.endsWith("boolean"))
+				value = (jsonObj.value == "true");
+			else
+				value = Number(jsonObj.value);
+			// throw `[toObject] unsupported literal: ${rdfObj.id}`;
 		}
+
+		if (value !== null)
+			obj[prpObj.name] = value;
 	}
 
 	return obj;
