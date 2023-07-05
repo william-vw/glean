@@ -1,66 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-                    
+                        
+    
     
     
     
     <wb-module deploy-name="fhir-server">
-                                        
+                                                
+        
         
         
         
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
-                                        
+                                                
+        
         
         
         
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
-                                        
+                                                
+        
         
         
         
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-                                        
+                                                
+        
         
         
         
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/.apt_generated"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/.apt_generated_tests"/>
+                
         <dependent-module archiveName="glean-core-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/glean-core/glean-core">
+                        
             <dependency-type>uses</dependency-type>
+                    
         </dependent-module>
+                
         <dependent-module archiveName="jen3-core-3.14.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jen3-core/jen3-core">
+                        
             <dependency-type>uses</dependency-type>
+                    
         </dependent-module>
+                
         <dependent-module archiveName="jena-kb-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/jena-kb/jena-kb">
+                        
             <dependency-type>uses</dependency-type>
+                    
         </dependent-module>
+                
         <dependent-module archiveName="rdf-utils-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/rdf-utils/rdf-utils">
+                        
             <dependency-type>uses</dependency-type>
+                    
         </dependent-module>
+                
         <dependent-module archiveName="utils-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/utils/utils">
+                        
             <dependency-type>uses</dependency-type>
+                    
         </dependent-module>
+                
         <dependent-module archiveName="ui-gen-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ui-gen/ui-gen">
+                        
             <dependency-type>uses</dependency-type>
+                    
         </dependent-module>
+                
         <dependent-module archiveName="code-gen-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/code-gen/code-gen">
+                        
             <dependency-type>uses</dependency-type>
+                    
         </dependent-module>
-                                        
+                                                
+        
         
         
         
         <property name="context-root" value="fhir-server"/>
-                                        
+                                                
+        
         
         
         
         <property name="java-output-path" value="/fhir-server/target/classes"/>
-                                    
+                                            
+    
     
     
     
     </wb-module>
-                
+                    
+
 
 
 
