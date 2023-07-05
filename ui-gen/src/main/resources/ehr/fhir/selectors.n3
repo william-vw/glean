@@ -18,7 +18,7 @@
 			fhir:ActivityDefinition.observationResultRequirement ?req ;
 			fhir:ActivityDefinition.title ?label .
 		?req fhir:ObservationDefinition.code ?code .
-		(?code ".*?#(.*)") string:scrape ?code_ln .
+		?code log:localName ?code_ln .
 	} .
 
 :select-datatype_data a tpl:Selector ;
@@ -45,9 +45,13 @@
 	rdf:value {
 		?req fhir:ObservationDefinition.permittedDataType :dt_boolean ;
 			fhir:ObservationDefinition.category in:category_present ;
-			fhir:ObservationDefinition.mutexWith ?mutex .
-		( ?mutex "," ) string:join ?mutex_str .
-		( ?mutex_str "http://.*?#(.*?)" "$1" ) string:replace ?mutex_ln .
+			fhir:ObservationDefinition.mutexWith ?mutexs .
+		(?ln
+			{
+				?mutexs!list:member log:localName ?ln
+			}
+		?lns) log:collectAllIn _:t .
+		( ?lns "," ) string:join ?mutex_ln .
 	} .
 
 :select-yes_no_data a tpl:Selector ;
@@ -67,7 +71,7 @@
 :select-num_size a tpl:Selector ;
 	rdf:value {
 		(?max 10) math:logarithm ?log .
-		?log math:floor ?size .
+		(?log 1)!math:sum math:ceiling ?size .
 	} .
 
 :select-int_range_field a tpl:CompositeSelector ;
