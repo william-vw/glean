@@ -39,7 +39,7 @@ import wvw.utils.rdf.NS;
 
 public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
-	private enum DataSources {
+	public enum DataSources {
 		SERVER, LOCAL
 	}
 
@@ -54,7 +54,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// NOTE: after editing any ui-gen source file, need to re-run UiGen
 		// make sure to remove out/html contents (so html is re-generated)
-		
+
 		// - print html separately
 
 //		printer.printUi("/cig/test/input/example1.n3",
@@ -62,6 +62,8 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		// - print workflow
 
+		String inFolder = "/Users/wvw/git/glean/glean-core/src/main/resources/";
+		String tmpFolder = "/Users/wvw/git/glean/glean-core/src/main/resources/tmp/";
 		String outFolder = "/Users/wvw/git/glean/visualcig-js/wf/";
 
 		// -- lipid
@@ -77,18 +79,18 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 //		String name = "rbc/rbc_match";
 //		String ns = NS.rbc;
 //		printer.printWorkflow(name, ns, outFolder);
-		
-		
+
 		// -- test
 		String name = "test/example1";
 		String ns = NS.ex;
-		printer.printWorkflow(name, ns, outFolder, DataSources.LOCAL);
+
+		printer.printWorkflow(name, ns, inFolder, tmpFolder, outFolder, DataSources.LOCAL);
 	}
 
 	private N3Model inputDef = null;
 
-	private File htmlDir = Paths.get("src/main/resources/out/html").toFile();
-	private File tmpDir = Paths.get("src/main/resources/out/tmp").toFile();
+	private File htmlDir;
+	private File tmpDir;
 
 	private Map<Resource, JenaKb> inputDatas = new HashMap<>();
 
@@ -113,12 +115,25 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		System.out.println("html? " + html);
 	}
 
-	public void printWorkflow(String name, String ns, String outFolder, DataSources forSource) throws Exception {
+	public void printWorkflow(String name, String ns, String inFolder, String tmpFolder, String outFolder, DataSources forSource)
+			throws Exception {
+
 		LOG.info("- printing workflow " + name + " for " + forSource);
-		
+
 		long start = System.currentTimeMillis();
 
-		WorkflowModel wf = new CIGModel(ns).initialize().load(getClass(), "cig/" + name + ".n3",
+		tmpDir = new File(tmpFolder);
+		if (!tmpDir.exists())
+			tmpDir.mkdir();
+		htmlDir = new File(tmpDir, "html");
+		if (!htmlDir.exists())
+			htmlDir.mkdir();
+		
+		File outDir = new File(outFolder);
+		if (!outDir.exists())
+			outDir.mkdir();
+
+		WorkflowModel wf = new CIGModel(ns).initialize().load(inFolder + "cig/" + name + ".n3",
 				LoadOptions.RECURSIVELY);
 
 //		wf.getKb().printAll();
@@ -165,12 +180,12 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		}
 
 		LOG.info("");
-		
+
 		LOG.info("written to " + outPath);
 
 		long end = System.currentTimeMillis();
 		LOG.info("writing: " + (end - start) + "ms\n");
-		
+
 		LOG.info("\n");
 	}
 
