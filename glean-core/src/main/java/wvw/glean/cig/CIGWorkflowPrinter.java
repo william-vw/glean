@@ -29,6 +29,7 @@ import wvw.cig.uigen.UiGen.UiFormats;
 import wvw.glean.workflow.WorkflowModel;
 import wvw.glean.workflow.WorkflowModel.LoadOptions;
 import wvw.glean.workflow.print.WorkflowD3TreePrinter;
+import wvw.glean.workflow.print.WorkflowJsPrinter;
 import wvw.glean.workflow.print.WorkflowJsonPrinter;
 import wvw.glean.workflow.print.WorkflowJsonPrinter.PrintJsonTaskHook;
 import wvw.glean.workflow.print.WorkflowPrinter;
