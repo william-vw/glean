@@ -29,7 +29,6 @@ import wvw.cig.uigen.UiGen.UiFormats;
 import wvw.glean.workflow.WorkflowModel;
 import wvw.glean.workflow.WorkflowModel.LoadOptions;
 import wvw.glean.workflow.print.WorkflowD3TreePrinter;
-import wvw.glean.workflow.print.WorkflowJsPrinter;
 import wvw.glean.workflow.print.WorkflowJsonPrinter;
 import wvw.glean.workflow.print.WorkflowJsonPrinter.PrintJsonTaskHook;
 import wvw.glean.workflow.print.WorkflowPrinter;
@@ -143,7 +142,6 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		case LOCAL:
 			// - js
-
 			N3Model ontology = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));
 			ontology.read(IOUtils.getResourceStream(getClass(), ontologyPath), "");
 
