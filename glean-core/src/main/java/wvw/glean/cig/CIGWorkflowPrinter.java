@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 
 		String inFolder = "/Users/wvw/git/glean/glean-core/src/main/resources/";
 		String tmpFolder = "/Users/wvw/git/glean/glean-core/src/main/resources/tmp/";
-		String outFolder = "/Users/wvw/git/glean/visualcig-js/wf/";
+		String outFolder = "/Users/wvw/git/glean/glean-js/wf/";
 
 		// -- lipid
 
@@ -87,18 +86,15 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		printer.printWorkflow(name, ns, inFolder, tmpFolder, outFolder, DataSources.LOCAL);
 	}
 
-	private N3Model inputDef = null;
+//	private N3Model inputDef = null;
 
+	private File inDir;
 	private File htmlDir;
 	private File tmpDir;
 
 	private Map<Resource, JenaKb> inputDatas = new HashMap<>();
 
 	public CIGWorkflowPrinter() throws IOException {
-		File defFile = Paths.get("src/main/resources/cig/input/definitions.n3").toFile();
-
-		inputDef = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));
-		inputDef.read(new FileInputStream(defFile), "N3");
 	}
 
 	public void printUi(String inputPath, String inputRes) throws Exception {
@@ -115,25 +111,26 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		System.out.println("html? " + html);
 	}
 
-	public void printWorkflow(String name, String ns, String inFolder, String tmpFolder, String outFolder, DataSources forSource)
-			throws Exception {
+	public void printWorkflow(String name, String ns, String inFolder, String tmpFolder, String outFolder,
+			DataSources forSource) throws Exception {
 
 		LOG.info("- printing workflow " + name + " for " + forSource);
 
 		long start = System.currentTimeMillis();
 
+		inDir = new File(inFolder);
 		tmpDir = new File(tmpFolder);
 		if (!tmpDir.exists())
 			tmpDir.mkdir();
 		htmlDir = new File(tmpDir, "html");
 		if (!htmlDir.exists())
 			htmlDir.mkdir();
-		
+
 		File outDir = new File(outFolder);
 		if (!outDir.exists())
 			outDir.mkdir();
 
-		WorkflowModel wf = new CIGModel(ns).initialize().load(inFolder + "cig/" + name + ".n3",
+		WorkflowModel wf = new CIGModel(ns, inFolder).initialize().load(inFolder + "cig/" + name + ".n3",
 				LoadOptions.RECURSIVELY);
 
 //		wf.getKb().printAll();
@@ -225,7 +222,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 	private String loadFrom(Resource htmlRes) {
 		String htmlPath = htmlRes.asLiteral().getString();
 
-		File htmlFile = Paths.get("src/main/resources" + htmlPath).toFile();
+		File htmlFile = new File(inDir, htmlPath);
 		try {
 			return IOUtils.readFromFile(htmlFile);
 
@@ -246,7 +243,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 		// if so, simply load & return that
 
 		String inPath = inputFileRes.asLiteral().getString();
-		File inputFile = Paths.get("src/main/resources" + inPath).toFile();
+		File inputFile = new File(inDir, inPath);
 		File htmlFile = new File(htmlDir, inputElRes.getLocalName() + ".html");
 
 		// input-file was not edited after html was previously generated
@@ -308,7 +305,7 @@ public class CIGWorkflowPrinter implements PrintJsonTaskHook {
 	}
 
 	private JenaKb loadInputData(String inPath) throws IOException {
-		File reportNeeds = Paths.get("src/main/resources" + inPath).toFile();
+		File reportNeeds = new File(inDir, inPath);
 
 		N3Model model = ModelFactory.createN3Model(N3ModelSpec.get(Types.N3_MEM));
 		model.read(new FileInputStream(reportNeeds), "N3");

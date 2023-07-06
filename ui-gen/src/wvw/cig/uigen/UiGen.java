@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -169,23 +170,26 @@ public class UiGen {
 	private void doGenerate(EhrStandards ehr, UiFormats ui, N3Model reportNeeds, File tmpDir,
 			OutputStream out, OutputOptions... options) throws Exception {
 
-		File selectors = IOUtils.getResource(getClass(),
+		InputStream selectors = IOUtils.getResourceStream(getClass(),
 				"ehr/" + ehr.getFolder() + "/out/selectors_composed.n3");
-		File preparedUi = IOUtils.getResource(getClass(),
+		InputStream preparedUi = IOUtils.getResourceStream(getClass(),
 				"ehr/" + ehr.getFolder() + "/out/" + ui.getFolder(options) + "/ui_prepared.n3");
 
 		File instantiatedUi = new File(tmpDir, "ui_instantiated.n3");
 
 		instantiateUi(ehr, ui, selectors, preparedUi, reportNeeds,
 				new FileOutputStream(instantiatedUi));
-		finalizeUi(ehr, ui, selectors, instantiatedUi, reportNeeds, out, options);
+		
+		selectors = IOUtils.getResourceStream(getClass(),
+				"ehr/" + ehr.getFolder() + "/out/selectors_composed.n3");
+		finalizeUi(ehr, ui, selectors, new FileInputStream(instantiatedUi), reportNeeds, out, options);
 
 //		instantiatedUi.delete();
 
 		LOG.info("written UI to outputstream");
 	}
 
-	protected void instantiateUi(EhrStandards ehr, UiFormats ui, File selectors, File preparedUi,
+	protected void instantiateUi(EhrStandards ehr, UiFormats ui, InputStream selectors, InputStream preparedUi,
 			N3Model reportNeeds, OutputStream out) throws Exception {
 
 		LOG.info("instantiating ui..");
@@ -197,8 +201,8 @@ public class UiGen {
 		N3Model model = ModelFactory.createN3Model(spec);
 
 		model.add(reportNeeds);
-		model.read(new FileInputStream(selectors), "N3");
-		model.read(new FileInputStream(preparedUi), "N3");
+		model.read(selectors, "N3");
+		model.read(preparedUi, "N3");
 		model.read(
 				IOUtils.getResourceStream(getClass(), "/ehr/" + ehr.getFolder() + "/templates.n3"),
 				"N3");
@@ -209,7 +213,7 @@ public class UiGen {
 		model.getDeductionsModel().write(out);
 	}
 
-	protected void finalizeUi(EhrStandards ehr, UiFormats ui, File selectors, File instantiatedUi,
+	protected void finalizeUi(EhrStandards ehr, UiFormats ui, InputStream selectors, InputStream instantiatedUi,
 			N3Model reportNeeds, OutputStream out, OutputOptions... options) throws Exception {
 
 		LOG.info("finalizing ui ..");
@@ -219,8 +223,8 @@ public class UiGen {
 		model.add(reportNeeds);
 		model.read(IOUtils.getResourceStream(getClass(),
 				"/ui/" + ui.getFolder(options) + "/ui_codes.n3"), "N3");
-		model.read(new FileInputStream(selectors), "N3");
-		model.read(new FileInputStream(instantiatedUi), "N3");
+		model.read(selectors, "N3");
+		model.read(instantiatedUi, "N3");
 		model.read(
 				IOUtils.getResourceStream(getClass(), "/ehr/" + ehr.getFolder() + "/templates.n3"),
 				"N3");

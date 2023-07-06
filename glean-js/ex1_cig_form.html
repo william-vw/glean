@@ -30,7 +30,7 @@
 <script type="module">
 let inputHandler = new RdfInputHandler("http://example.org/");
 
-let source = new FSM("/wf/test/example1_local.js");
+let source = new FSM("/wf/test/out/example1_local.js");
 await source.load();
 
 let cig = new CIGForm({ source: source, input: inputHandler, container: '#main-container' });

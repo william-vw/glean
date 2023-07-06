@@ -1,0 +1,187 @@
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log:     <http://www.w3.org/2000/10/swap/log#> .
+@prefix in:      <http://n3.w3c.org/builtin/input#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix math:    <http://www.w3.org/2000/10/swap/math#> .
+@prefix list:    <http://www.w3.org/2000/10/swap/list#> .
+
+<http://example.org/action1_decision3>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://example.org/some_other_code3'></span><label><input type='checkbox' id='some_other_code3' code='some_other_code3' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_none' mandatory='false' />Option 1</label></td></tr>" .
+
+{
+    ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+            <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#dt_boolean> .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.category>
+            <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#category_present> .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.mutexWith>
+            ?mutexs .
+    ( ?ln {
+    ?mutexs
+        list:member _:b1 .
+    _:b1  log:localName ?ln .} ?lns )  log:collectAllIn _:b2 .
+    ( ?lns "," )  <http://www.w3.org/2000/10/swap/string#join>
+            ?mutex_ln .
+    ?action
+        rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+            ?req .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.title>
+            ?label .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+            ?code .
+    ?code
+        log:localName ?code_ln .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-present_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ?output ( "_code0_" "_label1_" "_id1_" "_mutex1_" ) ( ?code ?label ?code_ln ?mutex_ln ) )  <http://www.w3.org/2000/10/swap/string#replaceAll>
+            ?output2 .}  =>  {
+    ?action
+        <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output2 .} .
+
+{
+    ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+            <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#dt_integer> .
+    ( ?max "10"^^xsd:int )  math:logarithm ?log .
+    ( ?log "1"^^xsd:int )  math:sum _:b3 .
+    _:b3  math:ceiling ?size .
+    ?range
+        <http://hl7.org/fhir/Range.low>
+            _:b4 .
+    _:b4  <http://hl7.org/fhir/Quantity.value>
+            ?min .
+    ?range
+        <http://hl7.org/fhir/Range.high>
+            _:b5 .
+    _:b5  <http://hl7.org/fhir/Quantity.value>
+            ?max .
+    ?range
+        rdfs:label ?rangeLabel .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+            ?range .
+    ?action
+        rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+            ?req .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.title>
+            ?label .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+            ?code .
+    ?code
+        log:localName ?code_ln .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-int_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ?output ( "_code0_" "_prefix-label1_" "_id1_" "_min1_" "_max1_" "_step1_" "_suffix-label1_" ) ( ?code ?label ?code_ln ?min ?max "1"^^xsd:int ?rangeLabel ) )  <http://www.w3.org/2000/10/swap/string#replaceAll>
+            ?output2 .}  =>  {
+    ?action
+        <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output2 .} .
+
+{
+    ( "10"^^xsd:int ?prec )  math:exponentiation ?divisor .
+    ( "1"^^xsd:int ?divisor )  math:quotient ?step .
+    ( ?max "10"^^xsd:int )  math:logarithm ?log .
+    ( ?log "1"^^xsd:int )  math:sum _:b6 .
+    _:b6  math:ceiling ?size .
+    ?range
+        <http://hl7.org/fhir/Range.low>
+            _:b7 .
+    _:b7  <http://hl7.org/fhir/Quantity.value>
+            ?min .
+    ?range
+        <http://hl7.org/fhir/Range.high>
+            _:b8 .
+    _:b8  <http://hl7.org/fhir/Quantity.value>
+            ?max .
+    ?range
+        rdfs:label ?rangeLabel .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.qualifiedInterval>
+            ?interval .
+    ?interval
+        <http://hl7.org/fhir/ObservationDefinition.qualifiedInterval.range>
+            ?range .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.quantitativeDetails>
+            ?quant .
+    ?quant
+        <http://hl7.org/fhir/ObservationDefinition.quantitativeDetails.unit>
+            ?unit .
+    ?unit
+        <http://hl7.org/fhir/CodeableConcept.coding>
+            ?coding .
+    ?coding
+        <http://hl7.org/fhir/Coding.system>
+            ?codeSystem .
+    ?coding
+        <http://hl7.org/fhir/Coding.code>
+            ?unitCode .
+    ?coding
+        rdfs:label ?unitLabel .
+    ?quant
+        <http://hl7.org/fhir/ObservationDefinition.quantitativeDetails.decimalPrecision>
+            ?prec .
+    ?action
+        rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+            ?req .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.title>
+            ?label .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+            ?code .
+    ?code
+        log:localName ?code_ln .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-quant_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ?output ( "_code0_" "_code10_" "_code11_" "_prefix-label12_" "_id12_" "_min12_" "_max12_" "_step12_" "_size12_" "_suffix-label12_" ) ( ?code ?codeSystem ?unitCode ?label ?code_ln ?min ?max ?step ?size ?rangeLabel ) )  <http://www.w3.org/2000/10/swap/string#replaceAll>
+            ?output2 .}  =>  {
+    ?action
+        <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output2 .} .
+
+{
+    ?req  <http://hl7.org/fhir/ObservationDefinition.permittedDataType>
+            <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#dt_boolean> .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.category>
+            <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#category_yes_no> .
+    ?action
+        rdf:type <http://hl7.org/fhir/ActivityDefinition> .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.observationResultRequirement>
+            ?req .
+    ?action
+        <http://hl7.org/fhir/ActivityDefinition.title>
+            ?label .
+    ?req  <http://hl7.org/fhir/ObservationDefinition.code>
+            ?code .
+    ?code
+        log:localName ?code_ln .
+    <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#ui-yes_no_input>
+        <http://niche.cs.dal.ca/ui_tpl.n3#output>
+            ?output .
+    ( ?output ( "_code0_" "_label1_" "_id1_" ) ( ?code ?label ?code_ln ) )  <http://www.w3.org/2000/10/swap/string#replaceAll>
+            ?output2 .}  =>  {
+    ?action
+        <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+            ?output2 .} .
+
+<http://example.org/action_none_decision3>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://example.org/code_none'></span><label><input type='checkbox' id='code_none' code='code_none' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='some_other_code3,some_other_code4,some_other_code5' mandatory='false' />None</label></td></tr>" .
+
+<http://example.org/action2_decision3>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://example.org/some_other_code4'></span><label><input type='checkbox' id='some_other_code4' code='some_other_code4' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_none' mandatory='false' />Option 2</label></td></tr>" .
+
+<http://example.org/action3_decision3>
+    <http://niche.cs.dal.ca/ui_tpl.n3#generated>
+        "<tr><td property='http://hl7.org/fhir/DiagnosticReport.result' typeof='http://hl7.org/fhir/Observation'><span style='display: none' property='http://hl7.org/fhir/Observation.code' resource='http://example.org/some_other_code5'></span><label><input type='checkbox' id='some_other_code5' code='some_other_code5' property='http://hl7.org/fhir/Observation.valueBoolean' mutex-with='code_none' mandatory='false' />Option 3</label></td></tr>" .

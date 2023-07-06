@@ -36,7 +36,7 @@ public class CIGTest {
 	public static void main(String[] args) throws Exception {
 		long start = System.currentTimeMillis();
 
-		CIGModel cig = (CIGModel) new CIGModel(cigNs, spec)
+		CIGModel cig = (CIGModel) new CIGModel(cigNs)
 				.initialize(reason, InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN)//, InitOptions.LOGGING)
 				.load(CIGModel.class, cigPath, LoadOptions.RECURSIVELY);
 

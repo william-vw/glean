@@ -1,0 +1,214 @@
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix math: <http://www.w3.org/2000/10/swap/math#>
+prefix state: <http://niche.cs.dal.ca/ns/state.owl#>
+prefix cond: <http://niche.cs.dal.ca/ns/condition/base.owl#>
+prefix gl: <http://niche.cs.dal.ca/ns/glean/base.owl#>
+prefix cig: <http://niche.cs.dal.ca/ns/cig/cig.owl#>
+prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#>
+prefix fhir: <http://hl7.org/fhir/>
+prefix : <http://example.org/>
+
+#
+:Example_Workflow a cig:MedicalWorkflow ;
+	state:in gl:Active ;
+	rdfs:label "Example Workflow" ;
+	rdfs:comment """An example workflow.""" ;
+
+	cig:inputFile "/cig/input/example1.n3" ;
+
+	gl:root true ;
+	gl:subTask :decision1 , :Example_Workflow2 , :after_workflow2 , :decision2 , :decision3 , :low_task, :option_task , :none_task .
+
+#
+:decision1 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+
+	rdfs:label "decision1?" ;
+	rdfs:comment """Random boolean choice.""" ;
+	
+	cig:input :decision1_report ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "yes" ;
+			rdfs:comment """Yes was selected.""" ;
+			
+			cond:allOf (
+				[ cond:premise { ?obs fhir:Observation.code :some_code ;
+						fhir:Observation.valueBoolean true } ]
+			)
+		] ;
+		
+		gl:branchTarget :Example_Workflow2
+		
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [ 
+			rdfs:label "no" ;
+			rdfs:comment """No was selected.""" ;
+			
+			cond:allOf (
+				[ cond:premise { ?obs fhir:Observation.code :some_code ;
+						fhir:Observation.valueBoolean false } ]
+			)
+		] ;
+		
+		gl:branchTarget :decision2
+	] .
+
+#
+:Example_Workflow2 a cig:MedicalWorkflow ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	gl:next :after_workflow2 ;
+	
+	rdfs:label "sub-workflow" ;
+	
+	gl:source "/cig/example2.n3" .
+
+#
+:after_workflow2 a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "after workflow2" ;
+	rdfs:comment "Something to do after workflow2." .
+
+#
+:decision2 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "decision2?" ;
+	
+	cig:input :decision2_report ;
+	
+	rdfs:comment """Let's check some values against some made-up thresholds.""" ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "pretty high" ;
+			rdfs:comment """some_other_code1 > 10 OR some_other_code2 > 5""" ;
+			
+			cond:anyOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :some_other_code1 ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:greaterThan 10 }
+				
+				] [ cond:premise 	
+					{ ?obs fhir:Observation.code :some_other_code2 ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:greaterThan 5 }
+				] )
+		] ;
+		
+		gl:branchTarget :decision3
+	
+	] , [ 
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "pretty low" ;
+			rdfs:comment """some_other_code1 <= 10 OR some_other_code2 <= 5""" ;
+			
+			cond:allOf ( 
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :some_other_code1 ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notGreaterThan 10 }
+				
+				] [ cond:premise  
+					{ ?obs fhir:Observation.code :some_other_code2 ; 
+						fhir:Observation.valueQuantity ?quantity . 
+						?quantity fhir:Quantity.value ?value .
+						?value math:notGreaterThan 5 }
+				] )
+		] ;
+		
+		gl:branchTarget :low_task
+	] .
+
+#
+:decision3 a gl:DecisionTask ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "decision3?" ;
+	
+	cig:input :decision3_report ;
+	
+	rdfs:comment """Let's choose between some arbitrary options, or select none.""" ;
+	
+	gl:decisionBranch [
+		state:in gl:Inactive ;
+		gl:order 0 ;
+		
+		gl:precondition [
+			rdfs:label "options 1-3" ;
+			rdfs:comment """One or more options were selected.""" ;
+			
+			cond:anyOf (
+				[ cond:premise { ?obs fhir:Observation.code :some_other_code3 ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :some_other_code4 ; fhir:Observation.valueBoolean true } ]
+				[ cond:premise { ?obs fhir:Observation.code :some_other_code5 ; fhir:Observation.valueBoolean true } ]
+			)
+		] ;
+		
+		gl:branchTarget :option_task 
+	
+	] , [
+		state:in gl:Inactive ;
+		gl:order 1 ;
+		
+		gl:precondition [
+			rdfs:label "none" ;
+			rdfs:comment """None was selected.""" ;
+			
+			cond:allOf (
+				[ cond:premise 
+					{ ?obs fhir:Observation.code :code_none ; 
+						fhir:Observation.valueBoolean true }
+				] )
+		] ;
+		
+		gl:branchTarget :none_task
+	] .
+
+#
+:low_task a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "low task" ;
+	rdfs:comment "(endpoint) something to do when values are pretty low." .
+
+#
+:option_task a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "option task" ;
+	rdfs:comment "(endpoint) something to do when one of the options got selected." .
+
+#
+:none_task a gl:EndPoint ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	rdfs:label "none task" ;
+	rdfs:comment "(endpoint) something to do when none of the options got selected." .

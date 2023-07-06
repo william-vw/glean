@@ -1,0 +1,199 @@
+@prefix : <http://example.org/> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@base <http://example.org/> .
+
+:decision1_report a fhir:PlanDefinition ;
+   fhir:PlanDefinition.name "decision1_report" ;
+   fhir:PlanDefinition.title "Decision 1: report" ;
+   fhir:PlanDefinition.status "active" ;
+   fhir:PlanDefinition.action ( [
+       fhir:PlanDefinition.action.definitionUri :action_decision1 
+   ] ) .
+
+#
+:action_decision1 a fhir:ActivityDefinition ;
+   fhir:ActivityDefinition.name "action_decision1" ;
+   fhir:ActivityDefinition.title "Data" ;
+   fhir:ActivityDefinition.observationResultRequirement [
+       fhir:ObservationDefinition.code :some_code ;
+       fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+       fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+       fhir:ObservationDefinition.mutexWith ( ) 
+   ] .
+
+#
+:decision2_report a fhir:PlanDefinition ;
+   fhir:PlanDefinition.name "decision2_report" ;
+   fhir:PlanDefinition.title "Decision 2: report" ;
+   fhir:PlanDefinition.status "active" ;
+   fhir:PlanDefinition.action ( [
+       fhir:PlanDefinition.action.definitionUri :action1_decision2 
+   ] [
+       fhir:PlanDefinition.action.definitionUri :action2_decision2 
+   ] ) .
+
+#
+:action1_decision2 a fhir:ActivityDefinition ;
+   fhir:ActivityDefinition.name "action1_decision2" ;
+   fhir:ActivityDefinition.title "Data 1" ;
+   fhir:ActivityDefinition.observationResultRequirement [
+       fhir:ObservationDefinition.code :some_other_code1 ;
+		# fhir:ObservationDefinition.category .. ;
+       fhir:ObservationDefinition.quantitativeDetails [
+           fhir:ObservationDefinition.quantitativeDetails.unit [
+               fhir:CodeableConcept.coding [
+                   fhir:Coding.system <http://unitsofmeasure.org> ;
+                   fhir:Coding.code "mmol/L" ; # millimole per liter
+                   rdfs:label "mmol/L" 
+               ] 
+           ] ;
+           fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 2 
+       ] ;
+       fhir:ObservationDefinition.qualifiedInterval [
+           fhir:ObservationDefinition.qualifiedInterval.range [
+               fhir:Range.low [
+                   fhir:Quantity.value 1 
+               ] ;
+               fhir:Range.high [
+                   fhir:Quantity.value 100 
+               ] ;
+               rdfs:label "(1-100)" 
+           ] 
+       ] 
+   ] .
+
+#
+:action2_decision2 a fhir:ActivityDefinition ;
+   fhir:ActivityDefinition.name "action2_decision2" ;
+   fhir:ActivityDefinition.title "Data 2" ;
+   fhir:ActivityDefinition.observationResultRequirement [
+       fhir:ObservationDefinition.code :some_other_code2 ;
+		# fhir:ObservationDefinition.category .. ;
+       fhir:ObservationDefinition.quantitativeDetails [
+           fhir:ObservationDefinition.quantitativeDetails.unit [
+               fhir:CodeableConcept.coding [
+                   fhir:Coding.system <http://unitsofmeasure.org> ;
+                   fhir:Coding.code "mmol/L" ; # millimole per liter
+                   rdfs:label "mmol/L" 
+               ] 
+           ] ;
+           fhir:ObservationDefinition.quantitativeDetails.decimalPrecision 2 
+       ] ;
+       fhir:ObservationDefinition.qualifiedInterval [
+           fhir:ObservationDefinition.qualifiedInterval.range [
+               fhir:Range.low [
+                   fhir:Quantity.value 1 
+               ] ;
+               fhir:Range.high [
+                   fhir:Quantity.value 100 
+               ] ;
+               rdfs:label "(1-100)" 
+           ] 
+       ] 
+   ] .
+
+#
+:decision3_report a fhir:PlanDefinition ;
+   fhir:PlanDefinition.name "decision3_report" ;
+   fhir:PlanDefinition.title "Options" ;
+   fhir:PlanDefinition.status "active" ;
+   fhir:PlanDefinition.action ( 
+   		[ fhir:PlanDefinition.action.definitionUri :action1_decision3 ] 
+		[ fhir:PlanDefinition.action.definitionUri :action2_decision3 ] 
+		[ fhir:PlanDefinition.action.definitionUri :action3_decision3 ] 
+		[ fhir:PlanDefinition.action.definitionUri :action_none_decision3 ] 
+   ) .
+
+#
+:action1_decision3 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action1_decision3" ;
+	fhir:ActivityDefinition.title "Option 1" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :some_other_code3 ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_none )
+	] .
+
+#
+:action2_decision3 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action2_decision3" ;
+	fhir:ActivityDefinition.title "Option 2" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :some_other_code4 ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_none )
+	] .
+
+#
+:action3_decision3 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action3_decision3" ;
+	fhir:ActivityDefinition.title "Option 3" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :some_other_code5 ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :code_none )
+	] .
+
+#
+:action_none_decision3 a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "action_none_decision3" ;
+	fhir:ActivityDefinition.title "None" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :code_none ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith (
+			:some_other_code3
+			:some_other_code4
+			:some_other_code5
+		)
+	] .
+
+
+# Code definitions
+:some_code fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "abc" 
+] .
+
+#
+:some_other_code1 fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "def" 
+] .
+
+#
+:some_other_code2 fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "ghi" 
+] .
+
+#
+:some_other_code3 fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "jkl" 
+] .
+
+#
+:some_other_code4 fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "mno" 
+] .
+
+#
+:some_other_code5 fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "pqr" 
+] .
+
+#
+:code_none fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "stu" 
+] .

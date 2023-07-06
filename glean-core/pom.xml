@@ -3,6 +3,7 @@
 	<groupId>wvw.cig.glean</groupId>
 	<artifactId>glean-core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
@@ -50,19 +51,42 @@
 
 
 	<build>
+<!--		<plugins>-->
+<!--			<plugin>-->
+<!--				<artifactId>maven-assembly-plugin</artifactId>-->
+<!--				<configuration>-->
+<!--					<archive>-->
+<!--						<manifest>-->
+<!--							<mainClass>wvw.glean.cig.CIGTest</mainClass>-->
+<!--						</manifest>-->
+<!--					</archive>-->
+<!--					<descriptorRefs>-->
+<!--						<descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--					</descriptorRefs>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
+<!--		</plugins>-->
 		<plugins>
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>wvw.glean.cig.CIGTest</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-shade-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <goals>
+			                <goal>shade</goal>
+			            </goals>
+			            <configuration>
+			                <shadedArtifactAttached>true</shadedArtifactAttached>
+			                <transformers>
+			                    <transformer implementation=
+			                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+			                        <mainClass>wvw.glean.cig.EditorCmd</mainClass>
+			                </transformer>
+			            </transformers>
+		                <finalName>genjs</finalName>
+			        </configuration>
+			        </execution>
+			    </executions>
 			</plugin>
 		</plugins>
 	</build>

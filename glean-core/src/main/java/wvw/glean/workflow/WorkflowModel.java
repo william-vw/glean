@@ -1,5 +1,6 @@
 package wvw.glean.workflow;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -52,8 +53,7 @@ public abstract class WorkflowModel {
 	protected final static Logger LOG = Logger.getLogger(WorkflowModel.class.getName());
 
 	public static InitOptions[] transit = { InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN };
-	public static InitOptions[] transitLog = { InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN,
-			InitOptions.LOGGING };
+	public static InitOptions[] transitLog = { InitOptions.DO_TRANSIT, InitOptions.LOAD_GEN, InitOptions.LOGGING };
 	public static InitOptions[] transitTest = { InitOptions.DO_TRANSIT };
 
 	public static ReasonTypes defaultReason = ReasonTypes.FORWARD; // ReasonTypes.HYBRID;
@@ -65,6 +65,7 @@ public abstract class WorkflowModel {
 	protected JenaKb kb;
 
 	protected String base = NS.glean;
+	protected String refFolder;
 	protected String condInf = NS.cond + "conditionMet";
 
 	protected Resource condInfPrp;
@@ -78,21 +79,17 @@ public abstract class WorkflowModel {
 	protected List<InputStream> addOntologies = new ArrayList<>();
 
 	public WorkflowModel() {
-		this(NS.glean);
-	}
-
-	public WorkflowModel(String base) {
-		this(base, defaultSpec);
+		setup(defaultSpec);
 	}
 
 	public WorkflowModel(N3ModelSpec spec) {
-		this(NS.glean, spec);
+		setup(spec);
 	}
 
-	public WorkflowModel(String base, N3ModelSpec spec) {
-		this.base = base;
+	public WorkflowModel(String refFolder) {
+		this.refFolder = refFolder;
 
-		setup(spec);
+		setup(defaultSpec);
 	}
 
 	private void setup(N3ModelSpec spec) {
@@ -120,8 +117,7 @@ public abstract class WorkflowModel {
 		return load(base, dataPath, loadOptions);
 	}
 
-	public WorkflowModel load(String base, String dataPath, LoadOptions... loadOptions)
-			throws IOException {
+	public WorkflowModel load(String base, String dataPath, LoadOptions... loadOptions) throws IOException {
 
 		if (ArrayUtils.contains(loadOptions, LoadOptions.RECURSIVELY)) {
 			JenaKb kb2 = new JenaKb(N3ModelSpec.get(Types.N3_MEM));
@@ -144,8 +140,8 @@ public abstract class WorkflowModel {
 		return load(base, cls, dataPath, loadOptions);
 	}
 
-	public WorkflowModel load(String base, Class<?> cls, String dataPath,
-			LoadOptions... loadOptions) throws IOException, URISyntaxException {
+	public WorkflowModel load(String base, Class<?> cls, String dataPath, LoadOptions... loadOptions)
+			throws IOException, URISyntaxException {
 
 		if (ArrayUtils.contains(loadOptions, LoadOptions.RECURSIVELY)) {
 			JenaKb kb2 = new JenaKb(N3ModelSpec.get(Types.N3_MEM));
@@ -205,8 +201,11 @@ public abstract class WorkflowModel {
 					long start = System.currentTimeMillis();
 					JenaKb kb2 = null;
 					try {
-						kb2 = new JenaKb(kb.getModel().getSpec()).fromClsRes(getClass(), base,
-								srcStr);
+						kb2 = new JenaKb(kb.getModel().getSpec());
+						if (this.refFolder != null)
+							kb2 = kb2.from(base, new File(this.refFolder, srcStr).getAbsolutePath());
+						else
+							kb2 = kb2.fromClsRes(getClass(), base, srcStr);
 						// let referencing model "override" default label
 						if (kb.contains(wf, RDFS.label, null))
 							kb2.remove(wf, RDFS.label, null);
@@ -276,8 +275,7 @@ public abstract class WorkflowModel {
 	protected void printAllTransits(List<EntityState> states, boolean groupPerState) {
 		if (groupPerState) {
 			MultiMap<String, EntityState> map = new HashMultiMap<>();
-			states.stream()
-					.forEach(state -> map.putValue(state.getAtomicState().getLocalName(), state));
+			states.stream().forEach(state -> map.putValue(state.getAtomicState().getLocalName(), state));
 
 			Iterator<Entry<String, List<EntityState>>> it = map.entrySet().iterator();
 			while (it.hasNext()) {
@@ -364,7 +362,7 @@ public abstract class WorkflowModel {
 				case ALL:
 					getResetInputsAndConditions(t, toRemove);
 
-				// fallthrough! :-)
+					// fallthrough! :-)
 				case ONLY_STATES:
 					getResetStates(t, toRemove, toAdd);
 					break;
@@ -416,15 +414,13 @@ public abstract class WorkflowModel {
 		endBulkTransit();
 	}
 
-	private void propagateThroughWorkflow(Resource task,
-			BiFunction<Resource, ResetCmds, ResetCmds> op) {
+	private void propagateThroughWorkflow(Resource task, BiFunction<Resource, ResetCmds, ResetCmds> op) {
 
 		propagateThroughWorkflow(task, op, ResetCmds.ALL, true, false);
 	}
 
-	private void propagateThroughWorkflow(Resource task,
-			BiFunction<Resource, ResetCmds, ResetCmds> op, ResetCmds curCmd, boolean first,
-			boolean isSuper) {
+	private void propagateThroughWorkflow(Resource task, BiFunction<Resource, ResetCmds, ResetCmds> op,
+			ResetCmds curCmd, boolean first, boolean isSuper) {
 
 		ResetCmds newCmd = op.apply(task, curCmd);
 		if (newCmd == ResetCmds.STOP)
@@ -490,12 +486,11 @@ public abstract class WorkflowModel {
 		Resource skolem = kb.toResource(Skolem.gen(cond.asNode()));
 		kb.list(skolem, condInfPrp, null).forEachRemaining(stmt -> toRemove.add(stmt));
 
-		kb.list(cond, kb.property("cond:allOf"), null)
-				.andThen(kb.list(cond, kb.property("cond:anyOf"), null)).forEachRemaining(stmt -> {
+		kb.list(cond, kb.property("cond:allOf"), null).andThen(kb.list(cond, kb.property("cond:anyOf"), null))
+				.forEachRemaining(stmt -> {
 					Collection coll = stmt.getObject().asCollection();
 
-					coll.getElements()
-							.forEachRemaining(el -> getResetConditionOperand(el, toRemove));
+					coll.getElements().forEachRemaining(el -> getResetConditionOperand(el, toRemove));
 				});
 	}
 
@@ -530,8 +525,7 @@ public abstract class WorkflowModel {
 		kb.removePremise(s, p, o, condInfPrp);
 	}
 
-	public void replaceConditionPremise(Resource s, Resource p, Resource o, Resource s2,
-			Resource p2, Resource o2) {
+	public void replaceConditionPremise(Resource s, Resource p, Resource o, Resource s2, Resource p2, Resource o2) {
 
 		kb.replacePremise(s, p, o, s2, p2, o2, condInfPrp);
 	}
@@ -583,8 +577,7 @@ public abstract class WorkflowModel {
 
 		private String label;
 
-		public EntityState(Resource entity, Resource atomicState, List<Resource> compoundStates,
-				JenaKb kb) {
+		public EntityState(Resource entity, Resource atomicState, List<Resource> compoundStates, JenaKb kb) {
 
 			this.entity = entity;
 			this.atomicState = atomicState;

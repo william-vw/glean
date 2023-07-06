@@ -36,12 +36,8 @@ public class WorkflowModel_Auto extends WorkflowModel {
 		super(spec);
 	}
 
-	public WorkflowModel_Auto(String base) {
-		super(base);
-	}
-
-	public WorkflowModel_Auto(String base, N3ModelSpec spec) {
-		super(base, spec);
+	public WorkflowModel_Auto(String refFolder) {
+		super(refFolder);
 	}
 
 	public static String pregenCodePath(ReasonTypes reasonType, InitOptions... initOptions) {
