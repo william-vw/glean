@@ -95,17 +95,23 @@ CIGForm.prototype._create = function (d, parentEntry, duplicate) {
 
     // - create appropriate content for element
 
+    // (treat atomic tasks with input-form as decision tasks)
+    if (d.inputForm)
+        d.node_type = 'decision_task';
+
     var content = null;
     switch (d.node_type) {
 
         case 'decision_task':
-            content = d.inputForm;
             if (d.description)
                 content =
                     `<div class='description'>
-                        ${d.inputForm}
+                        <span class='name'>${d.name}</span>
                         <span class='tooltip3'><img src='img/qm.svg' /><span>${d.description}</span></span>
+                        ${d.inputForm}
                     </div>`;
+                else
+                    content = `${d.name} d.inputForm`;
             break;
 
         case 'atomic_task':
