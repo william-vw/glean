@@ -51,7 +51,7 @@ InputHandler.prototype.setupInput = async function (el, d, prefix) {
     }
 }
 
-InputHandler.prototype.inputShown = async function (el) {
+InputHandler.prototype.inputShown = async function (id, el) {
     let inputs = el.find('input');
     // console.log("shown:", el, inputs);
     
@@ -60,11 +60,11 @@ InputHandler.prototype.inputShown = async function (el) {
         inputs.get(0).focus();
 
         // try populating the input elements
-        this._tryPopulateInput(el);
+        this._tryPopulateInput(id, el);
     }
 }
 
-InputHandler.prototype._tryPopulateInput = function (el) { }
+InputHandler.prototype._tryPopulateInput = function (id, el) { }
 
 InputHandler.prototype.submitInputData = async function (element) { }
 

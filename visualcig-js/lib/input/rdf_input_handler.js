@@ -88,6 +88,7 @@ RdfInputHandler.prototype._onExtractedStmt = function (reference, stmt, store) {
 RdfInputHandler.prototype._onNewInput = function (id, rdf) {
     const stmts = rdf.store.getQuads(null, namedNode(prefixes.fhir + 'Observation.code'), null);
 
+    let codeMap = {};
     // per code, insert associated user value into inputMap
     for (let stmt of stmts) {
         let code = stmt.object.id;
@@ -112,15 +113,21 @@ RdfInputHandler.prototype._onNewInput = function (id, rdf) {
                     .object.value;
         }
 
-        this._inputMap[code] = value;
+        codeMap[code] = value;
     }
+    this._inputMap[id] = codeMap;
 
     // console.log("_newInput:", id, this._inputMap);
 }
 
 // try populate input field with prior user input, based on its associated code
 
-RdfInputHandler.prototype._tryPopulateInput = async function (el) {
+RdfInputHandler.prototype._tryPopulateInput = async function (id, el) {
+    if (!(id in this._inputMap))
+        return;
+
+    let codeMap = this._inputMap[id];
+
     // extract annotations of input element
     let rdf = await extractRdfData(el, (quad) => quad, { insertUserInput: false });
     const stmts = rdf.store.getQuads(null, namedNode(prefixes.fhir + 'Observation.code'), null);
@@ -132,7 +139,7 @@ RdfInputHandler.prototype._tryPopulateInput = async function (el) {
         let code = stmt.object.id;
         const id = localName(code);
 
-        let value = this._inputMap[code];
+        let value = codeMap[code];
         // console.log("populate:", code, id, this._inputMap);
         if (value === undefined)
             continue;
