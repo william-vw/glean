@@ -148,6 +148,10 @@ class NodeUpdates {
 		return this;
 	}
 
+	addUpdates(from) {
+		this.updates.push(...from.updates);
+	}
+
 	forEach(fn) {
 		fn(this.updates);
 	}
@@ -157,6 +161,13 @@ class NodeUpdates {
 			this.sets.forEach(set => fn(set.updates));
 		else
 			fn(this.updates);
+	}
+
+	length() {
+		if (this.sets.length > 0)
+			return this.sets.reduce((a, b) => a + b.length, 0);
+		else
+			return this.updates.length;
 	}
 
 	toString() {

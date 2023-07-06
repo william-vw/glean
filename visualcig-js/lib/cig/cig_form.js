@@ -312,7 +312,7 @@ CIGForm.prototype._show = function (d) {
         // so only consider direct child table
         let form = el.find('table').first();
 
-        this._input.inputShown(form);
+        this._input.inputShown(d.id, form);
     }
 
     return true;
