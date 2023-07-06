@@ -453,8 +453,13 @@ div.form-node table {
 }
 
 div.form-node [node_type = decision_task] div.description {
+  padding-left: 10px;
   display: flex;
   /* align-items: center; */
+}
+
+div.form-node [node_type = decision_task] div.description .name {
+  padding-top: 2px;
 }
 
 div.form-node [node_type = decision_task] div.description img {
