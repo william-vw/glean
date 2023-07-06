@@ -17,7 +17,7 @@ prefix : <http://example.org/>
 	cig:inputFile "/cig/test/input/example1.n3" ;
 
 	gl:root true ;
-	gl:subTask :task1 , :task2 , :task3 , :task4 , :task5, :task6 , :task7  .
+	gl:subTask :task1 , :Example_Workflow2 , :task3 , :task4 , :task5, :task6 , :task7 , :task8 .
 
 #
 :task1 a gl:DecisionTask ;
@@ -43,7 +43,7 @@ prefix : <http://example.org/>
 			)
 		] ;
 		
-		gl:branchTarget :task2
+		gl:branchTarget :Example_Workflow2
 		
 	] , [
 		state:in gl:Inactive ;
@@ -63,7 +63,18 @@ prefix : <http://example.org/>
 	] .
 
 #
-:task2 a gl:EndPoint ;
+:Example_Workflow2 a cig:MedicalWorkflow ;
+	state:in gl:Inactive ;
+	gl:conditional false ; 
+	
+	gl:next :task8 ;
+	
+	rdfs:label "sub-workflow" ;
+	
+	gl:source "/cig/test/example2.n3" .
+
+#
+:task8 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	

@@ -1,0 +1,64 @@
+@prefix : <http://example.org/> .
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix in: <http://niche.cs.dal.ca/ns/cig/input/fhir.owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@base <http://example.org/> .
+
+#
+:task_state_report a fhir:PlanDefinition ;
+   fhir:PlanDefinition.name "state_report" ;
+   fhir:PlanDefinition.title "State: report" ;
+   fhir:PlanDefinition.status "active" ;
+   fhir:PlanDefinition.action ( 
+   	[ fhir:PlanDefinition.action.definitionUri :task_active_state ] 
+		[ fhir:PlanDefinition.action.definitionUri :task_completed_state ] 
+   ) .
+
+#
+:task_active_state a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "active_state" ;
+	fhir:ActivityDefinition.title "Active" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :taskStateActive ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :taskStateCompleted )
+	] .
+
+#
+:task_completed_state a fhir:ActivityDefinition ;
+	fhir:ActivityDefinition.name "completed_state" ;
+	fhir:ActivityDefinition.title "Completed" ;
+	fhir:ActivityDefinition.observationResultRequirement [
+		fhir:ObservationDefinition.code :taskStateCompleted ;
+		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
+		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+		fhir:ObservationDefinition.mutexWith ( :taskStateActive )
+	] .
+
+#
+:decision21_report a fhir:PlanDefinition ;
+   fhir:PlanDefinition.name "decision21_report" ;
+   fhir:PlanDefinition.title "Decision 21: report" ;
+   fhir:PlanDefinition.status "active" ;
+   fhir:PlanDefinition.action ( [
+       fhir:PlanDefinition.action.definitionUri :action_decision21 
+   ] ) .
+
+#
+:action_decision21 a fhir:ActivityDefinition ;
+   fhir:ActivityDefinition.name "action_decision21" ;
+   fhir:ActivityDefinition.title "Data" ;
+   fhir:ActivityDefinition.observationResultRequirement [
+       fhir:ObservationDefinition.code :some_code2 ;
+       fhir:ObservationDefinition.category in:category_survey , in:category_yes_no ;
+       fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
+       fhir:ObservationDefinition.mutexWith ( ) 
+   ] .
+
+# Code definitions
+:some_code2 fhir:CodeableConcept.coding [
+   fhir:Coding.system <http://www.snomed.org> ;
+   fhir:Coding.code "abc" 
+] .
