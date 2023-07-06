@@ -98,7 +98,7 @@
 #
 :decision3_report a fhir:PlanDefinition ;
    fhir:PlanDefinition.name "decision3_report" ;
-   fhir:PlanDefinition.title "Decision 3: report" ;
+   fhir:PlanDefinition.title "Options" ;
    fhir:PlanDefinition.status "active" ;
    fhir:PlanDefinition.action ( 
    		[ fhir:PlanDefinition.action.definitionUri :action1_decision3 ] 

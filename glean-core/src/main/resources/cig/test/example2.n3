@@ -12,30 +12,30 @@ prefix : <http://example.org/>
 :Example_Workflow2 a cig:MedicalWorkflow ;
 	state:in gl:Inactive ;
 	rdfs:label "Example Workflow 2" ;
-	rdfs:comment """Example Workflow 2""" ;
+	rdfs:comment """A example nested workflow.""" ;
 
 	cig:inputFile "/cig/test/input/example2.n3" ;
 
 	gl:root false ;
-	gl:subTask :task21 , :task22 , :task23 , :task24 , :task25 .
+	gl:subTask :flow2_decision1 , :yes_task , :no_task , :flow2_action , :flow2_endpoint .
 
 #
-:task21 a gl:DecisionTask ;
+:flow2_decision1 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 
 	rdfs:label "decision1?" ;
-	rdfs:comment """Decision 1?""" ;
+	rdfs:comment """Another random boolean choice.""" ;
 	
-	cig:input :decision21_report ;
+	cig:input :flow2_decision1_report ;
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		gl:order 0 ;
 		
 		gl:precondition [
-			rdfs:label "option1" ;
-			rdfs:comment """Option 1""" ;
+			rdfs:label "yes" ;
+			rdfs:comment """Yes was selected.""" ;
 			
 			cond:allOf (
 				[ cond:premise { ?obs fhir:Observation.code :some_code2 ;
@@ -43,15 +43,15 @@ prefix : <http://example.org/>
 			)
 		] ;
 		
-		gl:branchTarget :task22
+		gl:branchTarget :yes_task
 		
 	] , [
 		state:in gl:Inactive ;
 		gl:order 1 ;
 		
 		gl:precondition [ 
-			rdfs:label "option2" ;
-			rdfs:comment """Option 2""" ;
+			rdfs:label "no" ;
+			rdfs:comment """No was selected.""" ;
 			
 			cond:allOf (
 				[ cond:premise { ?obs fhir:Observation.code :some_code2 ;
@@ -59,48 +59,48 @@ prefix : <http://example.org/>
 			)
 		] ;
 		
-		gl:branchTarget :task23 
+		gl:branchTarget :no_task 
 	] .
 
 #
-:task22 a gl:Task ;
+:yes_task a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	gl:involvesAction false ;
 	
-	gl:next :task24 ;
+	gl:next :flow2_action ;
 	
-	rdfs:label "task1.1" ;
-	rdfs:comment """Task 1.1""" .
+	rdfs:label "yes task" ;
+	rdfs:comment """Something to do if yes. This task will complete automatically.""" .
 
 #
-:task23 a gl:Task ;
+:no_task a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	gl:involvesAction false ;
 	
-	gl:next :task24 ;
+	gl:next :flow2_action ;
 	
-	rdfs:label "task1.2" ;
-	rdfs:comment """Task 1.2""" .
+	rdfs:label "no task" ;
+	rdfs:comment """Something to do if no. This task will complete automatically.""" .
 
 #
-:task24 a gl:Task ;
+:flow2_action a gl:Task ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	gl:involvesAction true ;
 	
 	cig:input :task_state_report ;
 
-	gl:next :task25 ;
+	gl:next :flow2_endpoint ;
 	
-	rdfs:label "task2" ;
-	rdfs:comment """Task 2""" .
+	rdfs:label "action" ;
+	rdfs:comment """The workflow's coming together again! We'll have to manually indicate the completion of this task.""" .
 
 #
-:task25 a gl:EndPoint ;
+:flow2_endpoint a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
 	rdfs:label "endpoint" ;
-	rdfs:comment "Endpoint" .
+	rdfs:comment "Finally!" .

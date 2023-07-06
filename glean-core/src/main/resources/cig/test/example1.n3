@@ -12,20 +12,20 @@ prefix : <http://example.org/>
 :Example_Workflow a cig:MedicalWorkflow ;
 	state:in gl:Active ;
 	rdfs:label "Example Workflow" ;
-	rdfs:comment """Example Workflow""" ;
+	rdfs:comment """An example workflow.""" ;
 
 	cig:inputFile "/cig/test/input/example1.n3" ;
 
 	gl:root true ;
-	gl:subTask :task1 , :Example_Workflow2 , :task3 , :task4 , :task5, :task6 , :task7 , :task8 .
+	gl:subTask :decision1 , :Example_Workflow2 , :after_workflow2 , :decision2 , :decision3 , :low_task, :option_task , :none_task .
 
 #
-:task1 a gl:DecisionTask ;
+:decision1 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 
 	rdfs:label "decision1?" ;
-	rdfs:comment """Decision 1?""" ;
+	rdfs:comment """Random boolean choice.""" ;
 	
 	cig:input :decision1_report ;
 	
@@ -34,8 +34,8 @@ prefix : <http://example.org/>
 		gl:order 0 ;
 		
 		gl:precondition [
-			rdfs:label "option1" ;
-			rdfs:comment """Option 1""" ;
+			rdfs:label "yes" ;
+			rdfs:comment """Yes was selected.""" ;
 			
 			cond:allOf (
 				[ cond:premise { ?obs fhir:Observation.code :some_code ;
@@ -50,8 +50,8 @@ prefix : <http://example.org/>
 		gl:order 1 ;
 		
 		gl:precondition [ 
-			rdfs:label "option2" ;
-			rdfs:comment """Option 2""" ;
+			rdfs:label "no" ;
+			rdfs:comment """No was selected.""" ;
 			
 			cond:allOf (
 				[ cond:premise { ?obs fhir:Observation.code :some_code ;
@@ -59,7 +59,7 @@ prefix : <http://example.org/>
 			)
 		] ;
 		
-		gl:branchTarget :task3 
+		gl:branchTarget :decision2
 	] .
 
 #
@@ -67,22 +67,22 @@ prefix : <http://example.org/>
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	gl:next :task8 ;
+	gl:next :after_workflow2 ;
 	
 	rdfs:label "sub-workflow" ;
 	
 	gl:source "/cig/test/example2.n3" .
 
 #
-:task8 a gl:EndPoint ;
+:after_workflow2 a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	rdfs:label "endpoint1" ;
-	rdfs:comment "Endpoint 1" .
+	rdfs:label "after workflow2" ;
+	rdfs:comment "Something to do after workflow2." .
 
 #
-:task3 a gl:DecisionTask ;
+:decision2 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -90,14 +90,14 @@ prefix : <http://example.org/>
 	
 	cig:input :decision2_report ;
 	
-	rdfs:comment """Decision 2?""" ;
+	rdfs:comment """Let's check some values against some made-up thresholds.""" ;
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		gl:order 0 ;
 		
 		gl:precondition [
-			rdfs:label "option1" ;
+			rdfs:label "pretty high" ;
 			rdfs:comment """some_other_code1 > 10 OR some_other_code2 > 5""" ;
 			
 			cond:anyOf ( 
@@ -115,14 +115,14 @@ prefix : <http://example.org/>
 				] )
 		] ;
 		
-		gl:branchTarget :task4 
+		gl:branchTarget :decision3
 	
 	] , [ 
 		state:in gl:Inactive ;
 		gl:order 1 ;
 		
 		gl:precondition [
-			rdfs:label "option2" ;
+			rdfs:label "pretty low" ;
 			rdfs:comment """some_other_code1 <= 10 OR some_other_code2 <= 5""" ;
 			
 			cond:allOf ( 
@@ -140,11 +140,11 @@ prefix : <http://example.org/>
 				] )
 		] ;
 		
-		gl:branchTarget :task5
+		gl:branchTarget :low_task
 	] .
 
 #
-:task4 a gl:DecisionTask ;
+:decision3 a gl:DecisionTask ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
@@ -152,15 +152,15 @@ prefix : <http://example.org/>
 	
 	cig:input :decision3_report ;
 	
-	rdfs:comment """Decision 3?""" ;
+	rdfs:comment """Let's choose between some arbitrary options, or select none.""" ;
 	
 	gl:decisionBranch [
 		state:in gl:Inactive ;
 		gl:order 0 ;
 		
 		gl:precondition [
-			rdfs:label "option1" ;
-			rdfs:comment """one of 3 options""" ;
+			rdfs:label "options 1-3" ;
+			rdfs:comment """One or more options were selected.""" ;
 			
 			cond:anyOf (
 				[ cond:premise { ?obs fhir:Observation.code :some_other_code3 ; fhir:Observation.valueBoolean true } ]
@@ -169,15 +169,15 @@ prefix : <http://example.org/>
 			)
 		] ;
 		
-		gl:branchTarget :task6 
+		gl:branchTarget :option_task 
 	
 	] , [
 		state:in gl:Inactive ;
 		gl:order 1 ;
 		
 		gl:precondition [
-			rdfs:label "option2" ;
-			rdfs:comment """none""" ;
+			rdfs:label "none" ;
+			rdfs:comment """None was selected.""" ;
 			
 			cond:allOf (
 				[ cond:premise 
@@ -186,29 +186,29 @@ prefix : <http://example.org/>
 				] )
 		] ;
 		
-		gl:branchTarget :task7
+		gl:branchTarget :none_task
 	] .
 
 #
-:task5 a gl:EndPoint ;
+:low_task a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	rdfs:label "endpoint3" ;
-	rdfs:comment "Endpoint 3" .
+	rdfs:label "low task" ;
+	rdfs:comment "(endpoint) something to do when values are pretty low." .
 
 #
-:task6 a gl:EndPoint ;
+:option_task a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	rdfs:label "endpoint4" ;
-	rdfs:comment "Endpoint 4" .
+	rdfs:label "option task" ;
+	rdfs:comment "(endpoint) something to do when one of the options got selected." .
 
 #
-:task7 a gl:EndPoint ;
+:none_task a gl:EndPoint ;
 	state:in gl:Inactive ;
 	gl:conditional false ; 
 	
-	rdfs:label "endpoint5" ;
-	rdfs:comment "Endpoint 5" .
+	rdfs:label "none task" ;
+	rdfs:comment "(endpoint) something to do when none of the options got selected." .

@@ -8,7 +8,7 @@
 #
 :task_state_report a fhir:PlanDefinition ;
    fhir:PlanDefinition.name "state_report" ;
-   fhir:PlanDefinition.title "State: report" ;
+   fhir:PlanDefinition.title "State" ;
    fhir:PlanDefinition.status "active" ;
    fhir:PlanDefinition.action ( 
    	[ fhir:PlanDefinition.action.definitionUri :task_active_state ] 
@@ -20,7 +20,7 @@
 	fhir:ActivityDefinition.name "active_state" ;
 	fhir:ActivityDefinition.title "Active" ;
 	fhir:ActivityDefinition.observationResultRequirement [
-		fhir:ObservationDefinition.code :taskStateActive ;
+		fhir:ObservationDefinition.code :taskStateActive ; # use this specific code to activate task
 		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
 		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
 		fhir:ObservationDefinition.mutexWith ( :taskStateCompleted )
@@ -31,16 +31,16 @@
 	fhir:ActivityDefinition.name "completed_state" ;
 	fhir:ActivityDefinition.title "Completed" ;
 	fhir:ActivityDefinition.observationResultRequirement [
-		fhir:ObservationDefinition.code :taskStateCompleted ;
+		fhir:ObservationDefinition.code :taskStateCompleted ; # use this specific code to complete task
 		fhir:ObservationDefinition.category in:category_survey , in:category_present ;
 		fhir:ObservationDefinition.permittedDataType in:dt_boolean ;
 		fhir:ObservationDefinition.mutexWith ( :taskStateActive )
 	] .
 
 #
-:decision21_report a fhir:PlanDefinition ;
-   fhir:PlanDefinition.name "decision21_report" ;
-   fhir:PlanDefinition.title "Decision 21: report" ;
+:flow2_decision1_report a fhir:PlanDefinition ;
+   fhir:PlanDefinition.name "flow2_decision1_report" ;
+   fhir:PlanDefinition.title "flow2_decision1: report" ;
    fhir:PlanDefinition.status "active" ;
    fhir:PlanDefinition.action ( [
        fhir:PlanDefinition.action.definitionUri :action_decision21 
