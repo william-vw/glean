@@ -55,18 +55,46 @@ FSM.prototype.submitObservation = function (reference, rdf) {
 	// console.log(rdf.str);
 
 	let obs = [];
-	for (let quad of rdf.store.getQuads(null, "http://niche.cs.dal.ca/ns/glean/base.owl#hasInputData", null)) {
-		let o = this._toObject(quad._object.id, nodeAdtMap, rdf.store);
-		obs.push(o);
+	let transits = new NodeUpdates();
+
+	for (let object of rdf.store.getObjects(null, "http://niche.cs.dal.ca/ns/glean/base.owl#hasInputData")) {
+		let newState = this._isTransit(object, rdf);
+		
+		// direct state transition
+		if (newState) {
+			e.isIn.type = newState;
+			transits.add(this._newUpdate(e));
+			
+		} else {
+			// regular observation
+			let o = this._toObject(object, nodeAdtMap, rdf.store);
+			obs.push(o);
+		}
 	}
-	e.hasInputData = obs.length > 0;
 	
+	e.hasInputData = (transits.length() > 0 || obs.length > 0);
 	console.log("[FSM] observation: " + JSON.stringify(obs, null, 4));
-	let transits = this._transitAll(obs);
+	
+	let obsTransits = this._transitAll(obs);
+	transits.addUpdates(obsTransits);
+	console.log("[FSM] transits: " + transits);
 
 	updates.addSet(transits);
 
 	return updates;
+}
+
+FSM.prototype._isTransit = function(input, rdf) {
+	for (let object of rdf.store.getObjects(input, "http://hl7.org/fhir/Observation.code")) {
+
+		// direct state transition
+		let ln = localName(object.id);
+		if (ln.startsWith("taskState")) {
+			return ln.substring("taskState".length);
+		}
+	}
+
+	return false;
 }
 
 FSM.prototype.resetObservations = function (id) {
@@ -541,8 +569,12 @@ FSM.prototype._toObject = function (r, nodeAdtMap, store) {
 		// console.log("quad:", prpQuad);
 
 		let prpId = prpQuad._predicate.id;
+
 		if (!(prpId in clsObj))
 			continue;
+			// there can be more annotations in the html than there is in the decision logic
+			// (doesn't mean there's an issue)
+			// throw `Data property not in ADT ${clsObj['name']}": ${prpId}`;
 
 		let prpObj = clsObj[prpId];
 		// console.log("prpObj", prpObj);
