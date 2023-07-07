@@ -17,6 +17,8 @@ To run the FSM, the generated LL rules can then be loaded into a [Notation3](htt
 
 ## Example Guidelines
 
+Under the [glean.js](https://github.com/william-vw/glean/tree/main/glean-js) module, you can find an [exemplar GLEAN TNM](https://github.com/william-vw/glean/tree/main/glean-js/wf/test/cig/example.n3) with multiple TNM constructs.
+
 Under [resources/cig/lipid](src/main/resources/cig/lipid), you can find GLEAN TNMs for lipid management for patients with chronic kidney disease; the top-level workflow is represented by [ckd_dyslipidemia.n3](src/main/resources/cig/lipid/ckd_dyslipidemia.n3). In the [input/](src/main/resources/cig/lipid/input) subfolder, you can find [HL7 FHIR ActivityDefinitions](https://www.hl7.org/fhir/activitydefinition.html) that specify data constraints on the health data needed by decision nodes. 
 
 ## Testing
@@ -25,10 +27,8 @@ This module includes the following tests:
 - [WorkflowTest](src/main/java/wvw/glean/workflow/WorkflowTest.java): run a set of test files for TNM constructs, which are found under [resources/test](src/main/resources/test).
 - [CIGTest](src/main/java/wvw/glean/cig/CIGTest.java): direct the lipid management workflow at runtime by manually inserting new patient health parameters, and checking the impact on workflow task states.
 
-## Visualization
+## Web browser
 
-Using [CIGWorkflowPrinter](src/main/java/wvw/glean/cig/CIGWorkflowPrinter.java), you can convert a GLEAN TNM to JSON format, which can be loaded into [VisualCIG.js](https://github.com/william-vw/glean/tree/main/visualcig-js). Update the file output path in `CIGWorkflowPrinter#main` for your system.
+[CIGWorkflowPrinter](src/main/java/wvw/glean/cig/CIGWorkflowPrinter.java) converts a GLEAN TNM into a JavaScript executable format, which can be loaded into [glean.js](https://github.com/william-vw/glean/tree/main/glean-js). See the latter for details.
 
 In order to convert the ActivityDefinition resources into HTML forms, the module relies on the [ui-gen module](https://github.com/william-vw/glean/tree/main/ui-gen). 
-
-See the `CIGWorkflowPrinter#main` method for examples.

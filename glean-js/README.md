@@ -1,40 +1,39 @@
-# VisualCIG.js
+# glean.js
 
-The VisualCIG.js module supplies visualization capabilities for [GLEAN workflows](https://github.com/william-vw/glean).
+The `glean.js` module is a fully in-browser platform for visualising and executing [GLEAN workflows](https://github.com/william-vw/glean).
 
-It visualizes the workflow in the browser as either an interactive workflow or data-oriented form using [D3](https://d3js.org/). Health data inputted into the visualization is (1) packaged as a FHIR EHR record, using [N3.js](https://github.com/rdfjs/N3.js/) and [rdfa.js](https://github.com/rubensworks/rdfa-streaming-parser.js), (2) sent to the CDS Server using [fhir.js](https://github.com/FHIR/fhir.js/), after which (3) the visualization is updated based on the server response.
+## How to use
 
-To run the NodeJS project, follow the regular steps to install and run the tool:
-- `npm install` (install dependencies in `package.json`)
-- `node app.js` (run the tool)  
+1. Manually author a GLEAN workflow. You can base yourself on the [exemplar workflow](wf/test/cig/example.n3). In general, your workflow should use the GLEAN constructs defined in the [glean ontology](https://github.com/william-vw/glean/blob/main/glean-core/src/main/resources/logic/glean.owl). You will also need to define [HL7 FHIR ActivityDefinitions](https://www.hl7.org/fhir/activitydefinition.html) with data constraints on allowed user input data - these are also included in the [exemplar](wf/test/cig/input/).
 
-Afterwards, to view a particular workflow, point your browser towards `http://localhost:3005/[html file]` (e.g., http://localhost:3005/statin_cig.html)
-
-## Setup
-
-The [statin_cig.html](statin_cig.html) and [statin_cig_form.html](statin_cig_form.html) files show how to setup a workflow visualization:
-
-- After [printing the workflow JSON code](https://github.com/william-vw/glean/tree/main/glean-core#visualization), ensure the JSON file was written to the `json/` folder and then refer to it in the following call: `cig.show("json/[json file]", config);`
-
-- Depending on whether you would like a workflow- or form-based visualization, use the following import statements:  
-`import { VisualCIG } from '/lib/cig_tree.js';` OR  
-`import { VisualCIG } from '/lib/cig_form.js';`
-
-- The `config` object in the HTML file shows the namespace that will be used to annotate health data:
+2. Convert your GLEAN workflow into an executable format. For this purpose, use the `genjs` tool (part of [`glean-core`](https://github.com/william-vw/glean/tree/main/glean-core)) compiled into a jar file here. For instance, to convert the exemplar workflow:
 ```
-const config = { 
-    ...
-    ns: 'http://niche.cs.dal.ca/ns/cig/kidney_statins.owl#' 
-}
+java -jar genjs.jar -folder [your local path/]glean/glean-js/wf/test -cig example -ns http://example.org/
+```
+Where:
+- `folder` is a directory with a `cig/` subfolder keeping all CIG-related artefacts. The tool will generate a `tmp/` folder for temporary output and an `out/` folder with the final output.
+- `name` is the name of your CIG file (without extension) under the `cig/` subfolder ("example" for the exemplar workflow).
+- `ns` is the namespace used to define your GLEAN workflow tasks ("http://example.org/" is the one used in the exemplar workflow).
+
+3. Copy and update one of the example [`tree`](ex1_cig_tree.html) or [`form`](ex1_cig_form.html) HTML files to respectively get an interactive workflow or a data-oriented form. You will have to replace the `FSM` constructor with the relative path to your executable workflow file (e.g., `"/wf/test/out/example_local.js"`), and the `RdfInputHandler` argument with your CIG namespace (e.g., `"http://example.org/"`).
+
+4. Run a local HTML server to view your HTML file (e.g., `python3 -m http.server`, pointing your browser to [http://localhost:8000](http://localhost:8000)).
+
+## A bit more detail
+
+Looking at the contents of an [example HTML file](ex1_cig_tree.html):
+```
+let inputHandler = new RdfInputHandler("http://example.org/");
+
+let source = new FSM("/wf/test/out/example_local.js");
+await source.load();
+
+let cig = new VisualCIG({ source: source, input: inputHandler, container: '#main-container' });
+cig.show();
 ```
 
-This namespace will have to match the one given in the [CIGServer](https://github.com/william-vw/glean/blob/main/fhir-server/src/main/java/wvw/cig/fhir/server/CIGServer.java)#initialize method (fhir-server module).
+The `InputHandler` will get user input values, i.e., manually entered into the workflow, and provide them to the `DataSource` for processing. Currently, we implemented an `RdfInputHandler` that extracts user input as RDF data, which is structured using RDFa annotations from the HTML input forms. These RDFa-annotated HTML input forms are automatically generated in step (2) above - you can find them under the `tmp/html` folder in your given directory (see [here](wf/test/tmp/html/decision1_report.html) for an example).
 
-Other configuration:
+The `DataSource` will subsequently process this input data and update task states accordingly. The `FSM` data source is a JavaScript engine that implements the Finite State Machine (FSM) execution semantics of GLEAN, as defined [here](https://github.com/william-vw/glean/tree/main/glean-core/src/main/resources/logic/workflow) in N3. Essentially, the user input (RDF data) is converted into an set of JavaScript objects; the FSM engine then checks whether this new data requires any tasks to transition to new states, and, if so, updates the workflow state. Alternatively, the `DataServer` data source allows for communication with a FHIR-compliant web server; any user input is sent to the server, which then calculates new task states and returns them to the data source. To act as a FHIR-compliant web server, you can look into the [`fhir-server`](https://github.com/william-vw/glean/tree/main/fhir-server) module.
 
-- The [fhir_client.js](lib/fhir_client.js) file includes a `config` object where a different FHIR server URL (`baseUrl` attribute) can be specified.
-
-
-## FHIR Server
-
-The visualization expects that the [fhir-server](https://github.com/william-vw/glean/fhir-server) module is up and running. It will contact this server for initializing the workflow state, sending inputted health data, and getting subsequent state updates.
+The `CIG` represents a concrete visualization of a CIG - currently, we support `VisualCIG`, which shows an interactive visual workflow, and `CIGForm`, which shows a data-oriented form geared towards quick data entry. The `CIG` receives task state updates from the `DataSource` and updates its visualization accordingly.

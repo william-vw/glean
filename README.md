@@ -6,7 +6,7 @@ It consists of the following modules:
 
 - [`glean-core`](glean-core). This module includes the Finite State Machine (FSM) implementation of TNM execution semantics, together with tests and tools.
 
-- [`visualcig-js`](visualcig-js). This module allows visualizing TNM as either interactive workflows or data-oriented forms.
+- [`glean.js`](glean-js). This module implements a fully in-browser platform for visualizing and executing TNM.
 
 - [`fhir-server`](fhir-server). This module implements a FHIR server that allows communication between the FSM and its visualization.
 

@@ -14,7 +14,7 @@ prefix : <http://example.org/>
 	rdfs:label "Example Workflow" ;
 	rdfs:comment """An example workflow.""" ;
 
-	cig:inputFile "/cig/input/example1.n3" ;
+	cig:inputFile "/cig/input/example.n3" ;
 
 	gl:root true ;
 	gl:subTask :decision1 , :Example_Workflow2 , :after_workflow2 , :decision2 , :decision3 , :low_task, :option_task , :none_task .
