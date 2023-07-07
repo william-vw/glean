@@ -76,6 +76,20 @@ CIGBase.prototype.loading_end = function () {
 
 CIGBase.prototype.onUserInput = function (taskId) { }
 
+CIGBase.prototype.onInputError = function (element, error) {
+	const errorEl = this._getErrorEl(element);
+	
+	if (error) {
+        errorEl.css('display', 'block')
+        errorEl.html(error);
+    
+    // (false means no error)
+    } else 
+        errorEl.css('display', 'none');
+}
+
+CIGBase.prototype._getErrorEl = function(element) { }
+
 CIGBase.prototype.refresh = function () {
 	let allUpdates = this._source.refresh();
 	this._processUpdates(allUpdates);

@@ -1322,6 +1322,10 @@ VisualCIG.prototype._setupLoadingIcon = function () {
 	);
 }
 
+VisualCIG.prototype._getErrorEl = function(element) {
+	return element.closest('table').find('.input-error');
+}
+
 
 // - TaskStack
 

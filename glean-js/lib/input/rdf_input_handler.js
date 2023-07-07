@@ -26,13 +26,10 @@ RdfInputHandler.prototype.submitInputData = async function (element) {
         container = container.find('div.input-form:visible');
     }
 
-    const error = element.closest('.form-node').find('.input-error');
-
     const check = this._checkInputData(container);
     if (check !== true) {
         console.error("submitInputData", check);
-        error.css('display', 'block')
-        error.html(check);
+        this.cig.get().onInputError(element, check);
 
         return;
     }
@@ -58,13 +55,13 @@ RdfInputHandler.prototype.submitInputData = async function (element) {
         } catch (e) {
             console.error(e); // JSON.stringify(e, null, 4));
 
-            error.css('display', 'block')
-            error.html(e);
+            this.cig.get().onInputError(element, e);
 
             return;
         }
 
-        error.css('display', 'none');
+        // no error
+        this.cig.get().onInputError(element, false);
 
         this._onNewInput(taskId, rdf);
 

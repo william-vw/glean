@@ -363,3 +363,7 @@ CIGForm.prototype._hide = function (d) {
 
     el.css('display', 'none');
 }
+
+CIGBase.prototype._getErrorEl = function(element) {
+	return element.closest('.form-node').find('.input-error').first();
+}
