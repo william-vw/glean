@@ -6,7 +6,7 @@ The `glean.js` module is a fully in-browser platform for visualising and executi
 
 1. Manually author a GLEAN workflow. You can base yourself on the [exemplar workflow](wf/test/cig/example.n3). In general, your workflow should use the GLEAN constructs defined in the [glean ontology](https://github.com/william-vw/glean/blob/main/glean-core/src/main/resources/logic/glean.owl). You will also need to define [HL7 FHIR ActivityDefinitions](https://www.hl7.org/fhir/activitydefinition.html) with data constraints on allowed user input data - these are also included in the [exemplar](wf/test/cig/input/).
 
-2. Convert your GLEAN workflow into an executable format. For this purpose, use the `genjs` tool (part of [`glean-core`](https://github.com/william-vw/glean/tree/main/glean-core)) compiled into a jar file here. For instance, to convert the exemplar workflow:
+2. Convert your GLEAN workflow into an executable format. For this purpose, use the *genjs* tool that was compiled into a jar file (`genjs.jar`). For instance, to convert the exemplar workflow:
 ```
 java -jar genjs.jar -folder [your local path/]glean/glean-js/wf/test -cig example -ns http://example.org/
 ```
@@ -14,6 +14,8 @@ Where:
 - `folder` is a directory with a `cig/` subfolder keeping all CIG-related artefacts. The tool will generate a `tmp/` folder for temporary output and an `out/` folder with the final output.
 - `name` is the name of your CIG file (without extension) under the `cig/` subfolder ("example" for the exemplar workflow).
 - `ns` is the namespace used to define your GLEAN workflow tasks ("http://example.org/" is the one used in the exemplar workflow).
+
+(You can find the source of _genjs_ under [`glean-core`](https://github.com/william-vw/glean/tree/main/glean-core))
 
 3. Copy and update one of the example [`tree`](ex1_cig_tree.html) or [`form`](ex1_cig_form.html) HTML files to respectively get an interactive workflow or a data-oriented form. You will have to replace the `FSM` constructor with the relative path to your executable workflow file (e.g., `"/wf/test/out/example_local.js"`), and the `RdfInputHandler` argument with your CIG namespace (e.g., `"http://example.org/"`).
 
